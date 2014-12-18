@@ -386,6 +386,7 @@ function main() {
     package libapt-pkg-dev
     package libudev-dev
     package libblkid-dev
+    package libpcap-dev
     package linux-headers-generic
     package ruby-dev
     package gcc
@@ -504,6 +505,7 @@ function main() {
     package flex
     package bison
     package libudev-devel
+    package libpcap-devel
 
     remove_package libunwind-devel
 
