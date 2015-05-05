@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-set(CMAKE_C_COMPILER "clang")
-set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_C_COMPILER "cc")
+set(CMAKE_CXX_COMPILER "c++")
 add_compile_options(
   -Wall
   -Wextra
@@ -36,6 +36,7 @@ if(APPLE)
     "-x objective-c++ -fobjc-arc -Wno-c++11-extensions -mmacosx-version-min=${APPLE_MIN_ABI}")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
   set(FREEBSD TRUE)
+  set(LINUX FALSE)
   set(CXX_COMPILE_FLAGS "${CXX_COMPILE_FLAGS} -std=c++11 -stdlib=libc++")
   set(OS_WHOLELINK_PRE "")
   set(OS_WHOLELINK_POST "")
@@ -164,7 +165,8 @@ elseif(OSQUERY_BUILD_PLATFORM STREQUAL "centos")
 elseif(OSQUERY_BUILD_PLATFORM STREQUAL "rhel")
   set(RHEL TRUE)
   message("-- Building for RHEL")
-elseif(FREEBSD)
+elseif(OSQUERY_BUILD_PLATFORM STREQUAL "freebsd")
+  set(FREEBSD TRUE)
   message("-- Building for FreeBSD")
 endif()
 
