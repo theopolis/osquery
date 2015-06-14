@@ -26,29 +26,6 @@
 
 namespace osquery {
 
-class RocksDatabasePlugin : public DatabasePlugin {
- public:
-  /// Data retrieval method.
-  Status get(const std::string& domain,
-             const std::string& key,
-             std::string& value) const;
-
-  /// Data storage method.
-  Status put(const std::string& domain,
-             const std::string& key,
-             const std::string& value);
-
-  /// Data removal method.
-  Status remove(const std::string& domain, const std::string& k);
-
-  /// Key/index lookup method.
-  Status scan(const std::string& domain,
-              std::vector<std::string>& results) const;
-};
-
-/// Backing-storage provider for osquery internal/core.
-REGISTER_INTERNAL(RocksDatabasePlugin, "database", "rocks");
-
 /////////////////////////////////////////////////////////////////////////////
 // Constants
 /////////////////////////////////////////////////////////////////////////////
@@ -81,6 +58,33 @@ CLI_FLAG(bool,
          false,
          "Keep osquery backing-store in memory");
 FLAG_ALIAS(bool, use_in_memory_database, database_in_memory);
+
+/////////////////////////////////////////////////////////////////////////////
+// plugin definitions (deprecate direct use)
+/////////////////////////////////////////////////////////////////////////////
+
+class RocksDatabasePlugin : public DatabasePlugin {
+ public:
+  /// Data retrieval method.
+  Status get(const std::string& domain,
+             const std::string& key,
+             std::string& value) const;
+
+  /// Data storage method.
+  Status put(const std::string& domain,
+             const std::string& key,
+             const std::string& value);
+
+  /// Data removal method.
+  Status remove(const std::string& domain, const std::string& k);
+
+  /// Key/index lookup method.
+  Status scan(const std::string& domain,
+              std::vector<std::string>& results) const;
+};
+
+/// Backing-storage provider for osquery internal/core.
+REGISTER_INTERNAL(RocksDatabasePlugin, "database", "rocks");
 
 /////////////////////////////////////////////////////////////////////////////
 // constructors and destructors

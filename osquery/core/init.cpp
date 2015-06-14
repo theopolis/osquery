@@ -86,6 +86,9 @@ namespace osquery {
 
 typedef std::chrono::high_resolution_clock chrono_clock;
 
+/// See database methods: resetDatabase and clearDatabaseCache.
+DECLARE_bool(database_reset);
+
 CLI_FLAG(bool,
          config_check,
          false,
@@ -195,6 +198,12 @@ Initializer::Initializer(int& argc, char**& argv, ToolType tool)
   } else {
     VLOG(1) << "osquery extension initialized [sdk=" << kSDKVersion << "]";
   }
+
+  // Check the backing store by allocating and exiting on error.
+  if (tool != OSQUERY_EXTENSION && !isWorker() && !DBHandle::checkDB()) {
+    LOG(ERROR) << binary_ << " initialize failed: Could not open RocksDB";
+    ::exit(EXIT_FAILURE);
+  }
 }
 
 void Initializer::initDaemon() {
@@ -204,7 +213,7 @@ void Initializer::initDaemon() {
   }
 
 #ifndef __APPLE__
-  // OSX uses launchd to daemonize.
+  // OS X uses launchd to daemonize.
   if (osquery::FLAGS_daemonize) {
     if (daemon(0, 0) == -1) {
       ::exit(EXIT_FAILURE);
@@ -227,6 +236,14 @@ void Initializer::initDaemon() {
   if (!pid_status.ok()) {
     LOG(ERROR) << binary_ << " initialize failed: " << pid_status.toString();
     ::exit(EXIT_FAILURE);
+  }
+
+  // Clear backing store caches, set by works and optionally extensions.
+  // There are two caches, those that persist indefinitely, and those per-run.
+  if (FLAGS_database_reset) {
+    resetDatabase();
+  } else {
+    clearDatabaseCache();
   }
 
   // Nice ourselves if using a watchdog and the level is not too permissive.
@@ -323,16 +340,6 @@ void Initializer::start() {
   // Pre-extension manager initialization options checking.
   if (FLAGS_config_check && !Watcher::hasManagedExtensions()) {
     FLAGS_disable_extensions = true;
-  }
-
-  // Check the backing store by allocating and exiting on error.
-  if (!DBHandle::checkDB()) {
-    LOG(ERROR) << binary_ << " initialize failed: Could not open RocksDB";
-    if (isWorker()) {
-      ::exit(EXIT_CATASTROPHIC);
-    } else {
-      ::exit(EXIT_FAILURE);
-    }
   }
 
   // Bind to an extensions socket and wait for registry additions.

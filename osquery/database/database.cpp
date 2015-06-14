@@ -27,6 +27,11 @@ namespace osquery {
 
 typedef unsigned char byte;
 
+CLI_FLAG(bool,
+         database_reset,
+         false,
+         "Reset the database (clear ALL data) when loading.");
+
 /////////////////////////////////////////////////////////////////////////////
 // Row - the representation of a row in a set of database results. Row is a
 // simple map where individual column names are keys, which map to the Row's
@@ -455,4 +460,8 @@ Status scanDatabaseKeys(const std::string& domain,
   }
   return status;
 }
+
+void clearDatabaseCache() {}
+
+void resetDatabase() {}
 }

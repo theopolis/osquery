@@ -477,6 +477,30 @@ Status deleteDatabaseValue(const std::string& domain, const std::string& key);
 Status scanDatabaseKeys(const std::string& domain,
                         std::vector<std::string>& keys);
 
+/**
+ * @brief Clear persistent/cached data that lives within-executions.
+ *
+ * An osquery daemon, extension, or shell may utilize multiple processes or
+ * workers. To save state between workers, osquery may calculate settings and
+ * store them as "cached" data. Examples include the daemon's schedule tick and
+ * a configuration's transient splay results. A splay should occur once per
+ * daemon run, but there may be many workers involved. Since each worker
+ * generates and stores a configuration the first splay values should persist
+ * until the daemon exits using the cache.
+ */
+void clearDatabaseCache();
+
+/**
+ * @brief Clear all cache, settings, scheduled query results, logs, everything.
+ *
+ * Using the --database_reset command line options/flag, osquery will first
+ * reset all database values. If this is used the daemon, shell, or extension
+ * continues executing. Some may configure their initiation (launchd/sysd)
+ * scripts to always reset, or use it combined with --config_check to reset
+ * then exit immediately.
+ */
+void resetDatabase();
+
 /// Generate a specific-use registry for database access abstraction.
 CREATE_REGISTRY(DatabasePlugin, "database");
 }
