@@ -18,7 +18,7 @@ namespace osquery {
 
 class CQueueException : public std::runtime_error {
  public:
-  explicit CQueueException(const char *str) : std::runtime_error(str) {};
+  explicit CQueueException(const std::string& s) : std::runtime_error(s) {};
 };
 
 class CQueue {
@@ -39,9 +39,10 @@ class CQueue {
    * shared buffer of the specified size.  The size must be accepted by the
    * kernel extension.
    *
+   * @param device The device node path for ioctl communication.
    * @param size The size of the shared buffer used for communication.
    */
-  CQueue(size_t size);
+  CQueue(const std::string& device, size_t size);
 
   /**
    * @brief Cleanup a cqueue.

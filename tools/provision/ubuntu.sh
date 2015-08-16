@@ -139,7 +139,8 @@ function main_ubuntu() {
   # Need headers and PC macros
   package libgcrypt-dev
   package libdevmapper-dev
-
   install_libcryptsetup
 
+  # Audit facility (kautitd) and netlink APIs
+  package libaudit-dev
 }
