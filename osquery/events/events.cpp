@@ -83,7 +83,7 @@ QueryData EventSubscriberPlugin::genTable(QueryContext& context) {
     optimize_time_ = getUnixTime() - 1;
   }
 
-  return get(start, stop);
+  return std::move(get(start, stop));
 }
 
 void EventPublisherPlugin::fire(const EventContextRef& ec, EventTime time) {

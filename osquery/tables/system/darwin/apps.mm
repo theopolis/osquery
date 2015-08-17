@@ -201,7 +201,7 @@ void genApplication(const pt::ptree& tree,
       r[item.second] = "";
     }
   }
-  results.push_back(r);
+  results.push_back(std::move(r));
 }
 
 Status genAppsFromLaunchServices(std::set<std::string>& apps) {
@@ -284,7 +284,7 @@ QueryData genApps(QueryContext& context) {
     genApplication(tree, path, results);
   }
 
-  return results;
+  return std::move(results);
 }
 
 QueryData genAppSchemes(QueryContext& context) {
@@ -357,7 +357,7 @@ QueryData genAppSchemes(QueryContext& context) {
 
       r["external"] = (scheme.second & kSchemeSystemDefault) ? "0" : "1";
       r["protected"] = (scheme.second & kSchemeProtected) ? "1" : "0";
-      results.push_back(r);
+      results.push_back(std::move(r));
     }
 
     if (default_app != nullptr) {
@@ -366,7 +366,7 @@ QueryData genAppSchemes(QueryContext& context) {
     CFRelease(apps);
   }
 
-  return results;
+  return std::move(results);
 }
 }
 }

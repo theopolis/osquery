@@ -272,7 +272,7 @@ void genPackageReceipt(const std::string& path, QueryData& results) {
       r[kPkgReceiptKeys.at(row.at("key"))] = row.at("value");
     }
   }
-  results.push_back(r);
+  results.push_back(std::move(r));
 }
 
 QueryData genPackageReceipts(QueryContext& context) {
@@ -283,7 +283,7 @@ QueryData genPackageReceipts(QueryContext& context) {
     for (const auto& path : paths) {
       genPackageReceipt(path, results);
     }
-    return results;
+    return std::move(results);
   }
 
   // Iterate over each well-known system absolute directory of receipts.
@@ -311,7 +311,7 @@ QueryData genPackageReceipts(QueryContext& context) {
     }
   }
 
-  return results;
+  return std::move(results);
 }
 }
 }

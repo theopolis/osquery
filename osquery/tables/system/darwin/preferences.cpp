@@ -111,7 +111,7 @@ void genOSXPrefValues(const CFTypeRef& value,
     return;
   }
 
-  results.push_back(r);
+  results.push_back(std::move(r));
 }
 
 void genOSXDomainPrefs(const CFStringRef& domain, QueryData& results) {
@@ -254,7 +254,7 @@ QueryData genOSXPreferences(QueryContext& context) {
     genOSXDefaultPreferences(context, results);
   }
 
-  return results;
+  return std::move(results);
 }
 }
 }
