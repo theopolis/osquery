@@ -9,6 +9,7 @@
  */
 
 #include <vector>
+#include <thread>
 
 #include <boost/filesystem/operations.hpp>
 
@@ -38,6 +39,7 @@ REGISTER(FilesystemConfigPlugin, "config", "filesystem");
 
 Status FilesystemConfigPlugin::genConfig(
     std::map<std::string, std::string>& config) {
+  printf("genconfig happening\n");
   if (!fs::is_regular_file(FLAGS_config_path)) {
     return Status(1, "config file does not exist");
   }
@@ -53,6 +55,7 @@ Status FilesystemConfigPlugin::genConfig(
       config[path] = content;
     }
   }
+
   return Status(0, "OK");
 }
 

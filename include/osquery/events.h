@@ -183,7 +183,7 @@ class EventPublisherPlugin : public Plugin {
    * config changes. Since Linux `inotify` has a subscription limit, `configure`
    * can dedup paths.
    */
-  virtual void configure(){};
+  virtual void configure() override{};
 
   /**
    * @brief Perform handle opening, OS API callback registration.
@@ -231,7 +231,12 @@ class EventPublisherPlugin : public Plugin {
    */
   virtual Status addSubscription(const SubscriptionRef& subscription) {
     subscriptions_.push_back(subscription);
-    return Status(0, "OK");
+    return Status(0);
+  }
+
+  /// Remove all subscriptions.
+  virtual void removeSubscriptions() {
+    SubscriptionVector().swap(subscriptions_);
   }
 
  public:
@@ -816,7 +821,7 @@ class EventSubscriber : public EventSubscriberPlugin {
    * When the EventSubscriber%'s `init` method is called you are assured the
    * EventPublisher has `setUp` and is ready to subscription for events.
    */
-  virtual Status init() { return Status(0, "OK"); }
+  virtual Status init() { return Status(0); }
 
   /**
    * @brief The registry plugin name for the subscriber's publisher.
@@ -867,6 +872,11 @@ class EventSubscriber : public EventSubscriberPlugin {
     return getType() + '.' + getName();
   }
 
+  /// Get a handle to the EventPublisher.
+  EventPublisherRef getPublisher() {
+    return EventFactory::getEventPublisher(getType());
+  }
+
  public:
   /**
    * @brief Request the subscriber's initialization state.
@@ -882,6 +892,7 @@ class EventSubscriber : public EventSubscriberPlugin {
 
   explicit EventSubscriber(bool enabled = true)
       : EventSubscriberPlugin(), disabled(!enabled), state_(SUBSCRIBER_NONE) {}
+  virtual ~EventSubscriber() {}
 
  protected:
   /**

@@ -118,18 +118,24 @@ class INotifyEventPublisher
   /// Create an `inotify` handle descriptor.
   Status setUp() override;
 
+  /// The configuration finished loading or was updated.
   void configure() override;
 
   /// Release the `inotify` handle descriptor.
   void tearDown() override;
 
+  /// The calling for beginning the thread's run loop.
   Status run() override;
+
+  /// Remove all monitors and subscriptions.
+  void removeSubscriptions() override;
+
+ private:
+  /// Helper/specialized event context creation.
+  INotifyEventContextRef createEventContextFrom(struct inotify_event* event);
 
   /// Check if the application-global `inotify` handle is alive.
   bool isHandleOpen() { return inotify_handle_ > 0; }
-
- private:
-  INotifyEventContextRef createEventContextFrom(struct inotify_event* event);
 
   /// Check all added Subscription%s for a path.
   bool isPathMonitored(const std::string& path);
