@@ -70,9 +70,9 @@ Status writeTextFile(const fs::path& path,
   return Status(0, "OK");
 }
 
-struct OpenReadableFile {
+struct OpenReadableFile : private boost::noncopyable {
  public:
-  OpenReadableFile(const fs::path& path) {
+  explicit OpenReadableFile(const fs::path& path) {
     dropper_ = DropPrivileges::get();
     if (dropper_->dropToParent(path)) {
       // Open the file descriptor and allow caller to perform error checking.
@@ -99,7 +99,7 @@ Status readFile(
     bool dry_run,
     bool preserve_time,
     std::function<void(std::string& buffer, size_t size)> predicate) {
-  auto handle = OpenReadableFile(path);
+  OpenReadableFile handle(path);
   if (handle.fd < 0) {
     return Status(1, "Cannot open file for reading: " + path.string());
   }

@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 #include <map>
 #include <set>
 #include <vector>
@@ -42,21 +44,6 @@ namespace tables {
 
 extern const std::vector<std::string> kSystemKeychainPaths;
 extern const std::vector<std::string> kUserKeychainPaths;
-
-// The flags are defined in openssl/x509v3.h,
-// and its keys in crypto/x509v3/v3_bitst.c
-// clang-format off
-const std::map<unsigned long, std::string> kKeyUsageFlags = {
-    {0x0001, "Encipher Only"},
-    {0x0002, "CRL Sign"},
-    {0x0004, "Key Cert Sign"},
-    {0x0008, "Key Agreement"},
-    {0x0010, "Data Encipherment"},
-    {0x0020, "Key Encipherment"},
-    {0x0040, "Non Repudiation"},
-    {0x0080, "Digital Signature"},
-    {0x8000, "Decipher Only"}};
-// clang-format on
 
 void genKeychains(const std::string& path, CFMutableArrayRef& keychains);
 std::string getKeychainPath(const SecKeychainItemRef& item);

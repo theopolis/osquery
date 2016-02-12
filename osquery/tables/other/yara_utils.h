@@ -8,6 +8,8 @@
  *
  */
 
+#pragma once
+
 #include <osquery/config.h>
 #include <osquery/tables.h>
 
