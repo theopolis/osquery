@@ -15,8 +15,9 @@
 #include <memory>
 #include <vector>
 
+#include <json/value.h>
+
 #include <boost/iterator/filter_iterator.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include <osquery/core.h>
 #include <osquery/database.h>
@@ -120,7 +121,7 @@ class Config : private boost::noncopyable {
    */
   void addPack(const std::string& name,
                const std::string& source,
-               const boost::property_tree::ptree& tree);
+               const Json::Value& tree);
 
   /**
    * @brief Remove a pack from the osquery schedule
@@ -160,8 +161,9 @@ class Config : private boost::noncopyable {
    *      }));
    * @endcode
    */
-  void scheduledQueries(std::function<
-      void(const std::string& name, const ScheduledQuery& query)> predicate);
+  void scheduledQueries(
+      std::function<void(const std::string& name, const ScheduledQuery& query)>
+          predicate);
 
   /**
    * @brief Map a function across the set of configured files
@@ -262,7 +264,7 @@ class Config : private boost::noncopyable {
    * @param pack True if the tree was built from pack data, otherwise false.
    */
   void applyParsers(const std::string& source,
-                    const boost::property_tree::ptree& tree,
+                    const Json::Value& tree,
                     bool pack = false);
 
   /**
@@ -439,7 +441,7 @@ class ConfigPlugin : public Plugin {
  */
 class ConfigParserPlugin : public Plugin {
  public:
-  using ParserConfig = std::map<std::string, boost::property_tree::ptree>;
+  using ParserConfig = std::map<std::string, Json::Value>;
 
  public:
   /**
@@ -468,11 +470,11 @@ class ConfigParserPlugin : public Plugin {
 
   Status setUp() override;
 
-  const boost::property_tree::ptree& getData() const { return data_; }
+  const Json::Value& getData() const { return data_; }
 
  protected:
   /// Allow the config parser to keep some global state.
-  boost::property_tree::ptree data_;
+  Json::Value data_;
 };
 
 /**

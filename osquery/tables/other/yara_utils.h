@@ -16,8 +16,6 @@
 #endif
 #include <yara.h>
 
-namespace pt = boost::property_tree;
-
 namespace osquery {
 
 void YARACompilerCallback(int error_level,
@@ -29,7 +27,7 @@ void YARACompilerCallback(int error_level,
 Status compileSingleFile(const std::string& file, YR_RULES** rule);
 
 Status handleRuleFiles(const std::string& category,
-                       const pt::ptree& rule_files,
+                       const Json::Value& rule_files,
                        std::map<std::string, YR_RULES*>& rules);
 
 int YARACallback(int message, void* message_data, void* user_data);

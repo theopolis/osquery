@@ -12,8 +12,9 @@
 #include <mutex>
 #include <random>
 
+#include <json/reader.h>
+
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include <osquery/config.h>
 #include <osquery/database.h>
@@ -26,8 +27,6 @@
 #include <osquery/tables.h>
 
 #include "osquery/core/conversions.h"
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -217,7 +216,7 @@ Config::Config()
 
 void Config::addPack(const std::string& name,
                      const std::string& source,
-                     const pt::ptree& tree) {
+                     const Json::Value& tree) {
   WriteLock wlock(config_schedule_mutex_);
   try {
     schedule_->add(std::make_shared<Pack>(name, source, tree));
@@ -350,52 +349,54 @@ Status Config::updateSource(const std::string& source,
   schedule_->removeAll(source);
   // Remove all files from this source.
   removeFiles(source);
+  // Clone and strip comments (handles hash-style comments).
+  auto clone = json;
+  stripConfigComments(clone);
 
-  // load the config (source.second) into a pt::ptree
-  pt::ptree tree;
-  try {
-    auto clone = json;
-    stripConfigComments(clone);
-    std::stringstream json_stream;
-    json_stream << clone;
-    pt::read_json(json_stream, tree);
-  } catch (const pt::json_parser::json_parser_error& e) {
+  Json::Value tree;
+  Json::Reader reader(Json::Features::all());
+  if (!reader.parse(clone, tree, false) || !tree.isObject()) {
+    fprintf(stderr, "%s\n", reader.getFormattedErrorMessages().c_str());
     return Status(1, "Error parsing the config JSON");
   }
 
   // extract the "schedule" key and store it as the main pack
-  if (tree.count("schedule") > 0 && !Registry::external()) {
-    auto& schedule = tree.get_child("schedule");
-    pt::ptree main_pack;
-    main_pack.add_child("queries", schedule);
+  if (tree.isMember("schedule") > 0 && !Registry::external()) {
+    auto& schedule = tree["schedule"];
+    Json::Value main_pack;
+    main_pack["queries"] = schedule;
     addPack("main", source, main_pack);
   }
 
-  if (tree.count("scheduledQueries") > 0 && !Registry::external()) {
-    auto& scheduled_queries = tree.get_child("scheduledQueries");
-    pt::ptree queries;
-    for (const std::pair<std::string, pt::ptree>& query : scheduled_queries) {
-      auto query_name = query.second.get<std::string>("name", "");
-      if (query_name.empty()) {
-        return Status(1, "Error getting name from legacy scheduled query");
+  if (tree.isMember("scheduledQueries") > 0 &&
+      tree["scheduledQueries"].isObject() && !Registry::external()) {
+    auto& scheduled_queries = tree["scheduledQueries"];
+    // This is a legacy transformation from a vector of objects.
+    Json::Value queries;
+    for (const auto& query : scheduled_queries) {
+      // It is possible an object did not include a name key.
+      if (query.isMember("name")) {
+        auto query_name = query.asString();
+        if (!query_name.empty()) {
+          queries[query_name] = query;
+        }
       }
-      queries.add_child(query_name, query.second);
+      Json::Value legacy_pack;
+      legacy_pack["queries"] = queries;
+      addPack("legacy_main", source, legacy_pack);
     }
-    pt::ptree legacy_pack;
-    legacy_pack.add_child("queries", queries);
-    addPack("legacy_main", source, legacy_pack);
   }
 
   // extract the "packs" key into additional pack objects
-  if (tree.count("packs") > 0 && !Registry::external()) {
-    auto& packs = tree.get_child("packs");
-    for (const auto& pack : packs) {
-      auto value = packs.get<std::string>(pack.first, "");
-      if (value.empty()) {
+  if (tree.isMember("packs") > 0 && tree["packs"].isObject() &&
+      !Registry::external()) {
+    const auto& packs = tree["packs"];
+    for (auto it = packs.begin(); it != packs.end(); it++) {
+      if (it->isObject()) {
         // The pack is a JSON object, treat the content as pack data.
-        addPack(pack.first, source, pack.second);
+        addPack(it.name(), source, *it);
       } else {
-        genPack(pack.first, source, value);
+        genPack(it.name(), source, it->asString());
       }
     }
   }
@@ -418,20 +419,18 @@ Status Config::genPack(const std::string& name,
     return Status(1, "Invalid plugin response");
   }
 
-  try {
-    pt::ptree pack_tree;
-    std::stringstream pack_stream;
-    pack_stream << response[0][name];
-    pt::read_json(pack_stream, pack_tree);
-    addPack(name, source, pack_tree);
-  } catch (const pt::json_parser::json_parser_error& e) {
+  Json::Value pack_tree;
+  Json::Reader reader;
+  if (!reader.parse(response[0][name], pack_tree, false)) {
     LOG(WARNING) << "Error parsing the pack JSON: " << name;
+  } else {
+    addPack(name, source, pack_tree);
   }
   return Status(0);
 }
 
 void Config::applyParsers(const std::string& source,
-                          const pt::ptree& tree,
+                          const Json::Value& tree,
                           bool pack) {
   // Iterate each parser.
   for (const auto& plugin : Registry::all("config_parser")) {
@@ -446,12 +445,12 @@ void Config::applyParsers(const std::string& source,
     }
 
     // For each key requested by the parser, add a property tree reference.
-    std::map<std::string, pt::ptree> parser_config;
+    std::map<std::string, Json::Value> parser_config;
     for (const auto& key : parser->keys()) {
-      if (tree.count(key) > 0) {
-        parser_config[key] = tree.get_child(key);
+      if (tree.isMember(key)) {
+        parser_config[key] = tree[key];
       } else {
-        parser_config[key] = pt::ptree();
+        parser_config[key] = Json::Value();
       }
     }
     // The config parser plugin will receive a copy of each property tree for
@@ -495,7 +494,8 @@ Status Config::update(const std::map<std::string, std::string>& config) {
   if (loaded_) {
     // The config has since been loaded.
     // This update call is most likely a response to an async update request
-    // from a config plugin. This request should request all plugins to update.
+    // from a config plugin. This request should request all plugins to
+    // update.
     for (const auto& registry : Registry::all()) {
       if (registry.first == "event_publisher" ||
           registry.first == "event_subscriber") {
@@ -611,7 +611,8 @@ void Config::recordQueryPerformance(const std::string& name,
     diff = AS_LITERAL(BIGINT_LITERAL, r1.at("resident_size")) -
            AS_LITERAL(BIGINT_LITERAL, r0.at("resident_size"));
     if (diff > 0) {
-      // Memory is stored as an average of RSS changes between query executions.
+      // Memory is stored as an average of RSS changes between query
+      // executions.
       query.average_memory = (query.average_memory * query.executions) + diff;
       query.average_memory = (query.average_memory / (query.executions + 1));
     }
@@ -731,7 +732,7 @@ Status ConfigPlugin::call(const PluginRequest& request,
 
 Status ConfigParserPlugin::setUp() {
   for (const auto& key : keys()) {
-    data_.put(key, "");
+    data_[key] = "";
   }
   return Status(0, "OK");
 }

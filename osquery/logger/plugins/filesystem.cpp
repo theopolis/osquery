@@ -15,7 +15,6 @@
 #include <osquery/flags.h>
 #include <osquery/logger.h>
 
-namespace pt = boost::property_tree;
 namespace fs = boost::filesystem;
 
 // This is the mode that glog uses for logfiles.  Must be at the top level

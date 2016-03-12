@@ -40,11 +40,11 @@ class FilePathsConfigParserPluginTests : public testing::Test {
 };
 
 TEST_F(FilePathsConfigParserPluginTests, test_get_files) {
-  std::vector<std::string> expected_categories = {
-      "config_files", "logs", "logs"};
+  std::vector<std::string> expected_categories = {"config_files", "logs",
+                                                  "logs"};
   std::vector<std::string> categories;
-  std::vector<std::string> expected_values = {
-      "/dev", "/dev/zero", "/dev/null", "/dev/random", "/dev/urandom"};
+  std::vector<std::string> expected_values = {"/dev", "/dev/zero", "/dev/null",
+                                              "/dev/random", "/dev/urandom"};
   std::vector<std::string> values;
 
   Config::getInstance().update(config_data_);
@@ -63,7 +63,7 @@ TEST_F(FilePathsConfigParserPluginTests, test_get_files) {
 TEST_F(FilePathsConfigParserPluginTests, test_get_file_accesses) {
   // Assume config data has been added.
   auto parser = Config::getParser("file_paths");
-  auto& accesses = parser->getData().get_child("file_accesses");
+  auto& accesses = parser->getData()["file_accesses"];
   EXPECT_EQ(accesses.size(), 2U);
 }
 

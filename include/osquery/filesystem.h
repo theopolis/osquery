@@ -15,8 +15,9 @@
 #include <string>
 #include <vector>
 
+#include <json/value.h>
+
 #include <boost/filesystem/path.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include <osquery/status.h>
 
@@ -241,49 +242,45 @@ const std::string& osqueryHomeDirectory();
 std::string lsperms(int mode);
 
 /**
- * @brief Parse a JSON file on disk into a property tree.
+ * @brief Parse a JSON file on disk into a JSON object.
  *
  * @param path the path of the JSON file.
- * @param tree output property tree.
+ * @param tree output JSON object.
  *
  * @return an instance of Status, indicating success or failure if malformed.
  */
-Status parseJSON(const boost::filesystem::path& path,
-                 boost::property_tree::ptree& tree);
+Status parseJSON(const boost::filesystem::path& path, Json::Value& tree);
 
 /**
- * @brief Parse JSON content into a property tree.
+ * @brief Parse JSON content into a JSON object.
  *
  * @param path JSON string data.
- * @param tree output property tree.
+ * @param tree output JSON object.
  *
  * @return an instance of Status, indicating success or failure if malformed.
  */
-Status parseJSONContent(const std::string& content,
-                        boost::property_tree::ptree& tree);
+Status parseJSONContent(const std::string& content, Json::Value& tree);
 
 #ifdef __APPLE__
 /**
- * @brief Parse a property list on disk into a property tree.
+ * @brief Parse a property list on disk into a JSON object.
  *
  * @param path the input path to a property list.
- * @param tree the output property tree.
+ * @param tree the output JSON object.
  *
  * @return an instance of Status, indicating success or failure if malformed.
  */
-Status parsePlist(const boost::filesystem::path& path,
-                  boost::property_tree::ptree& tree);
+Status parsePlist(const boost::filesystem::path& path, Json::Value& tree);
 
 /**
- * @brief Parse property list content into a property tree.
+ * @brief Parse property list content into a JSON object.
  *
  * @param content the input string-content of a property list.
- * @param tree the output property tree.
+ * @param tree the output JSON object.
  *
  * @return an instance of Status, indicating success or failure if malformed.
  */
-Status parsePlistContent(const std::string& content,
-                         boost::property_tree::ptree& tree);
+Status parsePlistContent(const std::string& content, Json::Value& tree);
 #endif
 
 #ifdef __linux__

@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-#include <boost/property_tree/json_parser.hpp>
+#include <json/writer.h>
 
 #include <gtest/gtest.h>
 
@@ -23,8 +23,6 @@
 #include <osquery/sql.h>
 
 #include "osquery/core/test_util.h"
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -68,9 +66,8 @@ class TestConfigPlugin : public ConfigPlugin {
                  const std::string& value,
                  std::string& pack) override {
     genPackCount++;
-    std::stringstream ss;
-    pt::write_json(ss, getUnrestrictedPack(), false);
-    pack = ss.str();
+    Json::FastWriter writer;
+    pack = writer.write(getUnrestrictedPack());
     return Status(0, "OK");
   }
 
@@ -162,9 +159,9 @@ TEST_F(ConfigTests, test_pack_noninline) {
 
 TEST_F(ConfigTests, test_pack_restrictions) {
   auto tree = getExamplePacksConfig();
-  auto packs = tree.get_child("packs");
-  for (const auto& pack : packs) {
-    get().addPack(pack.first, "", pack.second);
+  auto packs = tree["packs"];
+  for (auto it = packs.begin(); it != packs.end(); it++) {
+    get().addPack(it.name(), "", *it);
   }
 
   std::map<std::string, bool> results = {
@@ -233,7 +230,7 @@ TEST_F(ConfigTests, test_get_scheduled_queries) {
       ([&queries](const std::string&, const ScheduledQuery& query) {
         queries.push_back(query);
       }));
-  EXPECT_EQ(queries.size(), getUnrestrictedPack().get_child("queries").size());
+  EXPECT_EQ(queries.size(), getUnrestrictedPack()["queries"].size());
 }
 
 class TestConfigParserPlugin : public ConfigParserPlugin {
@@ -249,11 +246,11 @@ class TestConfigParserPlugin : public ConfigParserPlugin {
     update_called = true;
     // Copy all expected keys into the parser's data.
     for (const auto& key : config) {
-      data_.put_child(key.first, key.second);
+      data_[key.first] = key.second;
     }
 
     // Set parser-rendered additional data.
-    data_.put("dictionary3.key2", "value2");
+    data_["dictionary3"]["key2"] = "value2";
     return Status(0, "OK");
   }
 
@@ -282,8 +279,8 @@ TEST_F(ConfigTests, test_get_parser) {
       std::dynamic_pointer_cast<TestConfigParserPlugin>(plugin);
   const auto& data = parser->getData();
 
-  EXPECT_EQ(data.count("list"), 1U);
-  EXPECT_EQ(data.count("dictionary"), 1U);
+  EXPECT_TRUE(data.isMember("list"));
+  EXPECT_TRUE(data.isMember("dictionary"));
 }
 
 class PlaceboConfigParserPlugin : public ConfigParserPlugin {
@@ -315,10 +312,10 @@ TEST_F(ConfigTests, test_plugin_reconfigure) {
 
 TEST_F(ConfigTests, test_pack_file_paths) {
   size_t count = 0;
-  auto fileCounter =
-      [&count](const std::string& c, const std::vector<std::string>& files) {
-        count += files.size();
-      };
+  auto fileCounter = [&count](const std::string& c,
+                              const std::vector<std::string>& files) {
+    count += files.size();
+  };
 
   get().addPack("unrestricted_pack", "", getUnrestrictedPack());
   get().files(fileCounter);

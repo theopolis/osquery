@@ -25,8 +25,8 @@ TEST_F(OptionsConfigParserPluginTests, test_get_option) {
   EXPECT_TRUE(s.ok());
   EXPECT_EQ(s.toString(), "OK");
 
-  EXPECT_EQ(c.getParser("options")->getData().get_child("options").get<bool>(
-                "enable_monitor"),
-            true);
+  EXPECT_EQ(
+      c.getParser("options")->getData()["options"]["enable_monitor"].asBool(),
+      true);
 }
 }

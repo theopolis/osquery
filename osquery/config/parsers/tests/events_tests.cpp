@@ -42,10 +42,10 @@ TEST_F(EventsConfigParserPluginTests, test_get_event) {
   EXPECT_TRUE(plugin != nullptr);
   const auto& data = plugin->getData();
 
-  EXPECT_EQ(data.count("events"), 1U);
-  EXPECT_GT(data.get_child("events").count("environment_variables"), 0U);
-  for (const auto& var : data.get_child("events.environment_variables")) {
-    EXPECT_TRUE(var.second.data() == "foo" || var.second.data() == "bar");
+  EXPECT_TRUE(data.isMember("events"));
+  EXPECT_TRUE(data["events"].isMember("environment_variables"));
+  for (const auto& var : data["events.environment_variables"]) {
+    EXPECT_TRUE(var.asString() == "foo" || var.asString() == "bar");
   }
 }
 }

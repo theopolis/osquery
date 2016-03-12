@@ -139,6 +139,7 @@ function main_ubuntu() {
     package bison
   fi
 
+  install_jsoncpp
   install_thrift
   install_rocksdb
   install_yara

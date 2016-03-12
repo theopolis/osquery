@@ -13,16 +13,17 @@
 #include <deque>
 #include <map>
 #include <memory>
-#include <vector>
 #include <set>
 #include <unordered_map>
+#include <vector>
+
+#include <json/value.h>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/property_tree/ptree.hpp>
 
-#include <osquery/registry.h>
 #include <osquery/core.h>
 #include <osquery/database.h>
+#include <osquery/registry.h>
 #include <osquery/status.h>
 
 /// Allow Tables to use "tracked" deprecated OS APIs.
@@ -270,10 +271,10 @@ struct ConstraintList : private boost::noncopyable {
    *   ]
    * }
    */
-  void serialize(boost::property_tree::ptree& tree) const;
+  void serialize(Json::Value& tree) const;
 
   /// See ConstraintList::unserialize.
-  void unserialize(const boost::property_tree::ptree& tree);
+  void unserialize(const Json::Value& tree);
 
   ConstraintList() : affinity(TEXT_TYPE) {}
 

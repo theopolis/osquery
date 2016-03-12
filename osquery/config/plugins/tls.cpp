@@ -11,8 +11,7 @@
 #include <sstream>
 #include <vector>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <json/reader.h>
 
 #include <osquery/config.h>
 #include <osquery/enroll.h>
@@ -24,8 +23,6 @@
 #include "osquery/remote/requests.h"
 #include "osquery/remote/serializers/json.h"
 #include "osquery/remote/utility.h"
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -94,17 +91,14 @@ Status TLSConfigPlugin::genConfig(std::map<std::string, std::string>& config) {
 
   if (FLAGS_tls_node_api) {
     // The node API embeds configuration data (JSON escaped).
-    pt::ptree tree;
-    try {
-      std::stringstream input;
-      input << json;
-      pt::read_json(input, tree);
-    } catch (const pt::json_parser::json_parser_error& e) {
+    Json::Value tree;
+    Json::Reader reader;
+    if (!reader.parse(json, tree, false)) {
       VLOG(1) << "Could not parse JSON from TLS node API";
     }
 
     // Re-encode the config key into JSON.
-    config["tls_plugin"] = unescapeUnicode(tree.get("config", ""));
+    config["tls_plugin"] = unescapeUnicode(tree["config"].asString());
   } else {
     config["tls_plugin"] = json;
   }

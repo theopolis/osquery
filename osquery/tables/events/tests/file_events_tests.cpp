@@ -8,9 +8,9 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <json/writer.h>
 
-#include <boost/property_tree/json_parser.hpp>
+#include <gtest/gtest.h>
 
 #include <osquery/config.h>
 #include <osquery/events.h>
@@ -71,9 +71,8 @@ TEST_F(FileEventsTableTests, test_table_empty) {
 class FileEventsTestsConfigPlugin : public ConfigPlugin {
  public:
   Status genConfig(std::map<std::string, std::string>& config) override {
-    std::stringstream ss;
-    pt::write_json(ss, getUnrestrictedPack(), false);
-    config["data"] = ss.str();
+    Json::FastWriter writer;
+    config["data"] = writer.write(getUnrestrictedPack());
     return Status(0);
   }
 };

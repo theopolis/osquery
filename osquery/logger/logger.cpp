@@ -11,8 +11,10 @@
 #include <algorithm>
 #include <thread>
 
+#include <json/reader.h>
+#include <json/writer.h>
+
 #include <boost/noncopyable.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include <osquery/extensions.h>
 #include <osquery/filesystem.h>
@@ -20,8 +22,6 @@
 #include <osquery/logger.h>
 
 #include "osquery/core/conversions.h"
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -153,20 +153,19 @@ class LoggerDisabler {
 
 static void serializeIntermediateLog(const std::vector<StatusLogLine>& log,
                                      PluginRequest& request) {
-  pt::ptree tree;
+  Json::Value tree;
   for (const auto& log_item : log) {
-    pt::ptree child;
-    child.put("s", log_item.severity);
-    child.put("f", log_item.filename);
-    child.put("i", log_item.line);
-    child.put("m", log_item.message);
-    tree.push_back(std::make_pair("", child));
+    Json::Value child;
+    child["s"] = log_item.severity;
+    child["f"] = log_item.filename;
+    child["i"] = log_item.line;
+    child["m"] = log_item.message;
+    tree.append(child);
   }
 
   // Save the log as a request JSON string.
-  std::ostringstream output;
-  pt::write_json(output, tree, false);
-  request["log"] = output.str();
+  Json::FastWriter writer;
+  request["log"] = writer.write(tree);
 }
 
 static void deserializeIntermediateLog(const PluginRequest& request,
@@ -176,20 +175,15 @@ static void deserializeIntermediateLog(const PluginRequest& request,
   }
 
   // Read the plugin request string into a JSON tree and enumerate.
-  pt::ptree tree;
-  try {
-    std::stringstream input;
-    input << request.at("log");
-    pt::read_json(input, tree);
-  } catch (const pt::json_parser::json_parser_error& e) {
-    return;
-  }
+  Json::Value tree;
+  Json::Reader reader;
+  reader.parse(request.at("log"), tree);
 
-  for (const auto& item : tree.get_child("")) {
+  for (const auto& item : tree) {
     log.push_back({
-        (StatusLogSeverity)item.second.get<int>("s", O_INFO),
-        item.second.get<std::string>("f", "<unknown>"),
-        item.second.get<int>("i", 0), item.second.get<std::string>("m", ""),
+        (StatusLogSeverity)item.get("s", O_INFO).asUInt(),
+        item.get("f", "<unknown>").asString(), item.get("i", 0).asInt(),
+        item["m"].asString(),
     });
   }
 }

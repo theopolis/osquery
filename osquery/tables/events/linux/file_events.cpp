@@ -8,11 +8,11 @@
  *
  */
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include <osquery/core.h>
 #include <osquery/config.h>
+#include <osquery/core.h>
 #include <osquery/logger.h>
 #include <osquery/tables.h>
 
@@ -62,7 +62,7 @@ void FileEventSubscriber::configure() {
   removeSubscriptions();
 
   auto parser = Config::getParser("file_paths");
-  auto& accesses = parser->getData().get_child("file_accesses");
+  auto& accesses = parser->getData()["file_accesses"];
   Config::getInstance().files([this, &accesses](
       const std::string& category, const std::vector<std::string>& files) {
     for (const auto& file : files) {
@@ -72,7 +72,7 @@ void FileEventSubscriber::configure() {
       sc->recursive = 0;
       sc->path = file;
       sc->mask = kFileDefaultMasks;
-      if (accesses.count(category) > 0) {
+      if (accesses.isMember(category)) {
         sc->mask |= kFileAccessMasks;
       }
       sc->category = category;

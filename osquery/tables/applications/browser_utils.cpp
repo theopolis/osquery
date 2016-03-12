@@ -8,10 +8,15 @@
  *
  */
 
-#include <osquery/logger.h>
-#include <osquery/tables/applications/browser_utils.h>
+#include <json/reader.h>
+#include <json/value.h>
 
+#include <osquery/logger.h>
+
+#include "osquery/tables/applications/browser_utils.h"
 #include "osquery/tables/system/system_utils.h"
+
+namespace fs = boost::filesystem;
 
 namespace osquery {
 namespace tables {
@@ -37,12 +42,9 @@ void genExtension(const std::string& uid,
   }
 
   // Read the extensions data into a JSON blob, then property tree.
-  pt::ptree tree;
-  try {
-    std::stringstream json_stream;
-    json_stream << json_data;
-    pt::read_json(json_stream, tree);
-  } catch (const pt::json_parser::json_parser_error& e) {
+  Json::Value tree;
+  Json::Reader reader;
+  if (!reader.parse(json_data, tree, false)) {
     VLOG(1) << "Could not parse JSON from: " << path + kManifestFile;
     return;
   }
@@ -51,7 +53,7 @@ void genExtension(const std::string& uid,
   r["uid"] = uid;
   // Most of the keys are in the top-level JSON dictionary.
   for (const auto& it : kExtensionKeys) {
-    r[it.second] = tree.get<std::string>(it.first, "");
+    r[it.second] = tree[it.first].asString();
 
     // Convert JSON bool-types to an integer.
     if (r[it.second] == "true") {

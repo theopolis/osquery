@@ -12,8 +12,6 @@
 #include <osquery/filesystem.h>
 #include <osquery/logger.h>
 
-namespace pt = boost::property_tree;
-
 namespace osquery {
 
 /**
@@ -38,43 +36,44 @@ class FilePathsConfigParserPlugin : public ConfigParserPlugin {
 };
 
 FilePathsConfigParserPlugin::FilePathsConfigParserPlugin() {
-  data_.put_child("file_paths", pt::ptree());
-  data_.put_child("file_accesses", pt::ptree());
+  data_["file_paths"] = Json::Value();
+  data_["file_accesses"] = Json::Value();
 }
 
 Status FilePathsConfigParserPlugin::update(const std::string& source,
                                            const ParserConfig& config) {
   if (config.count("file_paths") > 0) {
-    data_.put_child("file_paths", config.at("file_paths"));
+    data_["file_paths"] = config.at("file_paths");
   }
 
-  auto& accesses = data_.get_child("file_accesses");
+  auto& accesses = data_["file_accesses"];
   if (config.count("file_accesses") > 0) {
     if (access_map_.count(source) > 0) {
       access_map_.erase(source);
     }
 
     for (const auto& category : config.at("file_accesses")) {
-      auto path = category.second.get_value<std::string>("");
+      auto path = category.asString();
       access_map_[source].push_back(path);
     }
     // Regenerate the access:
     for (const auto& source : access_map_) {
       for (const auto& category : source.second) {
-        accesses.put(category, source.first);
+        accesses[category] = source.first;
       }
     }
   }
 
   Config::getInstance().removeFiles(source);
-  for (const auto& category : data_.get_child("file_paths")) {
-    for (const auto& path : category.second) {
-      auto pattern = path.second.get_value<std::string>("");
+  auto& file_paths = data_["file_paths"];
+  for (auto it = file_paths.begin(); it != file_paths.end(); it++) {
+    for (const auto& path : *it) {
+      auto pattern = path.asString();
       if (pattern.empty()) {
         continue;
       }
       replaceGlobWildcards(pattern);
-      Config::getInstance().addFile(source, category.first, pattern);
+      Config::getInstance().addFile(source, it.name(), pattern);
     }
   }
 

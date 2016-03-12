@@ -74,6 +74,7 @@ ADD_OSQUERY_LINK_CORE("boost_system")
 ADD_OSQUERY_LINK_CORE("boost_filesystem")
 ADD_OSQUERY_LINK_CORE("boost_regex")
 ADD_OSQUERY_LINK_CORE("yara")
+ADD_OSQUERY_LINK_CORE("jsoncpp")
 
 # Remaining additional development libraries.
 ADD_OSQUERY_LINK_ADDITIONAL("cppnetlib-uri")

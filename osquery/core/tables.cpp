@@ -8,14 +8,13 @@
  *
  */
 
-#include <boost/property_tree/json_parser.hpp>
+#include <json/reader.h>
+#include <json/writer.h>
 
 #include <osquery/database.h>
 #include <osquery/flags.h>
 #include <osquery/logger.h>
 #include <osquery/tables.h>
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -53,29 +52,26 @@ void TablePlugin::removeExternal(const std::string& name) {
 
 void TablePlugin::setRequestFromContext(const QueryContext& context,
                                         PluginRequest& request) {
-  pt::ptree tree;
-  tree.put("limit", context.limit);
+  Json::Value tree;
+  tree["limit"] = context.limit;
 
   // The QueryContext contains a constraint map from column to type information
   // and the list of operand/expression constraints applied to that column from
   // the query given.
-  pt::ptree constraints;
-  for (const auto& constraint : context.constraints) {
-    pt::ptree child;
-    child.put("name", constraint.first);
-    constraint.second.serialize(child);
-    constraints.push_back(std::make_pair("", child));
+  {
+    Json::Value constraints;
+    for (const auto& constraint : context.constraints) {
+      Json::Value child;
+      child["name"] = constraint.first;
+      constraint.second.serialize(child);
+      constraints.append(child);
+    }
+    tree["constraints"] = constraints;
   }
-  tree.add_child("constraints", constraints);
 
   // Write the property tree as a JSON string into the PluginRequest.
-  std::ostringstream output;
-  try {
-    pt::write_json(output, tree, false);
-  } catch (const pt::json_parser::json_parser_error& e) {
-    // The content could not be represented as JSON.
-  }
-  request["context"] = output.str();
+  Json::FastWriter writer;
+  request["context"] = writer.write(tree);
 }
 
 void TablePlugin::setContextFromRequest(const PluginRequest& request,
@@ -85,20 +81,17 @@ void TablePlugin::setContextFromRequest(const PluginRequest& request,
   }
 
   // Read serialized context from PluginRequest.
-  pt::ptree tree;
-  try {
-    std::stringstream input;
-    input << request.at("context");
-    pt::read_json(input, tree);
-  } catch (const pt::json_parser::json_parser_error& e) {
+  Json::Value tree;
+  Json::Reader reader;
+  if (!reader.parse(request.at("context"), tree, false)) {
     return;
   }
 
   // Set the context limit and deserialize each column constraint list.
-  context.limit = tree.get<int>("limit", 0);
-  for (const auto& constraint : tree.get_child("constraints")) {
-    auto column_name = constraint.second.get<std::string>("name");
-    context.constraints[column_name].unserialize(constraint.second);
+  context.limit = tree.get("limit", 0).asUInt();
+  for (const auto& constraint : tree["constraints"]) {
+    auto column_name = constraint["name"].asString();
+    context.constraints[column_name].unserialize(constraint);
   }
 }
 
@@ -276,27 +269,27 @@ std::set<std::string> ConstraintList::getAll(ConstraintOperator op) const {
   return set;
 }
 
-void ConstraintList::serialize(boost::property_tree::ptree& tree) const {
-  boost::property_tree::ptree expressions;
+void ConstraintList::serialize(Json::Value& tree) const {
+  Json::Value expressions;
   for (const auto& constraint : constraints_) {
-    boost::property_tree::ptree child;
-    child.put("op", constraint.op);
-    child.put("expr", constraint.expr);
-    expressions.push_back(std::make_pair("", child));
+    Json::Value child;
+    child["op"] = constraint.op;
+    child["expr"] = constraint.expr;
+    expressions.append(child);
   }
-  tree.add_child("list", expressions);
-  tree.put("affinity", columnTypeName(affinity));
+  tree["list"] = expressions;
+  tree["affinity"] = columnTypeName(affinity);
 }
 
-void ConstraintList::unserialize(const boost::property_tree::ptree& tree) {
+void ConstraintList::unserialize(const Json::Value& tree) {
   // Iterate through the list of operand/expressions, then set the constraint
   // type affinity.
-  for (const auto& list : tree.get_child("list")) {
-    Constraint constraint(list.second.get<unsigned char>("op"));
-    constraint.expr = list.second.get<std::string>("expr");
+  for (const auto& list : tree["list"]) {
+    Constraint constraint(list["op"].asUInt());
+    constraint.expr = list["expr"].asString();
     constraints_.push_back(constraint);
   }
-  affinity = columnTypeName(tree.get<std::string>("affinity", "UNKNOWN"));
+  affinity = columnTypeName(tree.get("affinity", "UNKNOWN").asString());
 }
 
 bool QueryContext::hasConstraint(const std::string& column,

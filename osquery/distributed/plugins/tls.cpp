@@ -8,11 +8,10 @@
  *
  */
 
-#include <vector>
 #include <sstream>
+#include <vector>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <json/reader.h>
 
 #include <osquery/distributed.h>
 #include <osquery/enroll.h>
@@ -20,11 +19,9 @@
 #include <osquery/registry.h>
 
 #include "osquery/remote/requests.h"
-#include "osquery/remote/transports/tls.h"
 #include "osquery/remote/serializers/json.h"
+#include "osquery/remote/transports/tls.h"
 #include "osquery/remote/utility.h"
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -68,15 +65,14 @@ Status TLSDistributedPlugin::getQueries(std::string& json) {
 }
 
 Status TLSDistributedPlugin::writeResults(const std::string& json) {
-  pt::ptree params;
-  std::stringstream ss(json);
-  std::string response;
-  try {
-    pt::read_json(ss, params);
-  } catch (const pt::ptree_error& e) {
-    return Status(1, "Error parsing JSON: " + std::string(e.what()));
+  Json::Value params;
+  Json::Reader reader;
+
+  if (!reader.parse(json, params, false)) {
+    return Status(1, "Could not parse JSON");
   }
 
+  std::string response;
   return TLSRequestHelper::go<JSONSerializer>(
       write_uri_, params, response, FLAGS_distributed_tls_max_attempts);
 }

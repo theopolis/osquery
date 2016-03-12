@@ -10,9 +10,6 @@
 
 #include <iostream>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
 #include <gtest/gtest.h>
 
 #include <osquery/core.h>
@@ -21,10 +18,7 @@
 #include <osquery/sql.h>
 
 #include "osquery/core/test_util.h"
-
 #include "osquery/sql/sqlite_util.h"
-
-namespace pt = boost::property_tree;
 
 DECLARE_string(distributed_tls_read_endpoint);
 DECLARE_string(distributed_tls_write_endpoint);
@@ -70,17 +64,17 @@ TEST_F(DistributedTests, test_serialize_distributed_query_request) {
   r.query = "foo";
   r.id = "bar";
 
-  pt::ptree tree;
+  Json::Value tree;
   auto s = serializeDistributedQueryRequest(r, tree);
   EXPECT_TRUE(s.ok());
-  EXPECT_EQ(tree.get<std::string>("query"), "foo");
-  EXPECT_EQ(tree.get<std::string>("id"), "bar");
+  EXPECT_EQ(tree["query"], "foo");
+  EXPECT_EQ(tree["id"], "bar");
 }
 
 TEST_F(DistributedTests, test_deserialize_distributed_query_request) {
-  pt::ptree tree;
-  tree.put<std::string>("query", "foo");
-  tree.put<std::string>("id", "bar");
+  Json::Value tree;
+  tree["query"] = "foo";
+  tree["id"] = "bar";
 
   DistributedQueryRequest r;
   auto s = deserializeDistributedQueryRequest(tree, r);
@@ -112,33 +106,33 @@ TEST_F(DistributedTests, test_serialize_distributed_query_result) {
   r1["foo"] = "bar";
   r.results = {r1};
 
-  pt::ptree tree;
+  Json::Value tree;
   auto s = serializeDistributedQueryResult(r, tree);
   EXPECT_TRUE(s.ok());
-  EXPECT_EQ(tree.get<std::string>("request.query"), "foo");
-  EXPECT_EQ(tree.get<std::string>("request.id"), "bar");
-  auto& results = tree.get_child("results");
+  EXPECT_EQ(tree["request.query"], "foo");
+  EXPECT_EQ(tree["request.id"], "bar");
+  auto& results = tree["results"];
   for (const auto& q : results) {
-    for (const auto& row : q.second) {
-      EXPECT_EQ(row.first, "foo");
-      EXPECT_EQ(q.second.get<std::string>(row.first), "bar");
+    for (auto it = q.begin(); it != q.end(); it++) {
+      EXPECT_EQ(it.name(), "foo");
+      EXPECT_EQ(it->asString(), "bar");
     }
   }
 }
 
 TEST_F(DistributedTests, test_deserialize_distributed_query_result) {
-  pt::ptree request;
-  request.put<std::string>("id", "foo");
-  request.put<std::string>("query", "bar");
+  Json::Value request;
+  request["id"] = "foo";
+  request["query"] = "bar";
 
-  pt::ptree row;
-  row.put<std::string>("foo", "bar");
-  pt::ptree results;
-  results.push_back(std::make_pair("", row));
+  Json::Value row;
+  row["foo"] = "bar";
+  Json::Value results;
+  results.append(row);
 
-  pt::ptree query_result;
-  query_result.put_child("request", request);
-  query_result.put_child("results", results);
+  Json::Value query_result;
+  query_result["request"] = request;
+  query_result["results"] = results;
 
   DistributedQueryResult r;
   auto s = deserializeDistributedQueryResult(query_result, r);

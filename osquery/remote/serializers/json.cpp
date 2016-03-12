@@ -8,34 +8,25 @@
  *
  */
 
-#include <boost/property_tree/json_parser.hpp>
+#include <json/reader.h>
+#include <json/writer.h>
 
 #include "osquery/remote/serializers/json.h"
 
-namespace pt = boost::property_tree;
-
 namespace osquery {
 
-Status JSONSerializer::serialize(const pt::ptree& params,
+Status JSONSerializer::serialize(const Json::Value& params,
                                  std::string& serialized) {
-  std::ostringstream output;
-  try {
-    pt::write_json(output, params, false);
-  } catch (const pt::json_parser::json_parser_error& e) {
-    return Status(1, e.what());
-  }
-  serialized = output.str();
+  Json::FastWriter writer;
+  serialized = writer.write(params);
   return Status(0, "OK");
 }
 
 Status JSONSerializer::deserialize(const std::string& serialized,
-                                   pt::ptree& params) {
-  try {
-    std::stringstream input;
-    input << serialized;
-    pt::read_json(input, params);
-  } catch (const pt::json_parser::json_parser_error& e) {
-    return Status(1, e.what());
+                                   Json::Value& params) {
+  Json::Reader reader;
+  if (!reader.parse(serialized, params, false)) {
+    return Status(1, "Could not parse JSON");
   }
   return Status(0, "OK");
 }

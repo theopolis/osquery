@@ -10,8 +10,6 @@
 
 #include <osquery/config.h>
 
-namespace pt = boost::property_tree;
-
 namespace osquery {
 
 /**
@@ -27,15 +25,15 @@ class EventsConfigParserPlugin : public ConfigParserPlugin {
 };
 
 Status EventsConfigParserPlugin::setUp() {
-  data_.put_child("events", pt::ptree());
+  data_["events"] = Json::Value();
   return Status(0, "OK");
 }
 
 Status EventsConfigParserPlugin::update(const std::string& source,
                                         const ParserConfig& config) {
   if (config.count("events") > 0) {
-    data_ = pt::ptree();
-    data_.put_child("events", config.at("events"));
+    data_ = Json::Value();
+    data_["events"] = config.at("events");
   }
   return Status(0, "OK");
 }

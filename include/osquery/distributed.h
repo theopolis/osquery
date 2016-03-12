@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+#include <json/value.h>
+
 #include <osquery/database.h>
 #include <osquery/registry.h>
 #include <osquery/status.h>
@@ -39,15 +41,15 @@ struct DistributedQueryRequest {
 };
 
 /**
- * @brief Serialize a DistributedQueryRequest into a property tree
+ * @brief Serialize a DistributedQueryRequest into a JSON value
  *
  * @param r the DistributedQueryRequest to serialize
- * @param tree the output property tree
+ * @param tree the output JSON value
  *
  * @return Status indicating the success or failure of the operation
  */
 Status serializeDistributedQueryRequest(const DistributedQueryRequest& r,
-                                        boost::property_tree::ptree& tree);
+                                        Json::Value& tree);
 
 /**
  * @brief Serialize a DistributedQueryRequest object into a JSON string
@@ -68,8 +70,8 @@ Status serializeDistributedQueryRequestJSON(const DistributedQueryRequest& r,
  *
  * @return Status indicating the success or failure of the operation
  */
-Status deserializeDistributedQueryRequest(
-    const boost::property_tree::ptree& tree, DistributedQueryRequest& r);
+Status deserializeDistributedQueryRequest(const Json::Value& tree,
+                                          DistributedQueryRequest& r);
 
 /**
  * @brief Deserialize a DistributedQueryRequest object from a JSON string
@@ -114,7 +116,7 @@ struct DistributedQueryResult {
  * @return Status indicating the success or failure of the operation
  */
 Status serializeDistributedQueryResult(const DistributedQueryResult& r,
-                                       boost::property_tree::ptree& tree);
+                                       Json::Value& tree);
 
 /**
  * @brief Serialize a DistributedQueryResult object into a JSON string
@@ -135,8 +137,8 @@ Status serializeDistributedQueryResultJSON(const DistributedQueryResult& r,
  *
  * @return Status indicating the success or failure of the operation
  */
-Status deserializeDistributedQueryResult(
-    const boost::property_tree::ptree& tree, DistributedQueryResult& r);
+Status deserializeDistributedQueryResult(const Json::Value& tree,
+                                         DistributedQueryResult& r);
 
 /**
  * @brief Deserialize a DistributedQueryResult object from a JSON string

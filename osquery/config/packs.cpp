@@ -11,17 +11,13 @@
 #include <algorithm>
 #include <random>
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include <osquery/core.h>
-#include <osquery/logger.h>
 #include <osquery/hash.h>
+#include <osquery/logger.h>
 #include <osquery/packs.h>
 #include <osquery/sql.h>
 
 #include "osquery/core/conversions.h"
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -106,24 +102,24 @@ size_t restoreSplayedValue(const std::string& name, size_t interval) {
 
 void Pack::initialize(const std::string& name,
                       const std::string& source,
-                      const pt::ptree& tree) {
+                      const Json::Value& tree) {
   name_ = name;
   source_ = source;
   // Check the shard limitation, shards falling below this value are included.
-  if (tree.count("shard") > 0) {
-    shard_ = tree.get<size_t>("shard", 0);
+  if (tree.isMember("shard")) {
+    shard_ = tree["shard"].asUInt();
   }
 
   // Check for a platform restriction.
   platform_.clear();
-  if (tree.count("platform") > 0) {
-    platform_ = tree.get<std::string>("platform", "");
+  if (tree.isMember("platform") > 0) {
+    platform_ = tree["platform"].asString();
   }
 
   // Check for a version restriction.
   version_.clear();
-  if (tree.count("version") > 0) {
-    version_ = tree.get<std::string>("version", "");
+  if (tree.isMember("version")) {
+    version_ = tree["version"].asString();
   }
 
   // Apply the shard, platform, and version checking.
@@ -135,9 +131,9 @@ void Pack::initialize(const std::string& name,
   }
 
   discovery_queries_.clear();
-  if (tree.count("discovery") > 0) {
-    for (const auto& item : tree.get_child("discovery")) {
-      discovery_queries_.push_back(item.second.get_value<std::string>());
+  if (tree.isMember("discovery")) {
+    for (const auto& item : tree["discovery"]) {
+      discovery_queries_.push_back(item.asString());
     }
   }
 
@@ -151,46 +147,49 @@ void Pack::initialize(const std::string& name,
   }
 
   schedule_.clear();
-  if (tree.count("queries") == 0) {
+  if (!tree.isMember("queries") || !tree["queries"].isObject()) {
     // This pack contained no queries.
     return;
   }
 
   // Iterate the queries (or schedule) and check platform/version/sanity.
-  for (const auto& q : tree.get_child("queries")) {
-    if (q.second.count("shard") > 0) {
-      auto shard = q.second.get<size_t>("shard", 0);
+  for (auto q = tree["queries"].begin(); q != tree["queries"].end(); q++) {
+    if (q->isMember("shard") > 0) {
+      auto shard = q->get("shard", 0).asUInt();
       if (shard > 0 && shard < getMachineShard()) {
         continue;
       }
     }
 
-    if (q.second.count("platform")) {
-      if (!checkPlatform(q.second.get<std::string>("platform", ""))) {
+    if (q->isMember("platform")) {
+      if (!checkPlatform(q->get("platform", "").asString())) {
         continue;
       }
     }
 
-    if (q.second.count("version")) {
-      if (!checkVersion(q.second.get<std::string>("version", ""))) {
+    if (q->isMember("version")) {
+      if (!checkVersion(q->get("version", "").asString())) {
         continue;
       }
     }
 
     ScheduledQuery query;
-    query.query = q.second.get<std::string>("query", "");
-    query.interval = q.second.get("interval", FLAGS_schedule_default_interval);
+    auto query_name = q.name();
+    query.query = q->get("query", "").asString();
+    query.interval =
+        q->get("interval", (Json::UInt64)FLAGS_schedule_default_interval)
+            .asUInt();
     if (query.interval <= 0 || query.query.empty() || query.interval > 592200) {
       // Invalid pack query.
-      VLOG(1) << "Query has invalid interval: " << q.first << ": "
+      VLOG(1) << "Query has invalid interval: " << query_name << ": "
               << query.interval;
       continue;
     }
 
-    query.splayed_interval = restoreSplayedValue(q.first, query.interval);
-    query.options["snapshot"] = q.second.get<bool>("snapshot", false);
-    query.options["removed"] = q.second.get<bool>("removed", true);
-    schedule_[q.first] = query;
+    query.splayed_interval = restoreSplayedValue(query_name, query.interval);
+    query.options["snapshot"] = q->get("snapshot", false).asBool();
+    query.options["removed"] = q->get("removed", true).asBool();
+    schedule_[query_name] = query;
   }
 }
 

@@ -12,8 +12,8 @@
 #include <osquery/filesystem.h>
 
 #include "osquery/remote/requests.h"
-#include "osquery/remote/transports/tls.h"
 #include "osquery/remote/serializers/json.h"
+#include "osquery/remote/transports/tls.h"
 
 namespace osquery {
 
@@ -79,9 +79,9 @@ std::string TLSEnrollPlugin::enroll() {
 Status TLSEnrollPlugin::requestKey(const std::string& uri,
                                    std::string& node_key) {
   // Read the optional enrollment secret data (sent with an enrollment request).
-  boost::property_tree::ptree params;
-  params.put<std::string>(FLAGS_tls_enroll_override, getEnrollSecret());
-  params.put<std::string>("host_identifier", getHostIdentifier());
+  Json::Value params;
+  params[FLAGS_tls_enroll_override] = getEnrollSecret();
+  params["host_identifier"] = getHostIdentifier();
 
   auto request = Request<TLSTransport, JSONSerializer>(uri);
   request.setOption("hostname", FLAGS_tls_hostname);
@@ -91,20 +91,20 @@ Status TLSEnrollPlugin::requestKey(const std::string& uri,
   }
 
   // The call succeeded, store the node secret key (the enrollment response).
-  boost::property_tree::ptree recv;
+  Json::Value recv;
   status = request.getResponse(recv);
   if (!status.ok()) {
     return status;
   }
 
   // Support multiple response keys as a node key (identifier).
-  if (recv.count("node_key") > 0) {
-    node_key = recv.get("node_key", "");
-  } else if (recv.count("id") > 0) {
-    node_key = recv.get("id", "");
+  if (recv.isMember("node_key")) {
+    node_key = recv["node_key"].asString();
+  } else if (recv.isMember("id")) {
+    node_key = recv["id"].asString();
   }
 
-  if (node_key.size() == 0) {
+  if (node_key.empty()) {
     return Status(1, "No node key returned from TLS enroll plugin");
   }
   return Status(0, "OK");

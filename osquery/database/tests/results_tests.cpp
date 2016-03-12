@@ -19,8 +19,6 @@
 
 #include "osquery/core/test_util.h"
 
-namespace pt = boost::property_tree;
-
 namespace osquery {
 
 class ResultsTests : public testing::Test {};
@@ -40,7 +38,8 @@ TEST_F(ResultsTests, test_simple_diff) {
 
 TEST_F(ResultsTests, test_serialize_row) {
   auto results = getSerializedRow();
-  pt::ptree tree;
+
+  Json::Value tree;
   auto s = serializeRow(results.second, tree);
   EXPECT_TRUE(s.ok());
   EXPECT_EQ(s.toString(), "OK");
@@ -62,7 +61,8 @@ TEST_F(ResultsTests, test_deserialize_row_json) {
 
 TEST_F(ResultsTests, test_serialize_query_data) {
   auto results = getSerializedQueryData();
-  pt::ptree tree;
+
+  Json::Value tree;
   auto s = serializeQueryData(results.second, tree);
   EXPECT_TRUE(s.ok());
   EXPECT_EQ(s.toString(), "OK");
@@ -91,7 +91,8 @@ TEST_F(ResultsTests, test_deserialize_query_data_json) {
 
 TEST_F(ResultsTests, test_serialize_diff_results) {
   auto results = getSerializedDiffResults();
-  pt::ptree tree;
+
+  Json::Value tree;
   auto s = serializeDiffResults(results.second, tree);
   EXPECT_TRUE(s.ok());
   EXPECT_EQ(s.toString(), "OK");
@@ -109,7 +110,8 @@ TEST_F(ResultsTests, test_serialize_diff_results_json) {
 
 TEST_F(ResultsTests, test_serialize_query_log_item) {
   auto results = getSerializedQueryLogItem();
-  pt::ptree tree;
+
+  Json::Value tree;
   auto s = serializeQueryLogItem(results.second, tree);
   EXPECT_TRUE(s.ok());
   EXPECT_EQ(s.toString(), "OK");

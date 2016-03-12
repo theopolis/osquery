@@ -16,17 +16,17 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include <json/reader.h>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include <osquery/core.h>
 #include <osquery/filesystem.h>
 #include <osquery/logger.h>
 #include <osquery/sql.h>
 
-namespace pt = boost::property_tree;
 namespace fs = boost::filesystem;
 namespace errc = boost::system::errc;
 
@@ -429,7 +429,7 @@ std::string lsperms(int mode) {
   return bits;
 }
 
-Status parseJSON(const fs::path& path, pt::ptree& tree) {
+Status parseJSON(const fs::path& path, Json::Value& tree) {
   std::string json_data;
   if (!readFile(path, json_data).ok()) {
     return Status(1, "Could not read JSON from file");
@@ -438,13 +438,10 @@ Status parseJSON(const fs::path& path, pt::ptree& tree) {
   return parseJSONContent(json_data, tree);
 }
 
-Status parseJSONContent(const std::string& content, pt::ptree& tree) {
-  // Read the extensions data into a JSON blob, then property tree.
-  try {
-    std::stringstream json_stream;
-    json_stream << content;
-    pt::read_json(json_stream, tree);
-  } catch (const pt::json_parser::json_parser_error& e) {
+Status parseJSONContent(const std::string& content, Json::Value& tree) {
+  // Read the extensions data into a JSON blob, then JSON value.
+  Json::Reader reader;
+  if (!reader.parse(content, tree, false)) {
     return Status(1, "Could not parse JSON from file");
   }
   return Status(0, "OK");

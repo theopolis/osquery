@@ -17,8 +17,10 @@
 #include <signal.h>
 #include <time.h>
 
+#include <json/reader.h>
+#include <json/writer.h>
+
 #include <boost/filesystem/operations.hpp>
-#include <boost/property_tree/json_parser.hpp>
 
 #include <osquery/core.h>
 #include <osquery/database.h>
@@ -100,50 +102,50 @@ std::map<std::string, std::string> getTestConfigMap() {
   return config;
 }
 
-pt::ptree getExamplePacksConfig() {
+Json::Value getExamplePacksConfig() {
   std::string content;
   auto s = readFile(kTestDataPath + "test_inline_pack.conf", content);
   assert(s.ok());
-  std::stringstream json;
-  json << content;
-  pt::ptree tree;
-  pt::read_json(json, tree);
+
+  Json::Value tree;
+  Json::Reader reader;
+  reader.parse(content, tree, false);
   return tree;
 }
 
 /// no discovery queries, no platform restriction
-pt::ptree getUnrestrictedPack() {
+Json::Value getUnrestrictedPack() {
   auto tree = getExamplePacksConfig();
-  auto packs = tree.get_child("packs");
-  return packs.get_child("unrestricted_pack");
+  auto packs = tree["packs"];
+  return packs["unrestricted_pack"];
 }
 
 // several restrictions (version, platform, shard)
-pt::ptree getRestrictedPack() {
+Json::Value getRestrictedPack() {
   auto tree = getExamplePacksConfig();
-  auto packs = tree.get_child("packs");
-  return packs.get_child("restricted_pack");
+  auto packs = tree["packs"];
+  return packs["restricted_pack"];
 }
 
 /// 1 discovery query, darwin platform restriction
-pt::ptree getPackWithDiscovery() {
+Json::Value getPackWithDiscovery() {
   auto tree = getExamplePacksConfig();
-  auto packs = tree.get_child("packs");
-  return packs.get_child("discovery_pack");
+  auto packs = tree["packs"];
+  return packs["discovery_pack"];
 }
 
 /// 1 discovery query which will always pass
-pt::ptree getPackWithValidDiscovery() {
+Json::Value getPackWithValidDiscovery() {
   auto tree = getExamplePacksConfig();
-  auto packs = tree.get_child("packs");
-  return packs.get_child("valid_discovery_pack");
+  auto packs = tree["packs"];
+  return packs["valid_discovery_pack"];
 }
 
 /// no discovery queries, no platform restriction, fake version string
-pt::ptree getPackWithFakeVersion() {
+Json::Value getPackWithFakeVersion() {
   auto tree = getExamplePacksConfig();
-  auto packs = tree.get_child("packs");
-  return packs.get_child("fake_version_pack");
+  auto packs = tree["packs"];
+  return packs["fake_version_pack"];
 }
 
 QueryData getTestDBExpectedResults() {
@@ -218,76 +220,74 @@ ScheduledQuery getOsqueryScheduledQuery() {
   return sq;
 }
 
-std::pair<pt::ptree, Row> getSerializedRow() {
+std::pair<Json::Value, Row> getSerializedRow() {
   Row r;
   r["foo"] = "bar";
   r["meaning_of_life"] = "42";
-  pt::ptree arr;
-  arr.put<std::string>("foo", "bar");
-  arr.put<std::string>("meaning_of_life", "42");
+
+  Json::Value arr;
+  arr["foo"] = "bar";
+  arr["meaning_of_life"] = "42";
   return std::make_pair(arr, r);
 }
 
-std::pair<pt::ptree, QueryData> getSerializedQueryData() {
+std::pair<Json::Value, QueryData> getSerializedQueryData() {
   auto r = getSerializedRow();
   QueryData q = {r.second, r.second};
-  pt::ptree arr;
-  arr.push_back(std::make_pair("", r.first));
-  arr.push_back(std::make_pair("", r.first));
+  Json::Value arr;
+  arr.append(r.first);
+  arr.append(r.first);
   return std::make_pair(arr, q);
 }
 
-std::pair<pt::ptree, DiffResults> getSerializedDiffResults() {
+std::pair<Json::Value, DiffResults> getSerializedDiffResults() {
   auto qd = getSerializedQueryData();
   DiffResults diff_results;
   diff_results.added = qd.second;
   diff_results.removed = qd.second;
 
-  pt::ptree root;
-  root.add_child("added", qd.first);
-  root.add_child("removed", qd.first);
-
+  Json::Value root;
+  root["added"] = qd.first;
+  root["removed"] = qd.first;
   return std::make_pair(root, diff_results);
 }
 
 std::pair<std::string, DiffResults> getSerializedDiffResultsJSON() {
   auto results = getSerializedDiffResults();
-  std::ostringstream ss;
-  pt::write_json(ss, results.first, false);
-  return std::make_pair(ss.str(), results.second);
+
+  Json::FastWriter writer;
+  return std::make_pair(writer.write(results.first), results.second);
 }
 
 std::pair<std::string, QueryData> getSerializedQueryDataJSON() {
   auto results = getSerializedQueryData();
-  std::ostringstream ss;
-  pt::write_json(ss, results.first, false);
-  return std::make_pair(ss.str(), results.second);
+
+  Json::FastWriter writer;
+  return std::make_pair(writer.write(results.first), results.second);
 }
 
-std::pair<pt::ptree, QueryLogItem> getSerializedQueryLogItem() {
+std::pair<Json::Value, QueryLogItem> getSerializedQueryLogItem() {
   QueryLogItem i;
-  pt::ptree root;
+  Json::Value root;
   auto dr = getSerializedDiffResults();
   i.results = dr.second;
   i.name = "foobar";
   i.calendar_time = "Mon Aug 25 12:10:57 2014";
   i.time = 1408993857;
   i.identifier = "foobaz";
-  root.add_child("diffResults", dr.first);
-  root.put<std::string>("name", "foobar");
-  root.put<std::string>("hostIdentifier", "foobaz");
-  root.put<std::string>("calendarTime", "Mon Aug 25 12:10:57 2014");
-  root.put<int>("unixTime", 1408993857);
+  root["diffResults"] = dr.first;
+  root["name"] = "foobar";
+  root["hostIdentifier"] = "foobaz";
+  root["calendarTime"] = "Mon Aug 25 12:10:57 2014";
+  root["unixTime"] = 1408993857;
   return std::make_pair(root, i);
 }
 
 std::pair<std::string, QueryLogItem> getSerializedQueryLogItemJSON() {
   auto results = getSerializedQueryLogItem();
 
-  std::ostringstream ss;
-  pt::write_json(ss, results.first, false);
-
-  return std::make_pair(ss.str(), results.second);
+  Json::FastWriter writer;
+  return std::make_pair(writer.write(results.first), results.second);
 }
 
 std::vector<SplitStringTestData> generateSplitStringTestData() {

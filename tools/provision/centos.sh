@@ -100,6 +100,7 @@ function main_centos() {
 
   install_snappy
   install_rocksdb
+  install_jsoncpp
   install_thrift
   install_yara
   install_asio

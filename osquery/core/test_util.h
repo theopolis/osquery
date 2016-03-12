@@ -14,15 +14,14 @@
 #include <utility>
 #include <vector>
 
+#include <json/value.h>
+
 #include <boost/noncopyable.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include <osquery/config.h>
 #include <osquery/core.h>
 #include <osquery/database.h>
 #include <osquery/filesystem.h>
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 /// Init function for tests and benchmarks.
@@ -49,12 +48,12 @@ extern std::string kFakeDirectory;
 // Get an example generate config with one static source name to JSON content.
 std::map<std::string, std::string> getTestConfigMap();
 
-pt::ptree getExamplePacksConfig();
-pt::ptree getUnrestrictedPack();
-pt::ptree getRestrictedPack();
-pt::ptree getPackWithDiscovery();
-pt::ptree getPackWithValidDiscovery();
-pt::ptree getPackWithFakeVersion();
+Json::Value getExamplePacksConfig();
+Json::Value getUnrestrictedPack();
+Json::Value getRestrictedPack();
+Json::Value getPackWithDiscovery();
+Json::Value getPackWithValidDiscovery();
+Json::Value getPackWithFakeVersion();
 
 ScheduledQuery getOsqueryScheduledQuery();
 
@@ -70,24 +69,24 @@ std::vector<std::pair<std::string, QueryData> > getTestDBResultStream();
 // getSerializedRow() return an std::pair where pair->first is a string which
 // should serialize to pair->second. pair->second should deserialize
 // to pair->first
-std::pair<pt::ptree, Row> getSerializedRow();
+std::pair<Json::Value, Row> getSerializedRow();
 
 // getSerializedQueryData() return an std::pair where pair->first is a string
 // which should serialize to pair->second. pair->second should
 // deserialize to pair->first
-std::pair<pt::ptree, QueryData> getSerializedQueryData();
+std::pair<Json::Value, QueryData> getSerializedQueryData();
 std::pair<std::string, QueryData> getSerializedQueryDataJSON();
 
 // getSerializedDiffResults() return an std::pair where pair->first is a string
 // which should serialize to pair->second. pair->second should
 // deserialize to pair->first
-std::pair<pt::ptree, DiffResults> getSerializedDiffResults();
+std::pair<Json::Value, DiffResults> getSerializedDiffResults();
 std::pair<std::string, DiffResults> getSerializedDiffResultsJSON();
 
 // getSerializedQueryLogItem() return an std::pair where pair->first
 // is a string which should serialize to pair->second. pair->second
 // should deserialize to pair->first
-std::pair<pt::ptree, QueryLogItem> getSerializedQueryLogItem();
+std::pair<Json::Value, QueryLogItem> getSerializedQueryLogItem();
 std::pair<std::string, QueryLogItem> getSerializedQueryLogItemJSON();
 
 // generate content for a PEM-encoded certificate

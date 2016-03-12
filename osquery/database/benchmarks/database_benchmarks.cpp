@@ -36,7 +36,7 @@ QueryData getExampleQueryData(size_t x, size_t y) {
 static void DATABASE_serialize(benchmark::State& state) {
   auto qd = getExampleQueryData(state.range_x(), state.range_y());
   while (state.KeepRunning()) {
-    boost::property_tree::ptree tree;
+    Json::Value tree;
     serializeQueryData(qd, tree);
   }
 }

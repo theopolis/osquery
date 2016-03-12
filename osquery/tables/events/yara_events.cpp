@@ -90,7 +90,7 @@ void YARAEventSubscriber::configure() {
 
   // Bail if there is no configured set of opt-in paths for yara.
   const auto& yara_config = plugin->getData();
-  if (yara_config.count("file_paths") == 0) {
+  if (!yara_config.isMember("file_paths")) {
     return;
   }
 
@@ -105,22 +105,23 @@ void YARAEventSubscriber::configure() {
 
   // For each category within yara's file_paths, add a subscription to the
   // corresponding set of paths.
-  const auto& yara_paths = yara_config.get_child("file_paths");
-  for (const auto& yara_path_element : yara_paths) {
+  const auto& yara_paths = yara_config["file_paths"];
+  for (auto it = yara_paths.begin(); it != yara_paths.end(); it++) {
+    auto category = it.name();
     // Subscribe to each file for the given key (category).
-    if (file_map.count(yara_path_element.first) == 0) {
+    if (file_map.count(category) == 0) {
       VLOG(1) << "Key in yara::file_paths not found in file_paths: "
-              << yara_path_element.first;
+              << category;
       continue;
     }
 
-    for (const auto& file : file_map.at(yara_path_element.first)) {
+    for (const auto& file : file_map.at(category)) {
       VLOG(1) << "Added YARA listener to: " << file;
       auto sc = createSubscriptionContext();
       sc->recursive = 0;
       sc->path = file;
       sc->mask = FILE_CHANGE_MASK;
-      sc->category = yara_path_element.first;
+      sc->category = category;
       subscribe(&YARAEventSubscriber::Callback, sc);
     }
   }
@@ -151,35 +152,24 @@ Status YARAEventSubscriber::Callback(const FileEventContextRef& ec,
     return Status(1, "ConfigParser unknown.");
   }
 
-  std::shared_ptr<YARAConfigParserPlugin> yaraParser;
-  try {
-    yaraParser = std::dynamic_pointer_cast<YARAConfigParserPlugin>(parser);
-  } catch (const std::bad_cast& e) {
-    return Status(1, "Error casting yara config parser plugin");
-  }
-  if (yaraParser == nullptr || yaraParser.get() == nullptr) {
-    return Status(1, "Yara parser unknown.");
-  }
-
-  auto rules = yaraParser->rules();
+  // Downcast the parser to retrieve the rules.
+  auto yara_parser = std::dynamic_pointer_cast<YARAConfigParserPlugin>(parser);
+  auto rules = yara_parser->rules();
 
   // Use the category as a lookup into the yara file_paths. The value will be
   // a list of signature groups to scan with.
-  auto category = r.at("category");
-  const auto& yara_config = parser->getData();
-  const auto& yara_paths = yara_config.get_child("file_paths");
-  const auto& sig_groups = yara_paths.find(category);
-  for (const auto& rule : sig_groups->second) {
-    const std::string group = rule.second.data();
-    int result = yr_rules_scan_file(rules[group],
-                                    ec->path.c_str(),
-                                    SCAN_FLAGS_FAST_MODE,
-                                    YARACallback,
-                                    (void*)&r,
-                                    0);
-
-    if (result != ERROR_SUCCESS) {
-      return Status(1, "YARA error: " + std::to_string(result));
+  const auto& yara_paths = parser->getData()["file_paths"];
+  if (yara_paths.isMember(sc->category)) {
+    for (const auto& rule : yara_paths[sc->category]) {
+      int result = yr_rules_scan_file(rules[rule.asString()],
+                                      ec->path.c_str(),
+                                      SCAN_FLAGS_FAST_MODE,
+                                      YARACallback,
+                                      (void*)&r,
+                                      0);
+      if (result != ERROR_SUCCESS) {
+        return Status(1, "YARA error: " + std::to_string(result));
+      }
     }
   }
 

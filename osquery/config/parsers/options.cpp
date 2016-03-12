@@ -12,8 +12,6 @@
 #include <osquery/flags.h>
 #include <osquery/logger.h>
 
-namespace pt = boost::property_tree;
-
 namespace osquery {
 
 /**
@@ -29,33 +27,31 @@ class OptionsConfigParserPlugin : public ConfigParserPlugin {
 };
 
 Status OptionsConfigParserPlugin::setUp() {
-  data_.put_child("options", pt::ptree());
+  data_["options"] = Json::Value();
   return Status(0, "OK");
 }
 
 Status OptionsConfigParserPlugin::update(const std::string& source,
                                          const ParserConfig& config) {
-  if (config.count("options") > 0) {
-    data_ = pt::ptree();
-    data_.put_child("options", config.at("options"));
+  if (config.count("options")) {
+    data_ = Json::Value();
+    data_["options"] = config.at("options");
   }
 
-  const auto& options = data_.get_child("options");
-  for (const auto& option : options) {
-    std::string value = options.get<std::string>(option.first, "");
-    if (value.empty()) {
+  for (auto it = data_["options"].begin(); it != data_["options"].end(); it++) {
+    if (!it->isString()) {
       continue;
     }
 
-    if (Flag::getType(option.first).empty()) {
-      LOG(WARNING) << "Cannot set unknown or invalid flag: " << option.first;
+    auto flag = it.name();
+    if (Flag::getType(flag).empty()) {
+      LOG(WARNING) << "Cannot set unknown or invalid flag: " << flag;
       return Status(1, "Unknown flag");
     }
 
-    Flag::updateValue(option.first, value);
+    Flag::updateValue(flag, it->asString());
     // There is a special case for supported Gflags-reserved switches.
-    if (option.first == "verbose" || option.first == "verbose_debug" ||
-        option.first == "debug") {
+    if (flag == "verbose" || flag == "verbose_debug" || flag == "debug") {
       setVerboseLevel();
       if (Flag::getValue("verbose") == "true") {
         VLOG(1) << "Verbose logging enabled by config option";

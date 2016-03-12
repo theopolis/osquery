@@ -11,14 +11,13 @@
 #include <sstream>
 #include <utility>
 
-#include <boost/property_tree/json_parser.hpp>
+#include <json/reader.h>
+#include <json/writer.h>
 
 #include <osquery/core.h>
 #include <osquery/distributed.h>
 #include <osquery/logger.h>
 #include <osquery/sql.h>
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -85,31 +84,24 @@ size_t Distributed::getCompletedCount() {
 }
 
 Status Distributed::serializeResults(std::string& json) {
-  pt::ptree tree;
-
+  Json::Value tree;
   {
     WriteLock lock(distributed_results_mutex_);
     for (const auto& result : results_) {
-      pt::ptree qd;
+      Json::Value qd;
       auto s = serializeQueryData(result.results, qd);
       if (!s.ok()) {
         return s;
       }
-      tree.add_child(result.request.id, qd);
+      tree[result.request.id] = qd;
     }
   }
 
-  pt::ptree results;
-  results.add_child("queries", tree);
+  Json::Value results;
+  results["queries"] = tree;
 
-  std::stringstream ss;
-  try {
-    pt::write_json(ss, results, false);
-  } catch (const pt::ptree_error& e) {
-    return Status(1, "Error writing JSON: " + std::string(e.what()));
-  }
-  json = ss.str();
-
+  Json::FastWriter writer;
+  json = writer.write(results);
   return Status(0, "OK");
 }
 
@@ -158,25 +150,23 @@ Status Distributed::flushCompleted() {
 }
 
 Status Distributed::acceptWork(const std::string& work) {
-  pt::ptree tree;
-  std::stringstream ss(work);
-  try {
-    pt::read_json(ss, tree);
+  Json::Value tree;
+  Json::Reader reader;
 
-    auto& queries = tree.get_child("queries");
-    for (const auto& node : queries) {
-      DistributedQueryRequest request;
-      request.id = node.first;
-      request.query = queries.get<std::string>(node.first, "");
-      if (request.query.empty() || request.id.empty()) {
-        return Status(1,
-                      "Distributed query does not have complete attributes.");
-      }
-      WriteLock wlock(distributed_queries_mutex_);
-      queries_.push_back(request);
+  if (!reader.parse(work, tree, false)) {
+    return Status(1, "Error parsing JSON");
+  }
+
+  auto& queries = tree["queries"];
+  for (auto it = queries.begin(); it != queries.end(); it++) {
+    DistributedQueryRequest request;
+    request.id = it.name();
+    request.query = it->asString();
+    if (request.query.empty() || request.id.empty()) {
+      return Status(1, "Distributed query does not have complete attributes.");
     }
-  } catch (const pt::ptree_error& e) {
-    return Status(1, "Error parsing JSON: " + std::string(e.what()));
+    WriteLock wlock(distributed_queries_mutex_);
+    queries_.push_back(request);
   }
 
   return Status(0, "OK");
@@ -190,45 +180,39 @@ DistributedQueryRequest Distributed::popRequest() {
 }
 
 Status serializeDistributedQueryRequest(const DistributedQueryRequest& r,
-                                        pt::ptree& tree) {
-  tree.put("query", r.query);
-  tree.put("id", r.id);
+                                        Json::Value& tree) {
+  tree["query"] = r.query;
+  tree["id"] = r.id;
   return Status(0, "OK");
 }
 
 Status serializeDistributedQueryRequestJSON(const DistributedQueryRequest& r,
-                                            std::string& json) {
-  pt::ptree tree;
+                                            Json::Value& json) {
+  Json::Value tree;
   auto s = serializeDistributedQueryRequest(r, tree);
   if (!s.ok()) {
     return s;
   }
-  std::stringstream ss;
-  try {
-    pt::write_json(ss, tree, false);
-  } catch (const pt::ptree_error& e) {
-    return Status(1, "Error serializing JSON: " + std::string(e.what()));
-  }
-  json = ss.str();
 
+  Json::FastWriter writer;
+  json = writer.write(tree);
   return Status(0, "OK");
 }
 
-Status deserializeDistributedQueryRequest(const pt::ptree& tree,
+Status deserializeDistributedQueryRequest(const Json::Value& tree,
                                           DistributedQueryRequest& r) {
-  r.query = tree.get<std::string>("query", "");
-  r.id = tree.get<std::string>("id", "");
+  r.query = tree["query"].asString();
+  r.id = tree["id"].asString();
   return Status(0, "OK");
 }
 
 Status deserializeDistributedQueryRequestJSON(const std::string& json,
                                               DistributedQueryRequest& r) {
-  std::stringstream ss(json);
-  pt::ptree tree;
-  try {
-    pt::read_json(ss, tree);
-  } catch (const pt::ptree_error& e) {
-    return Status(1, "Error serializing JSON: " + std::string(e.what()));
+  Json::Value tree;
+  Json::Reader reader;
+
+  if (!reader.parse(json, tree, false)) {
+    return Status(1, "Error serializing JSON");
   }
   return deserializeDistributedQueryRequest(tree, r);
 }
@@ -239,72 +223,63 @@ Status deserializeDistributedQueryRequestJSON(const std::string& json,
 /////////////////////////////////////////////////////////////////////////////
 
 Status serializeDistributedQueryResult(const DistributedQueryResult& r,
-                                       pt::ptree& tree) {
-  pt::ptree request;
+                                       Json::Value& tree) {
+  Json::Value request;
   auto s = serializeDistributedQueryRequest(r.request, request);
   if (!s.ok()) {
     return s;
   }
 
-  pt::ptree results;
+  Json::Value results;
   s = serializeQueryData(r.results, results);
   if (!s.ok()) {
     return s;
   }
 
-  tree.add_child("request", request);
-  tree.add_child("results", results);
-
+  tree["request"] = request;
+  tree["results"] = results;
   return Status(0, "OK");
 }
 
 Status serializeDistributedQueryResultJSON(const DistributedQueryResult& r,
                                            std::string& json) {
-  pt::ptree tree;
+  Json::Value tree;
   auto s = serializeDistributedQueryResult(r, tree);
   if (!s.ok()) {
     return s;
   }
-  std::stringstream ss;
-  try {
-    pt::write_json(ss, tree, false);
-  } catch (const pt::ptree_error& e) {
-    return Status(1, "Error serializing JSON: " + std::string(e.what()));
-  }
-  json = ss.str();
 
+  Json::FastWriter writer;
+  json = writer.write(tree);
   return Status(0, "OK");
 }
 
-Status deserializeDistributedQueryResult(const pt::ptree& tree,
+Status deserializeDistributedQueryResult(const Json::Value& tree,
                                          DistributedQueryResult& r) {
   DistributedQueryRequest request;
-  auto s =
-      deserializeDistributedQueryRequest(tree.get_child("request"), request);
+  auto s = deserializeDistributedQueryRequest(tree["request"], request);
   if (!s.ok()) {
     return s;
   }
 
   QueryData results;
-  s = deserializeQueryData(tree.get_child("results"), results);
+  s = deserializeQueryData(tree["results"], results);
   if (!s.ok()) {
     return s;
   }
 
   r.request = request;
   r.results = results;
-
   return Status(0, "OK");
 }
 
 Status deserializeDistributedQueryResultJSON(const std::string& json,
                                              DistributedQueryResult& r) {
-  std::stringstream ss(json);
-  pt::ptree tree;
-  try {
-    pt::read_json(ss, tree);
-  } catch (const pt::ptree_error& e) {
-    return Status(1, "Error serializing JSON: " + std::string(e.what()));
+  Json::Value tree;
+  Json::Reader reader;
+
+  if (!reader.parse(json, tree, false)) {
+    return Status(1, "Error serializing JSON");
   }
   return deserializeDistributedQueryResult(tree, r);
 }

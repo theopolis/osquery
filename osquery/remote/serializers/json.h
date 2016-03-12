@@ -29,8 +29,7 @@ class JSONSerializer : public Serializer {
    * @return An instance of osquery::Status indicating the success or failure
    * of the operation
    */
-  Status serialize(const boost::property_tree::ptree& params,
-                   std::string& serialized);
+  Status serialize(const Json::Value& params, std::string& serialized);
 
   /**
    * @brief Deerialize a property tree into a property tree
@@ -43,8 +42,7 @@ class JSONSerializer : public Serializer {
    * @return An instance of osquery::Status indicating the success or failure
    * of the operation
    */
-  Status deserialize(const std::string& serialized,
-                     boost::property_tree::ptree& params);
+  Status deserialize(const std::string& serialized, Json::Value& params);
 
   /**
    * @brief Returns the HTTP content type, for HTTP/TLS transport

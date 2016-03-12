@@ -73,8 +73,8 @@ class TLSRequestHelper : private boost::noncopyable {
    */
   template <class TSerializer>
   static Status go(const std::string& uri,
-                   boost::property_tree::ptree& params,
-                   boost::property_tree::ptree& output) {
+                   Json::Value& params,
+                   Json::Value& output) {
     auto node_key = getNodeKey("tls");
 
     // If using a GET request, append the node_key to the URI variables.
@@ -82,7 +82,7 @@ class TLSRequestHelper : private boost::noncopyable {
     if (FLAGS_tls_node_api) {
       uri_suffix = "&node_key=" + node_key;
     } else {
-      params.put<std::string>("node_key", node_key);
+      params["node_key"] = node_key;
     }
 
     // Again check for GET to call with/without parameters.
@@ -101,10 +101,11 @@ class TLSRequestHelper : private boost::noncopyable {
     }
 
     // Receive config or key rejection
-    if (output.count("error") > 0) {
-      return Status(1, "Request failed: " + output.get("error", "<unknown>"));
-    } else if (output.count("node_invalid") > 0) {
-      auto invalid = output.get("node_invalid", "");
+    if (output.isMember("error")) {
+      return Status(
+          1, "Request failed: " + output.get("error", "<unknown>").asString());
+    } else if (output.isMember("node_invalid")) {
+      auto invalid = output["node_invalid"].asString();
       if (invalid == "1" || invalid == "true" || invalid == "True") {
         if (!FLAGS_disable_reenrollment) {
           clearNodeKey();
@@ -125,9 +126,8 @@ class TLSRequestHelper : private boost::noncopyable {
    * @return a Status object indicating the success or failure of the operation
    */
   template <class TSerializer>
-  static Status go(const std::string& uri,
-                   boost::property_tree::ptree& output) {
-    boost::property_tree::ptree params;
+  static Status go(const std::string& uri, Json::Value& output) {
+    Json::Value params;
     return TLSRequestHelper::go<TSerializer>(uri, params, output);
   }
 
@@ -144,9 +144,9 @@ class TLSRequestHelper : private boost::noncopyable {
    */
   template <class TSerializer>
   static Status go(const std::string& uri,
-                   boost::property_tree::ptree& params,
+                   Json::Value& params,
                    std::string& output) {
-    boost::property_tree::ptree recv;
+    Json::Value recv;
     auto s = TLSRequestHelper::go<TSerializer>(uri, params, recv);
     if (s.ok()) {
       auto serializer = TSerializer();
@@ -166,7 +166,7 @@ class TLSRequestHelper : private boost::noncopyable {
    */
   template <class TSerializer>
   static Status go(const std::string& uri, std::string& output) {
-    boost::property_tree::ptree params;
+    Json::Value params;
     return TLSRequestHelper::go<TSerializer>(uri, params, output);
   }
 
@@ -184,7 +184,7 @@ class TLSRequestHelper : private boost::noncopyable {
    */
   template <class TSerializer>
   static Status go(const std::string& uri,
-                   boost::property_tree::ptree& params,
+                   Json::Value& params,
                    std::string& output,
                    const size_t attempts) {
     Status s;
@@ -215,7 +215,7 @@ class TLSRequestHelper : private boost::noncopyable {
   static Status go(const std::string& uri,
                    std::string& output,
                    const size_t attempts) {
-    boost::property_tree::ptree params;
+    Json::Value params;
     return TLSRequestHelper::go<TSerializer>(uri, params, output, attempts);
   }
 };

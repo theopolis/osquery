@@ -8,8 +8,6 @@
  *
  */
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include <gtest/gtest.h>
 
 #include <osquery/core.h>
@@ -28,7 +26,7 @@ class PacksTests : public testing::Test {};
 
 TEST_F(PacksTests, test_parse) {
   auto tree = getExamplePacksConfig();
-  EXPECT_EQ(tree.count("packs"), 1U);
+  EXPECT_TRUE(tree.isMember("packs"));
 }
 
 TEST_F(PacksTests, test_should_pack_execute) {
@@ -109,8 +107,8 @@ TEST_F(PacksTests, test_check_version) {
 TEST_F(PacksTests, test_restriction_population) {
   // Require that all potential restrictions are populated before being checked.
   auto tree = getExamplePacksConfig();
-  auto packs = tree.get_child("packs");
-  Pack fpack("fake_pack", packs.get_child("restricted_pack"));
+  auto packs = tree["packs"];
+  Pack fpack("fake_pack", packs["restricted_pack"]);
 
   ASSERT_FALSE(fpack.getPlatform().empty());
   ASSERT_FALSE(fpack.getVersion().empty());

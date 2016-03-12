@@ -216,6 +216,25 @@ function install_cppnetlib() {
   fi
 }
 
+function install_jsoncpp() {
+  SOURCE=jsoncpp-1.6.5
+  TARBALL=$SOURCE.tar.gz
+  URL=$DEPS_URL/$TARBALL
+
+  if provision jsoncpp /usr/local/lib/libjsoncpp.a; then
+    pushd $SOURCE
+    mkdir -p build
+    pushd build
+    CC="$CC" CXX="$CXX" cmake -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+      -DCMAKE_C_FLAGS="$CFLAGS" \
+      -DJSONCPP_WITH_TESTS=OFF -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF ..
+    make -j $THREADS
+    sudo make install
+    popd
+    popd
+  fi
+}
+
 function install_yara() {
   SOURCE=yara-3.4.0
   TARBALL=$SOURCE.tar.gz

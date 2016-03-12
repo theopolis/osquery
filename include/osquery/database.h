@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/property_tree/ptree.hpp>
+#include <json/value.h>
 
 #include <osquery/registry.h>
 #include <osquery/status.h>
@@ -77,14 +77,14 @@ using RowData = std::string;
 using Row = std::map<std::string, RowData>;
 
 /**
- * @brief Serialize a Row into a property tree
+ * @brief Serialize a Row into a JSON value
  *
  * @param r the Row to serialize
- * @param tree the output property tree
+ * @param tree the output JSON value
  *
  * @return Status indicating the success or failure of the operation
  */
-Status serializeRow(const Row& r, boost::property_tree::ptree& tree);
+Status serializeRow(const Row& r, Json::Value& tree);
 
 /**
  * @brief Serialize a Row object into a JSON string
@@ -97,14 +97,14 @@ Status serializeRow(const Row& r, boost::property_tree::ptree& tree);
 Status serializeRowJSON(const Row& r, std::string& json);
 
 /**
- * @brief Deserialize a Row object from a property tree
+ * @brief Deserialize a Row object from a JSON value
  *
- * @param tree the input property tree
+ * @param tree the input JSON value
  * @param r the output Row structure
  *
  * @return Status indicating the success or failure of the operation
  */
-Status deserializeRow(const boost::property_tree::ptree& tree, Row& r);
+Status deserializeRow(const Json::Value& tree, Row& r);
 
 /**
  * @brief Deserialize a Row object from a JSON string
@@ -129,15 +129,14 @@ Status deserializeRowJSON(const std::string& json, Row& r);
 using QueryData = std::vector<Row>;
 
 /**
- * @brief Serialize a QueryData object into a property tree
+ * @brief Serialize a QueryData object into a JSON value
  *
  * @param q the QueryData to serialize
- * @param tree the output property tree
+ * @param tree the output JSON value
  *
  * @return Status indicating the success or failure of the operation
  */
-Status serializeQueryData(const QueryData& q,
-                          boost::property_tree::ptree& tree);
+Status serializeQueryData(const QueryData& q, Json::Value& tree);
 
 /**
  * @brief Serialize a QueryData object into a JSON string
@@ -149,9 +148,8 @@ Status serializeQueryData(const QueryData& q,
  */
 Status serializeQueryDataJSON(const QueryData& q, std::string& json);
 
-/// Inverse of serializeQueryData, convert property tree to QueryData.
-Status deserializeQueryData(const boost::property_tree::ptree& tree,
-                            QueryData& qd);
+/// Inverse of serializeQueryData, convert JSON value to QueryData.
+Status deserializeQueryData(const Json::Value& tree, QueryData& qd);
 
 /// Inverse of serializeQueryDataJSON, convert a JSON string to QueryData.
 Status deserializeQueryDataJSON(const std::string& json, QueryData& qd);
@@ -185,15 +183,14 @@ struct DiffResults {
 };
 
 /**
- * @brief Serialize a DiffResults object into a property tree
+ * @brief Serialize a DiffResults object into a JSON value
  *
  * @param d the DiffResults to serialize
- * @param tree the output property tree
+ * @param tree the output JSON value
  *
  * @return Status indicating the success or failure of the operation
  */
-Status serializeDiffResults(const DiffResults& d,
-                            boost::property_tree::ptree& tree);
+Status serializeDiffResults(const DiffResults& d, Json::Value& tree);
 
 /**
  * @brief Serialize a DiffResults object into a JSON string
@@ -241,7 +238,7 @@ bool addUniqueRowToQueryData(QueryData& q, const Row& r);
  * This function is intended as a workaround for
  * https://svn.boost.org/trac/boost/ticket/8883,
  * and will allow rows containing data with non-ASCII characters to be stored in
- * the database and parsed back into a property tree.
+ * the database and parsed back into a JSON value.
  *
  * @param oldData the old QueryData to copy
  * @param newData the new escaped QueryData object
@@ -353,15 +350,14 @@ struct QueryLogItem {
 };
 
 /**
- * @brief Serialize a QueryLogItem object into a property tree
+ * @brief Serialize a QueryLogItem object into a JSON value
  *
  * @param item the QueryLogItem to serialize
- * @param tree the output property tree
+ * @param tree the output JSON value
  *
  * @return Status indicating the success or failure of the operation
  */
-Status serializeQueryLogItem(const QueryLogItem& item,
-                             boost::property_tree::ptree& tree);
+Status serializeQueryLogItem(const QueryLogItem& item, Json::Value& tree);
 
 /**
  * @brief Serialize a QueryLogItem object into a JSON string
@@ -373,24 +369,23 @@ Status serializeQueryLogItem(const QueryLogItem& item,
  */
 Status serializeQueryLogItemJSON(const QueryLogItem& item, std::string& json);
 
-/// Inverse of serializeQueryLogItem, convert property tree to QueryLogItem.
-Status deserializeQueryLogItem(const boost::property_tree::ptree& tree,
-                               QueryLogItem& item);
+/// Inverse of serializeQueryLogItem, convert JSON value to QueryLogItem.
+Status deserializeQueryLogItem(const Json::Value& tree, QueryLogItem& item);
 
 /// Inverse of serializeQueryLogItem, convert a JSON string to QueryLogItem.
 Status deserializeQueryLogItemJSON(const std::string& json, QueryLogItem& item);
 
 /**
- * @brief Serialize a QueryLogItem object into a property tree
+ * @brief Serialize a QueryLogItem object into a JSON value
  * of events, a list of actions.
  *
  * @param item the QueryLogItem to serialize
- * @param tree the output property tree
+ * @param tree the output JSON value
  *
  * @return Status indicating the success or failure of the operation
  */
 Status serializeQueryLogItemAsEvents(const QueryLogItem& item,
-                                     boost::property_tree::ptree& tree);
+                                     Json::Value& tree);
 
 /**
  * @brief Serialize a QueryLogItem object into a JSON string of events,

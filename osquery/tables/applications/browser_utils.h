@@ -10,19 +10,14 @@
 
 #pragma once
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include <osquery/filesystem.h>
 #include <osquery/tables.h>
-
-namespace fs = boost::filesystem;
-namespace pt = boost::property_tree;
 
 namespace osquery {
 namespace tables {
 
 QueryData genChromeBasedExtensions(QueryContext& context,
-                                   const fs::path& sub_dir);
+                                   const boost::filesystem::path& sub_dir);
 
 /// A helper check to rename bool-type values as 1 or 0.
 inline void jsonBoolAsInt(std::string& s) {

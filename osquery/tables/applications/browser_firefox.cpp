@@ -8,8 +8,6 @@
  *
  */
 
-#include <boost/property_tree/json_parser.hpp>
-
 #include <osquery/filesystem.h>
 #include <osquery/logger.h>
 #include <osquery/tables.h>
@@ -18,7 +16,6 @@
 #include "osquery/tables/system/system_utils.h"
 
 namespace fs = boost::filesystem;
-namespace pt = boost::property_tree;
 
 namespace osquery {
 namespace tables {
@@ -55,27 +52,27 @@ const std::map<std::string, std::string> kFirefoxAddonKeys = {
 void genFirefoxAddonsFromExtensions(const std::string& uid,
                                     const std::string& path,
                                     QueryData& results) {
-  pt::ptree tree;
+  Json::Value tree;
   if (!osquery::parseJSON(path + kFirefoxExtensionsFile, tree).ok()) {
     TLOG << "Could not parse JSON from: " << path + kFirefoxExtensionsFile;
     return;
   }
 
-  for (const auto& addon : tree.get_child("addons")) {
+  for (const auto& addon : tree["addons"]) {
     Row r;
     r["uid"] = uid;
     // Most of the keys are in the top-level JSON dictionary.
     for (const auto& it : kFirefoxAddonKeys) {
-      r[it.second] = addon.second.get(it.first, "");
+      r[it.second] = addon[it.first].asString();
 
       // Convert bool-types to an integer.
       jsonBoolAsInt(r[it.second]);
     }
 
     // There are several ways to disabled the addon, check each.
-    if (addon.second.get("softDisable", "false") == "true" ||
-        addon.second.get("appDisabled", "false") == "true" ||
-        addon.second.get("userDisabled", "false") == "true") {
+    if (addon.get("softDisable", false).asBool() ||
+        addon.get("appDisabled", false).asBool() ||
+        addon.get("userDisabled", false).asBool()) {
       r["disabled"] = INTEGER(1);
     } else {
       r["disabled"] = INTEGER(0);

@@ -26,6 +26,7 @@ function main_darwin() {
   package gflags
   package glog
   package lz4
+  package jsoncpp
   package snappy
   package rocksdb
   package thrift

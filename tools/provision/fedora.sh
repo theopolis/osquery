@@ -54,6 +54,7 @@ function main_fedora() {
   install_boost
   install_iptables_dev
   install_snappy
+  install_jsoncpp
   install_thrift
   install_gflags
   install_glog

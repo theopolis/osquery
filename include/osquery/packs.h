@@ -15,7 +15,8 @@
 #include <string>
 #include <vector>
 
-#include <boost/property_tree/ptree.hpp>
+#include <json/value.h>
+
 #include <boost/noncopyable.hpp>
 
 #include <osquery/database.h>
@@ -31,23 +32,20 @@ struct PackStats {
 
 /**
  * @brief The programmatic representation of a query pack
- *
- * Instantiating a new Pack object parses JSON and may throw a
- * boost::property_tree::json_parser::json_parser_error exception
  */
 class Pack : private boost::noncopyable {
  public:
-  Pack(const std::string& name, const boost::property_tree::ptree& tree)
+  Pack(const std::string& name, const Json::Value& tree)
       : Pack(name, "", tree) {}
   Pack(const std::string& name,
        const std::string& source,
-       const boost::property_tree::ptree& tree) {
+       const Json::Value& tree) {
     initialize(name, source, tree);
   }
 
   void initialize(const std::string& name,
                   const std::string& source,
-                  const boost::property_tree::ptree& tree);
+                  const Json::Value& tree);
   /**
    * @brief Getter for the pack's discovery query
    *

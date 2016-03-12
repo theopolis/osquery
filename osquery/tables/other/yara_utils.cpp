@@ -107,7 +107,7 @@ Status compileSingleFile(const std::string &file, YR_RULES **rules) {
  * in the map under the given category.
  */
 Status handleRuleFiles(const std::string &category,
-                       const pt::ptree &rule_files,
+                       const Json::Value &rule_files,
                        std::map<std::string, YR_RULES *> &rules) {
   YR_COMPILER *compiler = nullptr;
   int result = yr_compiler_create(&compiler);
@@ -121,8 +121,8 @@ Status handleRuleFiles(const std::string &category,
   bool compiled = false;
   for (const auto &item : rule_files) {
     YR_RULES *tmp_rules = nullptr;
-    auto rule = item.second.get("", "");
-    if (rule[0] != '/') {
+    auto rule = item.asString();
+    if (!rule.empty() && rule[0] != '/') {
       rule = std::string("/etc/osquery/yara/") + rule;
     }
 
@@ -256,12 +256,12 @@ Status YARAConfigParserPlugin::update(const std::string &source,
   const auto &yara_config = config.at("yara");
 
   // Look for a "signatures" key with the group/file content.
-  if (yara_config.count("signatures") > 0) {
-    const auto &signatures = yara_config.get_child("signatures");
-    data_.add_child("signatures", signatures);
-    for (const auto &element : signatures) {
-      VLOG(1) << "Compiling YARA signature group: " << element.first;
-      auto status = handleRuleFiles(element.first, element.second, rules_);
+  if (yara_config.isMember("signatures") > 0) {
+    const auto &signatures = yara_config["signatures"];
+    data_["signatures"] = signatures;
+    for (auto it = signatures.begin(); it != signatures.end(); it++) {
+      VLOG(1) << "Compiling YARA signature group: " << it.name();
+      auto status = handleRuleFiles(it.name(), *it, rules_);
       if (!status.ok()) {
         VLOG(1) << "YARA rule compile error: " << status.getMessage();
         return status;
@@ -271,9 +271,9 @@ Status YARAConfigParserPlugin::update(const std::string &source,
 
   // The "file_paths" set maps the rule groups to the "file_paths" top level
   // configuration key. That similar key keeps the groups of file paths.
-  if (yara_config.count("file_paths") > 0) {
-    const auto &file_paths = yara_config.get_child("file_paths");
-    data_.add_child("file_paths", file_paths);
+  if (yara_config.isMember("file_paths") > 0) {
+    const auto &file_paths = yara_config["file_paths"];
+    data_["file_paths"] = file_paths;
   }
   return Status(0, "OK");
 }

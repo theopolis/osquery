@@ -149,10 +149,10 @@ http::client TLSTransport::getClient() {
 
   // 'Optionally', though all TLS plugins should set a hostname, supply an SNI
   // hostname. This will reveal the requested domain.
-  if (options_.count("hostname")) {
+  if (options_.isMember("hostname")) {
 #if BOOST_NETLIB_VERSION_MINOR >= 12
     // Boost cpp-netlib will only support SNI in versions >= 0.12
-    options.openssl_sni_hostname(options_.get<std::string>("hostname"));
+    options.openssl_sni_hostname(options_["hostname"].asString());
 #endif
   }
 
@@ -203,8 +203,8 @@ Status TLSTransport::sendRequest(const std::string& params) {
 
   // Allow request calls to override the default HTTP POST verb.
   HTTPVerb verb = HTTP_POST;
-  if (options_.count("verb") > 0) {
-    verb = (HTTPVerb)options_.get<int>("verb", HTTP_POST);
+  if (options_.isMember("verb") > 0) {
+    verb = (HTTPVerb)options_.get("verb", HTTP_POST).asInt();
   }
 
   try {

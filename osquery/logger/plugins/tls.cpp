@@ -13,8 +13,8 @@
 #include <thread>
 #include <vector>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <json/reader.h>
+#include <json/writer.h>
 
 #include <osquery/enroll.h>
 #include <osquery/flags.h>
@@ -26,8 +26,6 @@
 #include "osquery/remote/utility.h"
 
 #include "osquery/logger/plugins/tls.h"
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -85,23 +83,16 @@ Status TLSLoggerPlugin::logString(const std::string& s) {
 
 Status TLSLoggerPlugin::logStatus(const std::vector<StatusLogLine>& log) {
   for (const auto& item : log) {
-    // Convert the StatusLogLine into ptree format, to convert to JSON.
-    pt::ptree buffer;
-    buffer.put("severity", (google::LogSeverity)item.severity);
-    buffer.put("filename", item.filename);
-    buffer.put("line", item.line);
-    buffer.put("message", item.message);
+    // Convert the StatusLogLine into JSON.
+    Json::Value buffer;
+    buffer["severity"] = (google::LogSeverity)item.severity;
+    buffer["filename"] = item.filename;
+    buffer["line"] = item.line;
+    buffer["message"] = item.message;
 
     // Convert to JSON, for storing a string-representation in the database.
-    std::string json;
-    try {
-      std::stringstream json_output;
-      pt::write_json(json_output, buffer, false);
-      json = json_output.str();
-    } catch (const pt::json_parser::json_parser_error& e) {
-      // The log could not be represented as JSON.
-      return Status(1, e.what());
-    }
+    Json::FastWriter writer;
+    auto json = writer.write(buffer);
 
     // Store the status line in a backing store.
     if (!json.empty()) {
@@ -137,27 +128,21 @@ Status TLSLoggerPlugin::init(const std::string& name,
 
 Status TLSLogForwarderRunner::send(std::vector<std::string>& log_data,
                                    const std::string& log_type) {
-  pt::ptree params;
-  params.put<std::string>("node_key", node_key_);
-  params.put<std::string>("log_type", log_type);
+  Json::Value params;
+  params["node_key"] = node_key_;
+  params["log_type"] = log_type;
 
   {
     // Read each logged line into JSON and populate a list of lines.
     // The result list will use the 'data' key.
-    pt::ptree children;
+    Json::Value children;
     iterate(log_data, ([&children](std::string& item) {
-              pt::ptree child;
-              try {
-                std::stringstream input;
-                input << item;
-                std::string().swap(item);
-                pt::read_json(input, child);
-              } catch (const pt::json_parser::json_parser_error& e) {
-                // The log line entered was not valid JSON, skip it.
-              }
-              children.push_back(std::make_pair("", std::move(child)));
+              Json::Value child;
+              Json::Reader reader;
+              reader.parse(item, child, false);
+              children.append(std::move(child));
             }));
-    params.add_child("data", std::move(children));
+    params["data"] = std::move(children);
   }
 
   auto request = Request<TLSTransport, JSONSerializer>(uri_);
