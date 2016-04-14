@@ -24,8 +24,9 @@ QueryData genListeningPorts(QueryContext& context) {
 
   PortMap ports;
   for (const auto& socket : sockets) {
-    if (socket.at("remote_port") != "0") {
+    if (socket.at("remote_port") != "0" || socket.at("local_port") == "0") {
       // Listening UDP/TCP ports have a remote_port == "0"
+      // If a local port is 0 then ignore the protocol/family = 0.
       continue;
     }
 
