@@ -22,6 +22,8 @@
 #include <osquery/database.h>
 #include <osquery/filesystem.h>
 
+#include "osquery/core/process.h"
+
 namespace pt = boost::property_tree;
 
 namespace osquery {
