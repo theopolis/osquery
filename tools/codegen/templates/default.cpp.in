@@ -41,6 +41,19 @@ class {{table_name_cc}}TablePlugin : public TablePlugin {
     };
   }
 
+{% if has_options %}\
+  ColumnOptionMap options() const override {
+    return {
+{% for column in schema %}\
+{% if column.options|length > 0 %}\
+      {"{{column.name}}", {{column.options_set}}}\
+{% if not loop.last %}, {% endif %}
+{% endif %}\
+{% endfor %}\
+    };
+  }
+{% endif %}\
+
   QueryData generate(QueryContext& request) override {
 {% if class_name != "" %}\
     if (EventFactory::exists(getName())) {
@@ -51,13 +64,13 @@ class {{table_name_cc}}TablePlugin : public TablePlugin {
       return QueryData();
     }
 {% else %}\
-{% if attributes.cachable %}\
+{% if attributes.cacheable %}\
     if (isCached(kCacheStep)) {
       return getCache();
     }
 {% endif %}\
     auto results = tables::{{function}}(request);
-{% if attributes.cachable %}\
+{% if attributes.cacheable %}\
     setCache(kCacheStep, kCacheInterval, results);
 {% endif %}
     return results;

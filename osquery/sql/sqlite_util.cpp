@@ -287,7 +287,7 @@ Status QueryPlanner::applyTypes(TableColumns& columns) {
       auto k = boost::lexical_cast<size_t>(row.at("p1"));
       for (const auto& type : column_types) {
         if (type.first - k < columns.size()) {
-          columns[type.first - k].second = type.second;
+          std::get<1>(columns[type.first - k]) = type.second;
         }
       }
     }
