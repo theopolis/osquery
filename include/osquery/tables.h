@@ -185,6 +185,9 @@ using TableColumns =
 /// Alias for map of column option flags to each column name.
 using ColumnOptionMap = std::map<std::string, ColumnOptions>;
 
+/// Alias for map of column alias sets.
+using ColumnAliasSet = std::map<std::string, std::set<std::string>>;
+
 /// Forward declaration of QueryContext for ConstraintList relationships.
 struct QueryContext;
 
@@ -576,6 +579,19 @@ class TablePlugin : public Plugin {
    * to communicate these subtleties to the user.
    */
   virtual ColumnOptionMap options() const { return ColumnOptionMap(); }
+
+  /**
+   * @brief Table name aliases create full-scan VIEWs for tables.
+   *
+   * Aliases allow table names to be changed/deprecated without breaking
+   * existing deployments and scheduled queries.
+   *
+   * @return A string vector of table name aliases.
+   */
+  virtual std::vector<std::string> aliases() const { return {}; }
+
+  /// Define a map of target columns to optional aliases.
+  virtual ColumnAliasSet columnAliases() const { return {}; }
 
   /**
    * @brief Generate a complete table representation.

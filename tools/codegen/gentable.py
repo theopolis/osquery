@@ -178,6 +178,7 @@ class TableState(Singleton):
         self.description = ""
         self.attributes = {}
         self.examples = []
+        self.aliases = []
         self.has_options = False
 
     def columns(self):
@@ -240,6 +241,7 @@ class TableState(Singleton):
             class_name=self.class_name,
             attributes=self.attributes,
             examples=self.examples,
+            aliases=self.aliases,
             has_options=self.has_options,
         )
 
@@ -262,10 +264,11 @@ class Column(object):
     documentation generation and reference.
     """
 
-    def __init__(self, name, col_type, description="", **kwargs):
+    def __init__(self, name, col_type, description="", aliases=[], **kwargs):
         self.name = name
         self.type = col_type
         self.description = description
+        self.aliases = aliases
         self.options = kwargs
 
 
@@ -281,7 +284,7 @@ class ForeignKey(object):
         self.table = kwargs.get("table", "")
 
 
-def table_name(name):
+def table_name(name, aliases=[]):
     """define the virtual table name"""
     logging.debug("- table_name")
     logging.debug("  - called with: %s" % name)
@@ -289,6 +292,7 @@ def table_name(name):
     table.description = ""
     table.attributes = {}
     table.examples = []
+    table.aliases = aliases
 
 
 def schema(schema_list):

@@ -131,7 +131,10 @@ Status TablePlugin::call(const PluginRequest& request,
                           {"op", INTEGER(std::get<2>(column))}});
     }
   } else if (request.at("action") == "definition") {
-    response.push_back({{"definition", columnDefinition()}});
+    response.push_back({
+        {"definition", columnDefinition()},
+
+    });
   } else {
     return Status(1, "Unknown table plugin action: " + request.at("action"));
   }
@@ -144,12 +147,29 @@ std::string TablePlugin::columnDefinition() const {
 }
 
 PluginResponse TablePlugin::routeInfo() const {
-  // Route info consists of only the serialized column information.
+  // Route info consists of the serialized column information.
   PluginResponse response;
   for (const auto& column : columns()) {
-    response.push_back({{"name", std::get<0>(column)},
+    response.push_back({{"type", "column"},
+                        {"name", std::get<0>(column)},
                         {"type", columnTypeName(std::get<1>(column))},
                         {"op", INTEGER(std::get<2>(column))}});
+  }
+
+  // Each table name alias is provided such that the core may add the views.
+  // These views need to be removed when the backing table is detached.
+  for (const auto& alias : aliases()) {
+    response.push_back({{"type", "alias"}, {"alias", alias}});
+  }
+
+  // Each column alias must be provided, additionally to the column's option.
+  // This sets up the value-replacement move within the SQL implementation.
+  for (const auto& target : columnAliases()) {
+    for (const auto& alias : target.second) {
+      response.push_back({{"type", "column_alias"},
+                          {"name", alias},
+                          {"target", target.first}});
+    }
   }
   return response;
 }

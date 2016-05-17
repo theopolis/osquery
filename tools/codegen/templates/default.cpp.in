@@ -41,6 +41,16 @@ class {{table_name_cc}}TablePlugin : public TablePlugin {
     };
   }
 
+{% if aliases|length > 0 %}\
+  std::vector<std::string> aliases() const override {
+    return {
+{% for alias in aliases %}\
+      "{{alias}}"\
+{% if not loop.last %}, {% endif %}
+{% endfor %}
+    };
+  }
+{% endif %}\
 {% if has_options %}\
   ColumnOptionMap options() const override {
     return {
