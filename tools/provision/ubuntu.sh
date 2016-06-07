@@ -60,6 +60,7 @@ function main_ubuntu() {
 
   if [[ $DISTRO = "precise" ]]; then
     package ruby1.9.3
+    package ruby1.9.1-dev
     sudo update-alternatives --set ruby /usr/bin/ruby1.9.1
     sudo update-alternatives --set gem /usr/bin/gem1.9.1
   fi
