@@ -8,6 +8,20 @@ macro(LOG MESSAGE)
   message("-- ${MESSAGE}")
 endmacro(LOG)
 
+# Set expected directory for within-build dependencies
+if(DEFINED ENV{OSQUERY_DEPS})
+  set(BUILD_DEPS "$ENV{OSQUERY_DEPS}")
+else()
+  set(BUILD_DEPS "/usr/local/osquery")
+endif()
+
+# Add the BUILD_DEPS library folder to CMake's link flags.
+# This allows CMake's compile tests to complete, but should be removed to
+# assure universal libc/libgcc linking.
+if(LINUX)
+  set(CMAKE_CXX_FLAGS "-L${BUILD_DEPS}/lib -Qunused-arguments")
+endif()
+
 # If no explicit compiler override and clang++ exists, prefer clang.
 find_file(CLANGXX_EXISTS "clang++")
 if(DEFINED ENV{CC})
@@ -25,8 +39,11 @@ endif()
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
-  LOG("Found ccache ${CCACHE_FOUND}")
-  LOG("Using ccache to speed up compilation")
+  if(NOT DEFINED CCACHE_FOUND_LOG)
+    set(CCACHE_FOUND_LOG TRUE CACHE BOOL "Write log line for ccache.")
+    LOG("Found ccache ${CCACHE_FOUND}")
+    LOG("Using ccache to speed up compilation")
+  endif()
   set(ENV{CCACHE_CPP2} "yes")
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
@@ -148,18 +165,6 @@ if(${OSQUERY_BUILD_DISTRO} STREQUAL "wheezy")
   set (CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu")
 endif()
 
-# Provisioning installs non-default C++11 runtimes on build hosts.
-# List those distros that include a non-system-default runtime.
-set(OSQUERY_REQUIRE_RUNTIMES
-  "lucid"
-  "precise"
-  "centos6"
-  "scientific6"
-  "rhel6"
-  "oracle6"
-  "wheezy"
-)
-
 # make debug (environment variable from Makefile)
 if(DEFINED ENV{DEBUG})
   set(DEBUG TRUE)
@@ -223,7 +228,7 @@ endif()
 
 # make analyze (environment variable from Makefile)
 if(DEFINED ENV{ANALYZE})
-  # TODO(#1985): How do we support clang-analyze on Windows?
+  # TODO(#1985): clang-analyze on Windows
   if(WIN32)
     message(FATAL_ERROR "Cannot analyze on Windows right now." )
   else()
@@ -364,6 +369,18 @@ elseif(DEBIAN_BASED)
   add_definitions(-DDEBIAN_BASED=1)
 endif()
 
+# Add sysroot overrides for each platform/distro.
+# These should be prioritized over all other includes.
+if(APPLE)
+  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/darwin")
+elseif(LINUX)
+  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/linux")
+endif()
+
+include_directories("${CMAKE_SOURCE_DIR}/third-party/sqlite3")
+include_directories("${CMAKE_SOURCE_DIR}/include")
+include_directories("${CMAKE_SOURCE_DIR}")
+
 set(MKDIR_OPTS "")
 if(WIN32)
   set(PROCESS_FAMILY "windows")
@@ -413,6 +430,12 @@ if(WIN32)
 else()
   set(PROCESS_FAMILY "posix")
   set(MKDIR_OPTS "-p")
+
+  find_program(THRIFT_COMPILER "thrift" HINTS "${BUILD_DEPS}")
+  find_program(PYTHON_EXECUTABLE "python" HINTS "${BUILD_DEPS}")
+
+  include_directories("${BUILD_DEPS}/include")
+  include_directories("${BUILD_DEPS}/include/openssl")
 endif()
 
 # Make sure the generated paths exist
@@ -421,72 +444,14 @@ execute_process(COMMAND mkdir ${MKDIR_OPTS} "${CMAKE_BINARY_DIR}/generated")
 # We need to link some packages as dynamic/dependent.
 set(CMAKE_FIND_LIBRARY_SUFFIXES .dll .dylib .so .a)
 
-find_package(BZip2 REQUIRED)
-
-if(NOT WIN32)
-  find_package(Dl REQUIRED)
-endif()
-
-find_package(Readline REQUIRED)
-
-# Apple has deprecated OpenSSL, static link with brew bottled libressl
-if(APPLE)
-  if(DEFINED ENV{BUILD_USE_LIBRESSL} OR ${OSQUERY_BUILD_DISTRO} STREQUAL "10.11")
-    if(NOT DEFINED ENV{BUILD_LINK_SHARED})
-      set(CMAKE_FIND_LIBRARY_SUFFIXES .a .dylib .so)
-    endif()
-    execute_process(COMMAND brew --prefix OUTPUT_VARIABLE BREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-    set(OPENSSL_ROOT_DIR "${BREW_PREFIX}/opt/libressl")
-  else()
-    # Some installs may find the optional brew /usr/local/lib/ as the root.
-    set(OPENSSL_ROOT_DIR "/usr")
-  endif()
-endif()
-
-find_package(OpenSSL REQUIRED)
-include_directories("${OPENSSL_INCLUDE_DIR}")
-
-# Make sure the OpenSSL/ssl library has a TLS client method.
-# Prefer the highest version of TLS, but accept 1.2, 1.1, or 1.0.
-include(CheckLibraryExists)
-set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
-set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES})
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "SSLv3_client_method" "" OPENSSL_SSL3)
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "TLSv1_2_client_method" "" OPENSSL_TLSV12)
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "TLSv1_1_client_method" "" OPENSSL_TLSV11)
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "TLSv1_client_method" "" OPENSSL_TLSV10)
-
-# Add a define based on the highest TLS version found. Fatal if no TLS client.
-if(OPENSSL_TLSV12)
-  add_definitions(-DHAS_SSL_TXT_TLSV1_2)
-elseif(OPENSSL_TLSV11)
-  add_definitions(-DHAS_SSL_TXT_TLSV1_1)
-elseif(OPENSSL_TLSV10)
-  add_definitions(-DHAS_SSL_TXT_TLSV1)
-else()
-  message(FATAL_ERROR "Cannot find any TLS client methods")
-endif()
-if(NOT OPENSSL_SSL3)
-  add_definitions(-DNO_SSL_TXT_SSLV3)
-endif()
-
 # Most dependent packages/libs we want static.
 if(NOT DEFINED ENV{BUILD_LINK_SHARED})
   set(CMAKE_FIND_LIBRARY_SUFFIXES .a .dylib .so)
 endif()
 
-if(DEFINED ENV{BOOST_ROOT})
-  set(BOOST_ROOT "$ENV{BOOST_ROOT}")
-  include_directories("${BOOST_ROOT}")
-endif()
-
-find_package(Gtest REQUIRED)
-find_package(Thrift 0.9.3 REQUIRED)
-
 # If using the RocksDB LITE version our code must also define ROCKSDB_LITE=1
 if(NOT DEFINED ENV{SKIP_ROCKSDB})
   set(ROCKSDB TRUE)
-  find_package(RocksDB REQUIRED)
 endif()
 
 # Python is used for table spec generation and formating.
@@ -497,14 +462,11 @@ if(NOT WIN32)
   endif()
 endif()
 
+find_package(Gtest REQUIRED)
 enable_testing()
 
 include(Packages)
 include(Thrift)
-
-include_directories("${CMAKE_SOURCE_DIR}/third-party/sqlite3")
-include_directories("${CMAKE_SOURCE_DIR}/include")
-include_directories("${CMAKE_SOURCE_DIR}")
 
 if(WIN32)
   # TODO(#1988): The paths used here might need to be modified in the future once third party dependencies
@@ -524,23 +486,6 @@ if(WIN32)
   # TODO(#1990): We probably need to add our third-party link directories here
   link_directories("${BOOST_DEP_DIR}/lib64-msvc-14.0")
   link_directories("${WINDOWS_DEP_DIR}/linenoise-ng/local/lib")
-else()
-  include_directories("/usr/local/include")
-  link_directories("/usr/local/lib")
-endif()
-
-# Add custom homebrew paths
-if(APPLE)
-  execute_process(COMMAND brew --prefix OUTPUT_VARIABLE BREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-  include_directories("${BREW_PREFIX}/include")
-  link_directories("${BREW_PREFIX}/lib")
-endif()
-
-# Add sysroot overrides for each platform/distro.
-if(APPLE)
-  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/darwin")
-elseif(LINUX)
-  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/linux")
 endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/sqlite3")

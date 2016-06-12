@@ -1,22 +1,26 @@
 class AwsSdkCpp < Formula
   desc "AWS SDK for C++"
   homepage "https://github.com/aws/aws-sdk-cpp"
-  url "https://github.com/aws/aws-sdk-cpp.git",
-    :tag => "0.12.17"
+  url "https://osquery-packages.s3.amazonaws.com/deps/aws-sdk-cpp-0.12.4.tar.gz"
 
-  option "with-static", "Build with static linking"
-  option "without-http-client", "Don't include the libcurl HTTP client"
-  option "with-logging-only", "Only build logging-related SDKs"
-  option "with-minimize-size", "Request size optimization"
+  bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
+    cellar :any_skip_relocation
+    sha256 "2c885ba185eb9db9f2a17fe4478bfb5044a3bc7bdaf24134ca83693365dd88e3" => :el_capitan
+    sha256 "9ab0bb9efacbbc7a9f22e0b7378dbecb119d3c9fa3ec59f9dd5aa99b8504e0da" => :x86_64_linux
+  end
 
   depends_on "cmake" => :build
 
   def install
+    ENV.cxx11
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
+
     args = std_cmake_args
-    args << "-DSTATIC_LINKING=1" if build.with? "static" or true
-    args << "-DNO_HTTP_CLIENT=1" if build.without? "http-client" or true
-    args << "-DBUILD_ONLY=firehose;kinesis" if build.with? "logging-only" or true
-    args << "-DMINIMIZE_SIZE=ON" if build.with? "minimize-size" or true
+    args << "-DSTATIC_LINKING=1"
+    args << "-DNO_HTTP_CLIENT=1"
+    args << "-DBUILD_ONLY=firehose;kinesis"
+    args << "-DMINIMIZE_SIZE=ON"
 
     mkdir "build" do
       system "cmake", "..", *args
