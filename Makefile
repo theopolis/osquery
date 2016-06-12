@@ -85,7 +85,7 @@ test_debug_build:
 		$(DEFINES) $(MAKE) test --no-print-directory $(MAKEFLAGS)
 
 deps: .setup
-	./tools/provision.sh build build/$(BUILD_DIR)
+	./tools/provision.sh build $(BUILD_DIR)
 
 clean: .setup
 	cd build/$(BUILD_DIR) && cmake ../../ && \

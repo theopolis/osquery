@@ -7,35 +7,41 @@
 #  LICENSE file in the root directory of this source tree. An additional grant
 #  of patent rights can be found in the PATENTS file in the same directory.
 
-function main_darwin() {
-  type brew >/dev/null 2>&1 || {
-    fatal "could not find homebrew. please install it from http://brew.sh/";
-  }
-
+function distro_main() {
   type pip >/dev/null 2>&1 || {
     fatal "could not find pip. please install it using 'sudo easy_install pip'";
   }
 
-  brew update
+  brew_tool xz
+  # brew_tool perl --without-test # Needs -lgdbm
+  brew_tool sphinx-doc
 
-  package wget
-  package cmake
-  package makedepend
-  package doxygen
-  package boost
-  package gflags
-  package glog
-  package lz4
-  package snappy
-  package rocksdb
-  package thrift
-  package yara
-  package libressl
-  package asio
-  package cpp-netlib
-  package google-benchmark
-  package libmagic
-  package sleuthkit
+  brew_dependency sqlite
+  brew_dependency readline
+  # brew_dependency zlib this is not available on Darwin
+  # brew_dependency bzip2 this is also not available on Darwin
+  brew_dependency openssl
 
-  local_brew aws-sdk-cpp
+  $BREW link --force openssl
+
+  brew_tool pkg-config
+  brew_tool cmake
+
+  local_brew_dependency boost
+  local_brew_dependency asio
+  local_brew_dependency cpp-netlib
+
+  brew_dependency google-benchmark
+  brew_dependency snappy
+  brew_dependency sleuthkit
+  brew_dependency libmagic
+
+  # Yara will pull in lz4, bz2, and libpcre.
+
+  local_brew_dependency yara
+  local_brew_dependency glog
+  local_brew_dependency thrift
+  local_brew_dependency rocksdb
+  local_brew_dependency gflags
+  local_brew_dependency aws-sdk-cpp
 }

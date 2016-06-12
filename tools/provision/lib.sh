@@ -7,6 +7,30 @@
 #  LICENSE file in the root directory of this source tree. An additional grant
 #  of patent rights can be found in the PATENTS file in the same directory.
 
+# 1: Path to install brew into
+# 2: Linux or Darwin
+function setup_brew() {
+  if [[ "$2" == "linux" ]]; then
+    BREW=https://github.com/Linuxbrew/brew
+  else
+    BREW=https://github.com/Homebrew/brew
+  fi
+
+  # Checkout new brew in local deps dir
+  DEPS="$1"
+  if [[ ! -d "$DEPS/.git" ]]; then
+    log "setting up new brew"
+    git clone $BREW .
+  else
+    log "checking for updates to brew"
+    git pull
+  fi
+
+  export HOMEBREW_MAKE_JOBS=$THREADS
+  export HOMEBREW_NO_EMOJI=1
+  export BREW="$DEPS/bin/brew"
+}
+
 function install_gcc() {
   SOURCE=gcc-4.8.4
   TARBALL=$SOURCE.tar.gz
@@ -552,30 +576,47 @@ function install_ruby() {
 #   2: parse structure
 function json_element() {
   CMD="import json,sys;obj=json.load(sys.stdin);print ${2}"
-  RESULT=`(echo "${1}" | python -c "${CMD}") || echo 'NAN'`
+  RESULT=`(echo "${1}" | python -c "${CMD}") 2>&1 || echo 'NAN'`
   echo $RESULT
+}
+
+# local_brew_tool NAME
+#   1: tool name
+function brew_tool() {
+  TOOL=$1
+  shift
+
+  export HOMEBREW_OPTIMIZATION_LEVEL=-Os
+  $BREW install $@ "$TOOL" --cc=clang
+}
+
+function brew_dependency() {
+  TOOL=$1
+  shift
+
+  export HOMEBREW_OPTIMIZATION_LEVEL=-Os
+  $BREW install --build-bottle $@ "$TOOL" --cc=clang
 }
 
 # local_brew NAME
 #   1: formula name
-function local_brew() {
+function local_brew_dependency() {
   FORMULA="${FORMULA_DIR}/$1.rb"
-  INFO=`brew info --json=v1 "${FORMULA}"`
+  INFO=`$BREW info --json=v1 "${FORMULA}"`
   INSTALLED=$(json_element "${INFO}" 'obj[0]["linked_keg"]')
   STABLE=$(json_element "${INFO}" 'obj[0]["versions"]["stable"]')
 
   # Could improve this detection logic to remove from-bottle.
   FROM_BOTTLE=false
 
-  export HOMEBREW_MAKE_JOBS=$THREADS
-  export HOMEBREW_NO_EMOJI=1
+  export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   if [[ "${INSTALLED}" = "NAN" || "${INSTALLED}" = "None" ]]; then
     log "local package $1 installing new version: ${STABLE}"
-    brew install -v --build-bottle "${FORMULA}"
+    $BREW install -v --build-bottle "${FORMULA}" --cc=clang
   elif [[ ! "${INSTALLED}" = "${STABLE}" || "${FROM_BOTTLE}" = "true" ]]; then
     log "local package $1 upgrading to new version: ${STABLE}"
-    brew uninstall "${FORMULA}"
-    brew install -v --build-bottle "${FORMULA}"
+    $BREW uninstall "${FORMULA}"
+    $BREW install --build-bottle "${FORMULA}" --cc=clang
   else
     log "local package $1 is already install: ${STABLE}"
   fi
@@ -701,6 +742,8 @@ function provision() {
 }
 
 function check() {
+  CMD="$1"
+  DISTRO_BUILD_DIR="build/$2"
   platform OS
 
   if [[ $OS = "darwin" ]]; then
@@ -711,13 +754,13 @@ function check() {
     HASH=`sha1sum "$0" | awk '{print $1}'`
   fi
 
-  if [[ "$1" = "build" ]]; then
-    echo $HASH > "$2/.provision"
+  if [[ "$CMD" = "build" ]]; then
+    echo $HASH > "$DISTRO_BUILD_DIR/.provision"
     if [[ ! -z "$SUDO_USER" ]]; then
-      chown $SUDO_USER "$2/.provision" > /dev/null 2>&1 || true
+      chown $SUDO_USER "$DISTRO_BUILD_DIR/.provision" > /dev/null 2>&1 || true
     fi
     return
-  elif [[ ! "$1" = "check" ]]; then
+  elif [[ ! "$CMD" = "check" ]]; then
     return
   fi
 
@@ -726,7 +769,7 @@ function check() {
     exit 1
   fi
 
-  CHECKPOINT=`cat $2/.provision 2>&1 &`
+  CHECKPOINT=`cat $DISTRO_BUILD_DIR/.provision 2>&1 &`
   if [[ ! $HASH = $CHECKPOINT ]]; then
     echo "Requested dependencies may have changed, run: make deps"
     exit 1

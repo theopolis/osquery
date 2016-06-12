@@ -96,9 +96,11 @@ if(APPLE)
   # Special compile flags for Objective-C++
   set(OBJCXX_COMPILE_FLAGS
     "-x objective-c++ -fobjc-arc -Wno-c++11-extensions")
+  set(BUILD_DEPS "darwin")
 elseif(WIN32)
   # Windows
   # C++11 features should be on by default in 2012 and beyond.
+  set(BUILD_DEPS "windows")
 else()
   set(CXX_COMPILE_FLAGS "${CXX_COMPILE_FLAGS} -std=c++11")
   set(OS_WHOLELINK_PRE "-Wl,-whole-archive")
@@ -109,11 +111,16 @@ else()
     set(FREEBSD TRUE)
     set(LINUX FALSE)
     set(ENV{SKIP_BENCHMARKS} "TRUE")
+    set(BUILD_DEPS "freebsd")
   else()
     set(LINUX TRUE)
     set(FREEBSD FALSE)
+    set(BUILD_DEPS "linux")
   endif()
 endif()
+
+# Set expected directory for within-build dependencies
+set(BUILD_DEPS "${CMAKE_SOURCE_DIR}/build/deps_${BUILD_DEPS}")
 
 # BUILD BUG: See issue #2112
 set(ENV{SKIP_BENCHMARKS} TRUE)
@@ -167,9 +174,7 @@ if(DEFINED ENV{DEBUG})
   add_definitions(-DDEBUG)
   WARNING_LOG("Setting DEBUG build")
 elseif(DEFINED ENV{SANITIZE})
-  # TODO(#1985): In the future, we need to find the MSVC equivalent flags for the following 
-  #              compiler flags.
-  
+  # TODO(#1985): MSVC does not have an equivalent
   # make sanitize (cannot make debug sanitize)
   add_compile_options(
     -g
@@ -204,9 +209,7 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(NOT DEFINED ENV{OPTIMIZED})
-  # TODO(#1985): Is there a congruent flag in MSVC for -mno-avx flag? I think it is implicit that the default
-  #              does not use avx. Ideally, this should be kept WIN64 only but we are having trouble determining
-  #              the target architecture
+  # TODO(#1985): MSVC -mno-avx flag equivalent
   if(WIN32)
     add_compile_options(/favor:AMD64)
   else()
@@ -216,7 +219,7 @@ endif()
 
 # make analyze (environment variable from Makefile)
 if(DEFINED ENV{ANALYZE})
-  # TODO(#1985): How do we support clang-analyze on Windows?
+  # TODO(#1985): clang-analyze on Windows
   if(WIN32)
     message(FATAL_ERROR "Cannot analyze on Windows right now." )
   else()
@@ -367,9 +370,6 @@ if(WIN32)
   set(WINDOWS_DEP_DIR "$ENV{ChocolateyInstall}/lib")
   string(REGEX REPLACE "\\\\" "/" WINDOWS_DEP_DIR ${WINDOWS_DEP_DIR})
   set(BOOST_DEP_DIR "$ENV{HOMEDRIVE}/local/boost-msvc14")
-  
-  # TODO(#1988): All the paths used here are within third-party\. However, after chocolateyfication, these
-  #              paths are subject to change.
 
   # Win64 specific BZIP2 variables
   set(BZIP2_INCLUDE_DIR "${WINDOWS_DEP_DIR}/bzip2/local/include")
@@ -405,9 +405,22 @@ if(WIN32)
   
   # Win64 specific glog
   set(glog_library "${WINDOWS_DEP_DIR}/glog/local/lib/glog.lib")
+
+  include_directories("${THRIFT_INCLUDE_DIR}")
+  include_directories("${BOOST_DEP_DIR}")
+  include_directories("${WINDOWS_DEP_DIR}/glog/local/include")
+  include_directories("${WINDOWS_DEP_DIR}/gflags-dev/local/include")
+
+  link_directories("${BOOST_DEP_DIR}/lib64-msvc-14.0")
 else()
   set(PROCESS_FAMILY "posix")
   set(MKDIR_OPTS "-p")
+
+  set(THRIFT_COMPILER "${BUILD_DEPS}/bin/thrift")
+  set(PYTHON_EXECUTABLE "/usr/bin/python")
+
+  include_directories("${BUILD_DEPS}/include")
+  link_directories("${BUILD_DEPS}/lib/")
 endif()
 
 # Make sure the generated paths exist 
@@ -416,72 +429,15 @@ execute_process(COMMAND mkdir ${MKDIR_OPTS} "${CMAKE_BINARY_DIR}/generated")
 # We need to link some packages as dynamic/dependent.
 set(CMAKE_FIND_LIBRARY_SUFFIXES .dll .dylib .so .a)
 
-find_package(BZip2 REQUIRED)
-
-if(NOT WIN32)
-  find_package(Dl REQUIRED)
-endif()
-
-find_package(Readline REQUIRED)
-
-# Apple has deprecated OpenSSL, static link with brew bottled libressl
-if(APPLE)
-  if(DEFINED ENV{BUILD_USE_LIBRESSL} OR ${OSQUERY_BUILD_DISTRO} STREQUAL "10.11")
-    if(NOT DEFINED ENV{BUILD_LINK_SHARED})
-      set(CMAKE_FIND_LIBRARY_SUFFIXES .a .dylib .so)
-    endif()
-    execute_process(COMMAND brew --prefix OUTPUT_VARIABLE BREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-    set(OPENSSL_ROOT_DIR "${BREW_PREFIX}/opt/libressl")
-  else()
-    # Some installs may find the optional brew /usr/local/lib/ as the root.
-    set(OPENSSL_ROOT_DIR "/usr")
-  endif()
-endif()
-
-find_package(OpenSSL REQUIRED)
-include_directories("${OPENSSL_INCLUDE_DIR}")
-
-# Make sure the OpenSSL/ssl library has a TLS client method.
-# Prefer the highest version of TLS, but accept 1.2, 1.1, or 1.0.
-include(CheckLibraryExists)
-set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
-set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES})
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "SSLv3_client_method" "" OPENSSL_SSL3)
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "TLSv1_2_client_method" "" OPENSSL_TLSV12)
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "TLSv1_1_client_method" "" OPENSSL_TLSV11)
-CHECK_LIBRARY_EXISTS(${OPENSSL_SSL_LIBRARY} "TLSv1_client_method" "" OPENSSL_TLSV10)
-
-# Add a define based on the highest TLS version found. Fatal if no TLS client.
-if(OPENSSL_TLSV12)
-  add_definitions(-DHAS_SSL_TXT_TLSV1_2)
-elseif(OPENSSL_TLSV11)
-  add_definitions(-DHAS_SSL_TXT_TLSV1_1)
-elseif(OPENSSL_TLSV10)
-  add_definitions(-DHAS_SSL_TXT_TLSV1)
-else()
-  message(FATAL_ERROR "Cannot find any TLS client methods")
-endif()
-if(NOT OPENSSL_SSL3)
-  add_definitions(-DNO_SSL_TXT_SSLV3)
-endif()
 
 # Most dependent packages/libs we want static.
 if(NOT DEFINED ENV{BUILD_LINK_SHARED})
   set(CMAKE_FIND_LIBRARY_SUFFIXES .a .dylib .so)
 endif()
 
-if(DEFINED ENV{BOOST_ROOT})
-  set(BOOST_ROOT "$ENV{BOOST_ROOT}")
-  include_directories("${BOOST_ROOT}")
-endif()
-
-find_package(Gtest REQUIRED)
-find_package(Thrift 0.9.3 REQUIRED)
-
 # If using the RocksDB LITE version our code must also define ROCKSDB_LITE=1
 if(NOT DEFINED ENV{SKIP_ROCKSDB})
   set(ROCKSDB TRUE)
-  find_package(RocksDB REQUIRED)
 endif()
 
 # Python is used for table spec generation and formating.
@@ -500,28 +456,6 @@ include(Thrift)
 include_directories("${CMAKE_SOURCE_DIR}/third-party/sqlite3")
 include_directories("${CMAKE_SOURCE_DIR}/include")
 include_directories("${CMAKE_SOURCE_DIR}")
-
-if(WIN32)
-  # TODO(#1988): The paths used here might need to be modified in the future once third party dependencies
-  #              are made into chocolatey packages.
-  include_directories("${THRIFT_INCLUDE_DIR}")
-  include_directories("${BOOST_DEP_DIR}")
-  include_directories("${WINDOWS_DEP_DIR}/glog/local/include")
-  include_directories("${WINDOWS_DEP_DIR}/gflags-dev/local/include")
-  
-  # TODO(#1990): We probably need to add our third-party link directories here
-  link_directories("${BOOST_DEP_DIR}/lib64-msvc-14.0")
-else()
-  include_directories("/usr/local/include")
-  link_directories("/usr/local/lib")
-endif()
-
-# Add custom homebrew paths
-if(APPLE)
-  execute_process(COMMAND brew --prefix OUTPUT_VARIABLE BREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-  include_directories("${BREW_PREFIX}/include")
-  link_directories("${BREW_PREFIX}/lib")
-endif()
 
 # Add sysroot overrides for each platform/distro.
 if(APPLE)
@@ -553,9 +487,6 @@ if(DOXYGEN_FOUND)
     COMMENT "Generating API documentation with Doxygen" VERBATIM
   )
 endif(DOXYGEN_FOUND)
-
-# TODO(#1985): We either need to find an equivalent command on Windows or write a Python script
-#              in tools/ that accomplishes the same task in a platform agnostic manner.
 
 # make format-all
 add_custom_target(

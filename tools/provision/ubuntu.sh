@@ -18,114 +18,164 @@ function add_repo() {
   fi
 }
 
-function main_ubuntu() {
-  if [[ $DISTRO = "precise" ]]; then
-    add_repo ppa:ubuntu-toolchain-r/test
-  elif [[ $DISTRO = "lucid" ]]; then
-    add_repo ppa:lucid-bleed/ppa
+function distro_main() {
+  if [[ "0" = "1" ]]; then
+    if [[ $DISTRO = "precise" ]]; then
+      add_repo ppa:ubuntu-toolchain-r/test
+    elif [[ $DISTRO = "lucid" ]]; then
+      add_repo ppa:lucid-bleed/ppa
+    fi
+
+    sudo apt-get update -y
+
+    if [[ $DISTRO = "lucid" ]]; then
+      package git-core
+    else
+      package git
+    fi
+
+    package wget
+    package unzip
+    package build-essential
+    package flex
+    package devscripts
+    package debhelper
+    package python-pip
+    package python-dev
+    # package linux-headers-generic
+    package ruby-dev
+    package gcc
+    package doxygen
+
+    package autopoint
+    package libssl-dev
+    package liblzma-dev
+    package uuid-dev
+    package libpopt-dev
+    package libdpkg-dev
+    package libudev-dev
+    package libblkid-dev
+    package libbz2-dev
+    package libreadline-dev
+    package libcurl4-openssl-dev
+
+    if [[ $DISTRO = "precise" ]]; then
+      package ruby1.9.3
+      sudo update-alternatives --set ruby /usr/bin/ruby1.9.1
+      sudo update-alternatives --set gem /usr/bin/gem1.9.1
+    fi
+
+    if [[ $DISTRO = "lucid" ]]; then
+      package libopenssl-ruby
+
+      package clang
+      package g++-multilib
+      install_gcc
+    elif [[ $DISTRO = "precise" ]]; then
+      # Need gcc 4.8 from ubuntu-toolchain-r/test to compile RocksDB/osquery.
+      package gcc-4.8
+      package g++-4.8
+      sudo update-alternatives \
+        --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 150 \
+        --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+
+      package clang-3.4
+      package clang-format-3.4
+    fi
+
+    if [[ $DISTRO = "precise" || $DISTRO = "lucid" || $DISTRO = "wily" ]]; then
+      package rubygems
+    fi
+
+    if [[ $DISTRO = "precise" || $DISTRO = "lucid" ]]; then
+      # Temporary removes (so we can override default paths).
+      package autotools-dev
+
+      #remove_package pkg-config
+      remove_package autoconf
+      remove_package automake
+      remove_package libtool
+
+      #install_pkgconfig
+      package pkg-config
+
+      install_autoconf
+      install_automake
+      install_libtool
+    else
+      package clang-3.6
+      package clang-format-3.6
+
+      sudo ln -sf /usr/bin/clang-3.6 /usr/bin/clang
+      sudo ln -sf /usr/bin/clang++-3.6 /usr/bin/clang++
+      sudo ln -sf /usr/bin/clang-format-3.6 /usr/bin/clang-format
+      sudo ln -sf /usr/bin/llvm-config-3.6 /usr/bin/llvm-config
+      sudo ln -sf /usr/bin/llvm-symbolizer-3.6 /usr/bin/llvm-symbolizer
+
+      package pkg-config
+      package autoconf
+      package automake
+      package libtool
+    fi
+
+    if [[ $DISTRO = "xenial" ]]; then
+      # Ubuntu bug 1578006
+      package plymouth-label
+    fi
+
+    set_cc gcc #-4.8
+    set_cxx g++ #-4.8
   fi
 
-  sudo apt-get update -y
+  brew_tool xz
+  brew_tool perl --without-test
+  brew_tool sphinx-doc
 
-  if [[ $DISTRO = "lucid" ]]; then
-    package git-core
-  else
-    package git
-  fi
+  brew_dependency sqlite
+  brew_dependency readline
+  brew_dependency zlib
+  brew_dependency bzip2
+  brew_dependency openssl
 
-  package wget
-  package unzip
-  package build-essential
-  package flex
-  package devscripts
-  package debhelper
-  package python-pip
-  package python-dev
-  # package linux-headers-generic
-  package ruby-dev
-  package gcc
-  package doxygen
+  brew_tool pkg-config
+  brew_tool cmake
 
-  package autopoint
-  package libssl-dev
-  package liblzma-dev
-  package uuid-dev
-  package libpopt-dev
-  package libdpkg-dev
-  package libudev-dev
-  package libblkid-dev
-  package libbz2-dev
-  package libreadline-dev
-  package libcurl4-openssl-dev
+  local_brew_dependency boost
+  local_brew_dependency asio
+  local_brew_dependency cpp-netlib
 
-  if [[ $DISTRO = "precise" ]]; then
-    package ruby1.9.3
-    sudo update-alternatives --set ruby /usr/bin/ruby1.9.1
-    sudo update-alternatives --set gem /usr/bin/gem1.9.1
-  fi
+  brew_dependency google-benchmark
+  brew_dependency snappy
 
-  if [[ $DISTRO = "lucid" ]]; then
-    package libopenssl-ruby
+  brew_dependency sleuthkit
+  brew_dependency libmagic
 
-    package clang
-    package g++-multilib
-    install_gcc
-  elif [[ $DISTRO = "precise" ]]; then
-    # Need gcc 4.8 from ubuntu-toolchain-r/test to compile RocksDB/osquery.
-    package gcc-4.8
-    package g++-4.8
-    sudo update-alternatives \
-      --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 150 \
-      --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+  local_brew_dependency thrift
+  local_brew_dependency rocksdb
+  local_brew_dependency gflags
+  local_brew_dependency aws-sdk-cpp
+  local_brew_dependency yara
+  local_brew_dependency glog
 
-    package clang-3.4
-    package clang-format-3.4
-  fi
+  # This begins the linux-specific dependencies.
+  # This provides the libblkid libraries.
+  brew_dependency util-linux
 
-  if [[ $DISTRO = "precise" || $DISTRO = "lucid" || $DISTRO = "wily" ]]; then
-    package rubygems
-  fi
+  local_brew_dependency libdevmapper
+  local_brew_dependency libaptpkg
+  local_brew_dependency libiptables
+  local_brew_dependency libgcrypt
+  local_brew_dependency libcryptsetup
+  local_brew_dependency libudev
+  local_brew_dependency libaudit
+  local_brew_dependency libdpkg
 
-  if [[ $DISTRO = "precise" || $DISTRO = "lucid" ]]; then
-    # Temporary removes (so we can override default paths).
-    package autotools-dev
+  # Util-Linux provides a static libuuid.
+  #brew_dependency libuuid
 
-    #remove_package pkg-config
-    remove_package autoconf
-    remove_package automake
-    remove_package libtool
+  return
 
-    #install_pkgconfig
-    package pkg-config
-
-    install_autoconf
-    install_automake
-    install_libtool
-  else
-    package clang-3.6
-    package clang-format-3.6
-
-    sudo ln -sf /usr/bin/clang-3.6 /usr/bin/clang
-    sudo ln -sf /usr/bin/clang++-3.6 /usr/bin/clang++
-    sudo ln -sf /usr/bin/clang-format-3.6 /usr/bin/clang-format
-    sudo ln -sf /usr/bin/llvm-config-3.6 /usr/bin/llvm-config
-    sudo ln -sf /usr/bin/llvm-symbolizer-3.6 /usr/bin/llvm-symbolizer
-
-    package pkg-config
-    package autoconf
-    package automake
-    package libtool
-  fi
-
-  if [[ $DISTRO = "xenial" ]]; then
-    # Ubuntu bug 1578006
-    package plymouth-label
-  fi
-
-  set_cc gcc #-4.8
-  set_cxx g++ #-4.8
-
-  install_cmake
+  #install_cmake
 
   if [[ $DISTRO = "lucid" ]]; then
     gem_install fpm -v 1.3.3

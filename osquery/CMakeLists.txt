@@ -36,26 +36,14 @@ if(WIN32)
 else()
   set(OS_CORE_LIBS
     pthread
-  )
-  set(BZIP2_LIBRARIES
-    bz2
     z
   )
 endif()
 
 # The core set of osquery libraries most discovered with find_package.
 set(OSQUERY_LIBS
-  ${OPENSSL_CRYPTO_LIBRARY}
-  ${OPENSSL_SSL_LIBRARY}
-  ${READLINE_LIBRARIES}
-  ${BZIP2_LIBRARIES}
   ${OS_CORE_LIBS}
 )
-
-# If building with RocksDB (default) append associated libraries.
-if(ROCKSDB)
-  set(OSQUERY_LIBS ${OSQUERY_LIBS} ${ROCKSDB_LIBRARIES})
-endif()
 
 if(APPLE OR LINUX)
   set(OSQUERY_LIBS ${OSQUERY_LIBS} dl)
@@ -75,7 +63,6 @@ endforeach()
 if(APPLE)
   ADD_OSQUERY_LINK_CORE("-Wl,-dead_strip")
   ADD_OSQUERY_LINK_CORE("-mmacosx-version-min=${OSX_VERSION_MIN}")
-  ADD_OSQUERY_LINK_CORE("lz4")
 elseif(LINUX OR FREEBSD)
   ADD_OSQUERY_LINK_CORE("-Wl,-zrelro -Wl,-znow")
   if(NOT ${OSQUERY_BUILD_DISTRO} STREQUAL "rhel6" AND
@@ -91,22 +78,30 @@ if(LINUX)
   ADD_OSQUERY_LINK_CORE("-Wl,--build-id")
 endif()
 
+ADD_OSQUERY_LINK_CORE("rocksdb_lite")
+ADD_OSQUERY_LINK_CORE("snappy")
+
 # The remaining boost libraries are discovered with find_library.
 ADD_OSQUERY_LINK_CORE("thrift")
 ADD_OSQUERY_LINK_CORE("gflags")
 ADD_OSQUERY_LINK_CORE("glog")
-ADD_OSQUERY_LINK_CORE("boost_system")
-ADD_OSQUERY_LINK_CORE("boost_filesystem")
-ADD_OSQUERY_LINK_CORE("boost_regex")
+
+ADD_OSQUERY_LINK_CORE("boost_system-mt")
+ADD_OSQUERY_LINK_CORE("boost_filesystem-mt")
+ADD_OSQUERY_LINK_CORE("boost_regex-mt")
 
 # TODO(#1956): Ignoring on WIN32 for now
 if(NOT WIN32)
-  ADD_OSQUERY_LINK_CORE("yara")
+  ADD_OSQUERY_LINK_ADDITIONAL("yara")
 endif()
 
 # Remaining additional development libraries.
 ADD_OSQUERY_LINK_ADDITIONAL("cppnetlib-uri")
 ADD_OSQUERY_LINK_ADDITIONAL("cppnetlib-client-connections")
+ADD_OSQUERY_LINK_ADDITIONAL("ssl")
+ADD_OSQUERY_LINK_ADDITIONAL("crypto")
+ADD_OSQUERY_LINK_ADDITIONAL("readline")
+ADD_OSQUERY_LINK_CORE("lzma bz2 lz4")
 
 if(DEFINED ENV{SANITIZE})
   if(DEFINED ENV{SANITIZE_THREAD})
@@ -197,8 +192,8 @@ if(NOT ${OSQUERY_BUILD_SDK_ONLY})
   add_dependencies(shell osquery_tools)
 
   add_executable(daemon main/daemon.cpp)
-  TARGET_OSQUERY_LINK_WHOLE(daemon libosquery)
   TARGET_OSQUERY_LINK_WHOLE(daemon libosquery_additional)
+  TARGET_OSQUERY_LINK_WHOLE(daemon libosquery)
   SET_OSQUERY_COMPILE(daemon "${CXX_COMPILE_FLAGS}")
   set_target_properties(daemon PROPERTIES OUTPUT_NAME osqueryd)
 

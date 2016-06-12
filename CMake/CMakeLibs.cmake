@@ -66,15 +66,27 @@ macro(ADD_OSQUERY_LINK IS_CORE LINK)
 endmacro(ADD_OSQUERY_LINK)
 
 macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
-  set(LINK_PATHS "${CMAKE_BUILD_DIR}/third-party/*/lib"
-    ${LINK_PATHS} /usr/lib /usr/local/lib "$ENV{HOME}")
+  set(LINK_PATHS
+    "${BUILD_DEPS}/lib"
+    "${CMAKE_BUILD_DIR}/third-party/*/lib"
+    ${LINK_PATHS}
+    "/usr/lib"
+    "/usr/lib/x86_64-linux-gnu/"
+    "$ENV{HOME}")
   if(NOT "${LINK}" MATCHES "(^[-/].*)")
     string(REPLACE " " ";" ITEMS "${LINK}")
     foreach(ITEM ${ITEMS})
       if(NOT DEFINED ${${ITEM}_library})
         if(NOT DEFINED ENV{BUILD_LINK_SHARED})
           find_library("${ITEM}_library"
-            NAMES "lib${ITEM}.a" "${ITEM}" ${LINK_PATHS})
+            NAMES "lib${ITEM}.a" "${ITEM}"
+            HINTS 
+              "${BUILD_DEPS}/lib"
+              "${CMAKE_BUILD_DIR}/third-party/*/lib"
+              ${LINK_PATHS}
+              "/usr/lib"
+              "/usr/lib/x86_64-linux-gnu/"
+              "$ENV{HOME}")
         else()
           find_library("${ITEM}_library"
             NAMES "lib${ITEM}.so" "lib${ITEM}.dylib" "${ITEM}" ${LINK_PATHS})

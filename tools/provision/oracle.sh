@@ -7,7 +7,7 @@
 #  LICENSE file in the root directory of this source tree. An additional grant
 #  of patent rights can be found in the PATENTS file in the same directory.
 
-function main_oracle() {
+function distro_main() {
   if [[ $DISTRO = "oracle5" ]]; then
     # Install the Fedora EPEL yum repository.
     sudo cp $FILES_DIR/oracle5.epel.repo /etc/yum.repos.d/

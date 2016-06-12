@@ -31,7 +31,7 @@ function enable_repo() {
   fi
 }
 
-function main_rhel() {
+function distro_main() {
   if [[ -z `rpm -qa epel-release` ]]; then
     if [[ $DISTRO = "rhel6" ]]; then
       sudo rpm -iv $DEPS_URL/epel-release-6-8.noarch.rpm

@@ -63,21 +63,20 @@ else()
       ${OSQUERY_UBUNTU_TABLES}
     )
 
-    # libdpkg API is volitile and suffers breaking changes.
-    # We need to find and pass in the libdpkg version via pkg-config
-    find_package(Libdpkg REQUIRED)
+    set(LIBDPKG_VERSION_NUMBER "1018004")
     add_definitions(-DLIBDPKG_VERSION=${LIBDPKG_VERSION_NUMBER})
 
-    ADD_OSQUERY_LINK_ADDITIONAL("apt-pkg dpkg liblzma.so")
-    ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup libdevmapper.so")
+    ADD_OSQUERY_LINK_ADDITIONAL("apt-pkg dpkg lzma lz4")
+    ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup devmapper")
+    ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
   endif()
 
-  ADD_OSQUERY_LINK_ADDITIONAL("libgcrypt.so")
   ADD_OSQUERY_LINK_ADDITIONAL("libresolv.so")
+  ADD_OSQUERY_LINK_ADDITIONAL("gcrypt gpg-error")
   ADD_OSQUERY_LINK_ADDITIONAL("blkid")
-  ADD_OSQUERY_LINK_ADDITIONAL("libuuid.so")
+  ADD_OSQUERY_LINK_ADDITIONAL("uuid")
   ADD_OSQUERY_LINK_ADDITIONAL("ip4tc")
-  ADD_OSQUERY_LINK_ADDITIONAL("libmagic.so")
+  ADD_OSQUERY_LINK_ADDITIONAL("magic")
   ADD_OSQUERY_LINK_ADDITIONAL("tsk")
 endif()
 

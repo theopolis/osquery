@@ -9,14 +9,17 @@
 
 set -e
 
+CC=clang
+CXX=clang++
 CFLAGS="-fPIE -fPIC -Os -DNDEBUG -march=x86-64 -mno-avx"
 CXXFLAGS="$CFLAGS"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BUILD_DIR="$SCRIPT_DIR/../build"
-WORKING_DIR="/tmp/osquery-provisioning"
-FILES_DIR="$SCRIPT_DIR/provision/files"
+
+WORKING_DIR="/tmp/osquery-provisioning" # no longer needed
+FILES_DIR="$SCRIPT_DIR/provision/files" # maybe needed
 FORMULA_DIR="$SCRIPT_DIR/provision/formula"
-DEPS_URL=https://osquery-packages.s3.amazonaws.com/deps
+DEPS_URL=https://osquery-packages.s3.amazonaws.com/deps # no longer needed
 export PATH="$PATH:/usr/local/bin"
 
 source "$SCRIPT_DIR/lib.sh"
@@ -39,57 +42,57 @@ function main() {
     if [[ $OS = "linux" ]]; then
       chown -h $SUDO_USER:$SUDO_GID "$BUILD_DIR/linux" || true
     fi
-    chown $SUDO_USER:$SUDO_GID "$WORKING_DIR" > /dev/null 2>&1 || true
   fi
-  cd "$WORKING_DIR"
 
+  BREW_TYPE="linux"
   if [[ $OS = "oracle" ]]; then
     log "detected oracle ($DISTRO)"
     source "$SCRIPT_DIR/provision/oracle.sh"
-    main_oracle
   elif [[ $OS = "centos" ]]; then
     log "detected centos ($DISTRO)"
     source "$SCRIPT_DIR/provision/centos.sh"
-    main_centos
   elif [[ $OS = "scientific" ]]; then
     log "detected scientific linux ($DISTRO)"
     source "$SCRIPT_DIR/provision/scientific.sh"
-    main_scientific
   elif [[ $OS = "rhel" ]]; then
     log "detected rhel ($DISTRO)"
     source "$SCRIPT_DIR/provision/rhel.sh"
-    main_rhel
   elif [[ $OS = "amazon" ]]; then
     log "detected amazon ($DISTRO)"
     source "$SCRIPT_DIR/provision/amazon.sh"
-    main_amazon
   elif [[ $OS = "ubuntu" ]]; then
     log "detected ubuntu ($DISTRO)"
     source "$SCRIPT_DIR/provision/ubuntu.sh"
-    main_ubuntu
   elif [[ $OS = "darwin" ]]; then
     log "detected mac os x ($DISTRO)"
     source "$SCRIPT_DIR/provision/darwin.sh"
-    main_darwin
+    BREW_TYPE="darwin"
   elif [[ $OS = "freebsd" ]]; then
     log "detected freebsd ($DISTRO)"
     source "$SCRIPT_DIR/provision/freebsd.sh"
-    main_freebsd
   elif [[ $OS = "fedora" ]]; then
     log "detected fedora ($DISTRO)"
     source "$SCRIPT_DIR/provision/fedora.sh"
-    main_fedora
   elif [[ $OS = "debian" ]]; then
     log "detected debian ($DISTRO)"
     source "$SCRIPT_DIR/provision/debian.sh"
-    main_debian
   else
     fatal "could not detect the current operating system. exiting."
-  fi
+  fi  
+
+
+  DEPS_DIR="$BUILD_DIR/deps_${BREW_TYPE}"
+  mkdir -p "$DEPS_DIR"
+  chown $SUDO_USER:$SUDO_GID "$DEPS_DIR" > /dev/null 2>&1 || true
+  cd "$DEPS_DIR"
+
+  setup_brew "$DEPS_DIR" "$BREW_TYPE"
+  distro_main
 
   cd "$SCRIPT_DIR/../"
 
   # Pip may have just been installed.
+  log "upgrading pip and installing python dependencies"
   PIP=`which pip`
   sudo $PIP install --upgrade pip
   sudo $PIP install -r requirements.txt
@@ -98,4 +101,4 @@ function main() {
 }
 
 check $1 $2
-main $1
+main $1 $2

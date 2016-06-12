@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function main_debian() {
+function distro_main() {
   sudo apt-get update -y --no-install-recommends
   sudo apt-get upgrade -y --no-install-recommends
 
