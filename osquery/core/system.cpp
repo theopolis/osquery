@@ -162,6 +162,8 @@ size_t getUnixTime() {
   return result;
 }
 
+#ifndef WIN32
+
 Status checkStalePid(const std::string& content) {
   int pid;
   try {
@@ -352,4 +354,5 @@ DropPrivileges::~DropPrivileges() {
     restoreGroups();
   }
 }
+#endif
 }

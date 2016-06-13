@@ -13,13 +13,19 @@
 ** utility for accessing SQLite databases.
 */
 
+#include <iostream>
+
 #include <signal.h>
 #include <stdio.h>
+
+#ifdef WIN32
+#include <io.h>
+#else
 #include <sys/resource.h>
 #include <sys/time.h>
+#endif
 
-#include <readline/history.h>
-#include <readline/readline.h>
+#include <linenoise.h>
 
 #include <sqlite3.h>
 
@@ -32,11 +38,14 @@
 #include <osquery/packs.h>
 
 #include "osquery/devtools/devtools.h"
+#include "osquery/filesystem/fileops.h"
 #include "osquery/sql/virtual_table.h"
 
 #if defined(SQLITE_ENABLE_WHERETRACE)
 extern int sqlite3WhereTrace;
 #endif
+
+namespace fs = boost::filesystem;
 
 namespace osquery {
 
@@ -98,7 +107,11 @@ static const char *modeDescr[] = {
 };
 
 // Make sure isatty() has a prototype.
+#ifdef WIN32
+int isatty(int fd) { return _isatty(fd); }
+#else
 extern int isatty(int);
+#endif
 
 // ctype macros that work with signed characters
 #define IsSpace(X) isspace((unsigned char)X)
@@ -124,6 +137,7 @@ static sqlite3_int64 timeOfDay(void) {
   return t;
 }
 
+#ifndef WIN32
 // Saved resource information for the beginning of an operation
 static struct rusage sBegin; // CPU time at start
 static sqlite3_int64 iBegin; // Wall-clock time at start
@@ -157,6 +171,14 @@ static void endTimer(void) {
 #define BEGIN_TIMER beginTimer()
 #define END_TIMER endTimer()
 #define HAS_TIMER 1
+
+#else
+
+#define BEGIN_TIMER
+#define END_TIMER
+#define HAS_TIMER 0
+
+#endif
 
 // Used to prevent warnings about unused parameters
 #define UNUSED_PARAMETER(x) (void)(x)
@@ -257,9 +279,9 @@ static char *one_input_line(FILE *in, char *zPrior, int isContinuation) {
   } else {
     char *zPrompt = isContinuation ? continuePrompt : mainPrompt;
     free(zPrior);
-    zResult = readline(zPrompt);
+    zResult = linenoise(zPrompt);
     if (zResult && *zResult) {
-      add_history(zResult);
+      linenoiseHistoryAdd(zResult);
     }
   }
   return zResult;
@@ -1522,11 +1544,14 @@ int launchIntoShell(int argc, char **argv) {
       printBold("virtual database");
       printf(". Need help, type '.help'\n");
 
-      auto history_file = osquery::osqueryHomeDirectory() + "/.history";
-      read_history(history_file.c_str());
+      auto history_file =
+          (fs::path(osquery::osqueryHomeDirectory()) / ".history")
+              .make_preferred()
+              .string();
+      linenoiseHistorySetMaxLen(100);
+      linenoiseHistoryLoad(history_file.c_str());
       rc = process_input(&data, 0);
-      stifle_history(100);
-      write_history(history_file.c_str());
+      linenoiseHistorySave(history_file.c_str());
     } else {
       rc = process_input(&data, stdin);
     }

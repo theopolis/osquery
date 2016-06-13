@@ -445,6 +445,7 @@ bool PlatformFile::isSpecialFile() const {
   return (::GetFileType(handle_) != FILE_TYPE_DISK);
 }
 
+// TODO: getCurrentUserSid should be an independent function!
 static Status isUserCurrentUser(PSID user) {
   BOOL ret = FALSE;
   HANDLE token = INVALID_HANDLE_VALUE;

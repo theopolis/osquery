@@ -24,6 +24,7 @@ DECLARE_bool(disable_distributed);
 DECLARE_string(distributed_plugin);
 
 void DistributedRunner::start() {
+#ifndef WIN32
   auto dist = Distributed();
   while (!interrupted()) {
     dist.pullUpdates();
@@ -32,9 +33,11 @@ void DistributedRunner::start() {
     }
     pauseMilli(FLAGS_distributed_interval * 1000);
   }
+#endif
 }
 
 Status startDistributed() {
+#ifndef WIN32
   if (!FLAGS_disable_distributed && !FLAGS_distributed_plugin.empty() &&
       Registry::getActive("distributed") == FLAGS_distributed_plugin) {
     Dispatcher::addService(std::make_shared<DistributedRunner>());
@@ -42,5 +45,8 @@ Status startDistributed() {
   } else {
     return Status(1, "Distributed query service not enabled.");
   }
+#else
+  return Status(0, "OK");
+#endif
 }
 }

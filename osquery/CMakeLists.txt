@@ -18,7 +18,7 @@ set(OSQUERY_TABLES_TESTS "")
 # TODO(WIN64): Changes for Win64 CMake
 if(WIN32)
   add_compile_options(
-    /Wall
+    /W3
   )
 else()
   add_compile_options(
@@ -31,7 +31,9 @@ endif()
 if(WIN32)
   set(OS_CORE_LIBS
     netapi32.lib
+    rpcrt4.lib
     shlwapi.lib
+    wbemuuid.lib
   )
 else()
   set(OS_CORE_LIBS
@@ -127,14 +129,17 @@ add_subdirectory(core)
 add_subdirectory(database)
 add_subdirectory(devtools)
 add_subdirectory(dispatcher)
-add_subdirectory(distributed)
 add_subdirectory(events)
 add_subdirectory(extensions)
 add_subdirectory(filesystem)
 add_subdirectory(logger)
 add_subdirectory(registry)
-add_subdirectory(remote)
 add_subdirectory(sql)
+
+if(NOT WIN32)
+  add_subdirectory(distributed)
+  add_subdirectory(remote)
+endif()
 
 if(NOT ENV{SKIP_TABLES})
   add_subdirectory(tables)
@@ -180,6 +185,7 @@ if(NOT ${OSQUERY_BUILD_SDK_ONLY})
   GENERATE_TABLES("${CMAKE_SOURCE_DIR}")
   AMALGAMATE("${CMAKE_SOURCE_DIR}" "additional" AMALGAMATION)
   AMALGAMATE("${CMAKE_SOURCE_DIR}" "foreign" AMALGAMATION_FOREIGN)
+  
   ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_additional_amalgamation ${AMALGAMATION})
   ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_foreign_amalgamation ${AMALGAMATION_FOREIGN})
 
@@ -194,9 +200,10 @@ if(NOT ${OSQUERY_BUILD_SDK_ONLY})
   TARGET_OSQUERY_LINK_WHOLE(shell libosquery_additional)
   SET_OSQUERY_COMPILE(shell "${CXX_COMPILE_FLAGS}")
   set_target_properties(shell PROPERTIES OUTPUT_NAME osqueryi)
+  target_link_libraries(shell "linenoise.lib")
   add_dependencies(shell osquery_tools)
 
-  add_executable(daemon main/daemon.cpp)
+  add_executable(daemon main/${PROCESS_FAMILY}/daemon.cpp)
   TARGET_OSQUERY_LINK_WHOLE(daemon libosquery)
   TARGET_OSQUERY_LINK_WHOLE(daemon libosquery_additional)
   SET_OSQUERY_COMPILE(daemon "${CXX_COMPILE_FLAGS}")
@@ -254,7 +261,7 @@ if(NOT DEFINED ENV{SKIP_TESTS})
   add_test(osquery_tests osquery_tests)
 
   # osquery kernel tests.
-  if(NOT ${OSQUERY_BUILD_SDK_ONLY})
+  if(NOT ${OSQUERY_BUILD_SDK_ONLY} AND NOT WIN32)
     add_executable(osquery_kernel_tests main/tests.cpp ${OSQUERY_KERNEL_TESTS})
     TARGET_OSQUERY_LINK_WHOLE(osquery_kernel_tests libosquery)
     TARGET_OSQUERY_LINK_WHOLE(osquery_kernel_tests libosquery_additional)

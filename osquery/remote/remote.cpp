@@ -11,7 +11,9 @@
 #include <string>
 #include <cstring>
 
+#ifndef WIN32
 #include <zlib.h>
+#endif
 
 namespace osquery {
 
@@ -19,6 +21,9 @@ namespace osquery {
 #define MOD_GZIP_ZLIB_CFACTOR 9
 
 std::string compressString(const std::string& data) {
+#ifdef WIN32
+  return data;
+#else
   z_stream zs;
   memset(&zs, 0, sizeof(zs));
 
@@ -56,5 +61,6 @@ std::string compressString(const std::string& data) {
   }
 
   return output;
+#endif
 }
 }
