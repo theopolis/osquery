@@ -127,8 +127,16 @@ function distro_main() {
     set_cxx g++ #-4.8
   fi
 
+  package git
+
+  if [[ $DISTRO = "precise" || $DISTRO = "lucid" ]]; then
+    package gawk
+    brew_tool gcc
+  fi
+
   brew_tool xz
   brew_tool perl --without-test
+  brew_tool gpatch
   brew_tool sphinx-doc
 
   brew_dependency sqlite
