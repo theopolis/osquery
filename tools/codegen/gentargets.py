@@ -16,18 +16,22 @@ def get_files_to_compile(json_data):
     files_to_compile = []
     for element in json_data:
         filename = element["file"]
-        if not filename.endswith("tests.cpp") and \
-                not filename.endswith("benchmarks.cpp") and \
-                "third-party" not in filename and \
-                "example" not in filename and \
-                "generated/gen" not in filename and \
-                "test_util" not in filename:
-            base = filename.rfind("osquery/")
-            filename = filename[base + len("osquery/"):]
-            base_generated = filename.rfind("generated/")
-            if base_generated >= 0:
-                filename = filename[base_generated:]
-            files_to_compile.append(filename)
+        print filename
+        if filename.endswith("tests.cpp") or \
+                filename.endswith("benchmarks.cpp") or \
+                filename.endswith(".mm") or \
+                "third-party" in filename or \
+                "example" in filename or \
+                "generated/gen" in filename or \
+                "windows" in filename or \
+                "test_util" in filename:
+            continue
+        base = filename.rfind("osquery/")
+        filename = filename[base + len("osquery/"):]
+        base_generated = filename.rfind("generated/")
+        if base_generated >= 0:
+            filename = filename[base_generated:]
+        files_to_compile.append(filename)
     return files_to_compile
 
 TARGETS_PREAMBLE = """
@@ -60,7 +64,6 @@ TARGETS_POSTSCRIPT = """  ],
     "gflags",
     "gtest",
     "rocksdb",
-    "libuuid",
   ],
   compiler_flags=[
     "-Wno-unused-function",

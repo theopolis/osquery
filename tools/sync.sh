@@ -39,6 +39,10 @@ rm -rf "$SYNC_DIR/osquery/examples"
 
 # delete all of the old CMake files
 find "$SYNC_DIR" -type f -name "CMakeLists.txt" -exec rm -f {} \;
+# delete the tests
+find "$SYNC_DIR" -type f -name "*_tests*" -exec rm -f {} \;
+find "$SYNC_DIR" -type f -name "*_benchmarks*" -exec rm -f {} \;
+
 
 # make the targets file
 mkdir -p "$SYNC_DIR/code-analysis"
