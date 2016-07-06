@@ -68,7 +68,7 @@ else()
 
     ADD_OSQUERY_LINK_ADDITIONAL("apt-pkg dpkg lzma lz4")
     ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup devmapper")
-    ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
+    #ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
   endif()
 
   ADD_OSQUERY_LINK_ADDITIONAL("libresolv.so")

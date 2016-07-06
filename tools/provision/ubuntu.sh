@@ -7,154 +7,67 @@
 #  LICENSE file in the root directory of this source tree. An additional grant
 #  of patent rights can be found in the PATENTS file in the same directory.
 
-function add_repo() {
-  REPO=$1
-  echo "Adding repository: $REPO"
-  if [[ $DISTRO = "lucid" ]]; then
-    package python-software-properties
-    sudo add-apt-repository $REPO
-  else
-    sudo add-apt-repository -y $REPO
-  fi
-}
-
 function distro_main() {
-  if [[ "0" = "1" ]]; then
-    if [[ $DISTRO = "precise" ]]; then
-      add_repo ppa:ubuntu-toolchain-r/test
-    elif [[ $DISTRO = "lucid" ]]; then
-      add_repo ppa:lucid-bleed/ppa
-    fi
-
-    sudo apt-get update -y
-
-    if [[ $DISTRO = "lucid" ]]; then
-      package git-core
-    else
-      package git
-    fi
-
-    package wget
-    package unzip
-    package build-essential
-    package flex
-    package devscripts
-    package debhelper
-    package python-pip
-    package python-dev
-    # package linux-headers-generic
-    package ruby-dev
-    package gcc
-    package doxygen
-
-    package autopoint
-    package libssl-dev
-    package liblzma-dev
-    package uuid-dev
-    package libpopt-dev
-    package libdpkg-dev
-    package libudev-dev
-    package libblkid-dev
-    package libbz2-dev
-    package libreadline-dev
-    package libcurl4-openssl-dev
-
-    if [[ $DISTRO = "precise" ]]; then
-      package ruby1.9.3
-      sudo update-alternatives --set ruby /usr/bin/ruby1.9.1
-      sudo update-alternatives --set gem /usr/bin/gem1.9.1
-    fi
-
-    if [[ $DISTRO = "lucid" ]]; then
-      package libopenssl-ruby
-
-      package clang
-      package g++-multilib
-      install_gcc
-    elif [[ $DISTRO = "precise" ]]; then
-      # Need gcc 4.8 from ubuntu-toolchain-r/test to compile RocksDB/osquery.
-      package gcc-4.8
-      package g++-4.8
-      sudo update-alternatives \
-        --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 150 \
-        --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
-
-      package clang-3.4
-      package clang-format-3.4
-    fi
-
-    if [[ $DISTRO = "precise" || $DISTRO = "lucid" || $DISTRO = "wily" ]]; then
-      package rubygems
-    fi
-
-    if [[ $DISTRO = "precise" || $DISTRO = "lucid" ]]; then
-      # Temporary removes (so we can override default paths).
-      package autotools-dev
-
-      #remove_package pkg-config
-      remove_package autoconf
-      remove_package automake
-      remove_package libtool
-
-      #install_pkgconfig
-      package pkg-config
-
-      install_autoconf
-      install_automake
-      install_libtool
-    else
-      package clang-3.6
-      package clang-format-3.6
-
-      sudo ln -sf /usr/bin/clang-3.6 /usr/bin/clang
-      sudo ln -sf /usr/bin/clang++-3.6 /usr/bin/clang++
-      sudo ln -sf /usr/bin/clang-format-3.6 /usr/bin/clang-format
-      sudo ln -sf /usr/bin/llvm-config-3.6 /usr/bin/llvm-config
-      sudo ln -sf /usr/bin/llvm-symbolizer-3.6 /usr/bin/llvm-symbolizer
-
-      package pkg-config
-      package autoconf
-      package automake
-      package libtool
-    fi
-
-    if [[ $DISTRO = "xenial" ]]; then
-      # Ubuntu bug 1578006
-      package plymouth-label
-    fi
-
-    set_cc gcc #-4.8
-    set_cxx g++ #-4.8
-  fi
-
   package git
+  package gawk
+  package autotools-dev
+  package autopoint
+  package python-dev
+  package python-pip
 
-  if [[ $DISTRO = "precise" || $DISTRO = "lucid" ]]; then
-    package gawk
-    brew_tool gcc
-  fi
-
+  # GCC 5x bootstrapping.
+  brew_tool patchelf
+  brew_tool binutils
+  brew_tool linux-headers
+  brew_tool zlib
+  brew_tool glibc
   brew_tool xz
-  brew_tool perl --without-test
+  brew_tool gmp
   brew_tool gpatch
-  brew_tool sphinx-doc
+  brew_tool mpfr
+  brew_tool libmpc
+  brew_tool isl
 
-  brew_dependency sqlite
-  brew_dependency readline
-  brew_dependency zlib
-  brew_dependency bzip2
-  brew_dependency openssl
+  # GCC 5x.
+  brew_tool gcc
 
+  set_cc gcc
+  set_cxx g++
+
+  # GCC-compiled (C) dependencies.
+  brew_tool ncurses
+  brew_tool unzip
+  brew_tool bzip2
+  brew_tool readline
+  brew_tool sqlite
+  brew_tool openssl
+  brew_tool libxml2
+  brew_tool libedit
+  brew_tool libidn
+
+  # LLVM dependencies.
   brew_tool pkg-config
+  brew_tool curl
+  brew_tool gdbm
+  brew_tool perl --without-test
+  brew_tool python
   brew_tool cmake
 
+  # LLVM.
+  brew_tool llvm # -v --with-clang
+
+  # osquery tool dependencies
+  brew_tool libtool
+  brew_tool bison
+
+  # Install custom formulas, build with LLVM/clang.
   local_brew_dependency boost
   local_brew_dependency asio
   local_brew_dependency cpp-netlib
+  local_brew_dependency google-benchmark
 
-  brew_dependency google-benchmark
+  brew_dependency lz4
   brew_dependency snappy
-
   brew_dependency sleuthkit
   brew_dependency libmagic
 
@@ -172,70 +85,13 @@ function distro_main() {
   local_brew_dependency libdevmapper
   local_brew_dependency libaptpkg
   local_brew_dependency libiptables
+
+  brew_tool libgpg-error
+  brew_tool popt
+
   local_brew_dependency libgcrypt
   local_brew_dependency libcryptsetup
   local_brew_dependency libudev
   local_brew_dependency libaudit
   local_brew_dependency libdpkg
-
-  # Util-Linux provides a static libuuid.
-  #brew_dependency libuuid
-
-  return
-
-  #install_cmake
-
-  if [[ $DISTRO = "lucid" ]]; then
-    gem_install fpm -v 1.3.3
-    install_openssl
-    install_bison
-  else
-    # No clang++ on lucid
-    set_cc clang
-    set_cxx clang++
-    gem_install fpm
-    package bison
-  fi
-
-  if [[ $DISTRO = "xenial" ]]; then
-    remove_package libunwind-dev
-  fi
-
-  install_boost
-  install_gflags
-  install_glog
-  install_google_benchmark
-
-  install_snappy
-  install_rocksdb
-  install_thrift
-  install_yara
-  install_asio
-  install_cppnetlib
-  install_sleuthkit
-
-  # Need headers and PC macros
-  if [[ $DISTRO = "vivid" || $DISTRO = "wily" || $DISRO = "xenial" ]]; then
-    package libgcrypt20-dev
-  else
-    package libgcrypt-dev
-  fi
-
-  package libdevmapper-dev
-  package libaudit-dev
-  package libmagic-dev
-
-  install_libaptpkg
-  install_iptables_dev
-  install_libcryptsetup
-
-  if [[ $DISTRO = "lucid" ]]; then
-    package python-argparse
-    package python-jinja2
-    package python-psutil
-  elif [[ $DISTRO = "xenial" ]]; then
-    package python-setuptools
-  fi
-
-  install_aws_sdk
 }

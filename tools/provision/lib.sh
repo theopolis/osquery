@@ -29,6 +29,7 @@ function setup_brew() {
   export HOMEBREW_MAKE_JOBS=$THREADS
   export HOMEBREW_NO_EMOJI=1
   export BREW="$DEPS/bin/brew"
+  $BREW tap homebrew/dupes
 }
 
 function install_gcc() {
@@ -587,7 +588,8 @@ function brew_tool() {
   shift
 
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
-  $BREW install $@ "$TOOL" --cc=clang
+  log "brew tool $TOOL"
+  $BREW install $@ "$TOOL"
 }
 
 function brew_dependency() {
@@ -595,6 +597,7 @@ function brew_dependency() {
   shift
 
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
+  log "brew dependency $TOOL"
   $BREW install --build-bottle $@ "$TOOL" --cc=clang
 }
 
@@ -611,14 +614,14 @@ function local_brew_dependency() {
 
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   if [[ "${INSTALLED}" = "NAN" || "${INSTALLED}" = "None" ]]; then
-    log "local package $1 installing new version: ${STABLE}"
+    log "brew local package $1 installing new version: ${STABLE}"
     $BREW install -v --build-bottle "${FORMULA}" --cc=clang
   elif [[ ! "${INSTALLED}" = "${STABLE}" || "${FROM_BOTTLE}" = "true" ]]; then
-    log "local package $1 upgrading to new version: ${STABLE}"
+    log "brew local package $1 upgrading to new version: ${STABLE}"
     $BREW uninstall "${FORMULA}"
     $BREW install --build-bottle "${FORMULA}" --cc=clang
   else
-    log "local package $1 is already install: ${STABLE}"
+    log "brew local package $1 is already install: ${STABLE}"
   fi
 }
 

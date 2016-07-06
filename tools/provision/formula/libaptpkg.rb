@@ -14,7 +14,7 @@ class Libaptpkg < Formula
 
     system "make", "clean"
     system "./configure", "--prefix=#{prefix}"
-    system "make", *args, "library"
+    system "make", "library", *args
 
     # apt-pkg does not include an install target.
     mkdir_p "#{prefix}/lib"

@@ -120,7 +120,11 @@ else()
 endif()
 
 # Set expected directory for within-build dependencies
-set(BUILD_DEPS "${CMAKE_SOURCE_DIR}/build/deps_${BUILD_DEPS}")
+if(DEFINED ENV{OSQUERY_DEPS})
+  set(BUILD_DEPS "$ENV{OSQUERY_DEPS}")
+else()
+  set(BUILD_DEPS "${CMAKE_SOURCE_DIR}/build/deps_${BUILD_DEPS}")
+endif()
 
 # BUILD BUG: See issue #2112
 set(ENV{SKIP_BENCHMARKS} TRUE)
@@ -420,7 +424,7 @@ else()
   set(PYTHON_EXECUTABLE "/usr/bin/python")
 
   include_directories("${BUILD_DEPS}/include")
-  link_directories("${BUILD_DEPS}/lib/")
+  link_directories("${BUILD_DEPS}/lib")
 endif()
 
 # Make sure the generated paths exist 

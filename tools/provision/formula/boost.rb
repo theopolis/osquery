@@ -87,7 +87,7 @@ class Boost < Formula
 
     system "./bootstrap.sh", *bootstrap_args
     system "./b2", "headers"
-    system "./b2", *args, "install"
+    system "./b2", "install", *args
   end
 end
 

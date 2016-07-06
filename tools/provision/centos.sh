@@ -8,117 +8,84 @@
 #  of patent rights can be found in the PATENTS file in the same directory.
 
 function distro_main() {
-  sudo yum update -y
-  package epel-release -y
-
-  package texinfo
-  package wget
-  package git-all
-  package unzip
-  package xz
-  package xz-devel
-  package python-pip
-  package python-devel
-  package rpm-build
+  package git
+  package gawk
   package ruby
-  package ruby-devel
-  package rubygems
-  package bzip2
-  package bzip2-devel
-  package openssl-devel
-  package readline-devel
-  package rpm-devel
-  package libblkid-devel
+  package gcc
 
-  if [[ $DISTRO = "centos6" ]]; then
-    # Install the CentOS6 Devtools-2 yum repository.
-    sudo cp $FILES_DIR/centos6.devtools-2.repo /etc/yum.repos.d/
+  # GCC 5x bootstrapping.
+  brew_tool patchelf
+  brew_tool zlib
+  brew_tool binutils
+  brew_tool linux-headers
+  brew_tool glibc
+  brew_tool xz
+  brew_tool gmp
+  brew_tool gpatch
+  brew_tool mpfr
+  brew_tool libmpc
+  brew_tool isl
 
-    package devtoolset-2-gcc
-    package devtoolset-2-binutils
-    package devtoolset-2-gcc-c++
+  # GCC 5x.
+  brew_tool gcc
 
-    if [[ ! -e /usr/bin/gcc ]]; then
-      sudo ln -s /opt/rh/devtoolset-2/root/usr/bin/gcc /usr/bin/gcc
-    fi
-    if [[ ! -e /usr/bin/g++ ]]; then
-      sudo ln -s /opt/rh/devtoolset-2/root/usr/bin/gcc /usr/bin/g++
-    fi
+  set_cc gcc
+  set_cxx g++
 
-    source /opt/rh/devtoolset-2/enable
-    if [[ ! -d /usr/lib/gcc ]]; then
-      sudo ln -s /opt/rh/devtoolset-2/root/usr/lib/gcc /usr/lib/
-    fi
-  elif [[ $DISTRO = "centos7" ]]; then
-    package gcc
-    package binutils
-    package gcc-c++
-  fi
+  # GCC-compiled (C) dependencies.
+  brew_tool ncurses
+  brew_tool unzip
+  brew_tool bzip2
+  brew_tool readline
+  brew_tool sqlite
+  brew_tool openssl
+  brew_tool libxml2
+  brew_tool libedit
+  brew_tool libidn
 
-  package clang
-  package clang-devel
+  # LLVM dependencies.
+  brew_tool pkg-config
+  brew_tool curl
+  brew_tool gdbm
+  brew_tool perl --without-test
+  brew_tool python
+  brew_tool cmake
 
-  install_cmake
+  # LLVM.
+  brew_tool llvm # -v --with-clang
 
-  set_cc clang
-  set_cxx clang++
+  # osquery tool dependencies
+  brew_tool libtool
+  brew_tool bison
 
-  if [[ $DISTRO = "centos6" ]]; then
-    package libudev-devel
-  fi
+  # Install custom formulas, build with LLVM/clang.
+  local_brew_dependency boost
+  local_brew_dependency asio
+  local_brew_dependency cpp-netlib
+  local_brew_dependency google-benchmark
 
-  package doxygen
-  package byacc
-  package flex
+  brew_dependency lz4
+  brew_dependency snappy
+  brew_dependency sleuthkit
+  brew_dependency libmagic
 
-  if [[ $DISTRO = "centos6" ]]; then
-    remove_package autoconf
-    remove_package automake
-    remove_package libtool
+  local_brew_dependency thrift
+  local_brew_dependency rocksdb
+  local_brew_dependency gflags
+  local_brew_dependency aws-sdk-cpp
+  local_brew_dependency yara
+  local_brew_dependency glog
 
-    install_autoconf
-    install_automake
-    install_libtool
+  # This begins the linux-specific dependencies.
+  # This provides the libblkid libraries.
+  brew_dependency util-linux
 
-    install_bison
-
-    package file-libs
-  elif [[ $DISTRO = "centos7" ]]; then
-    package autoconf
-    package automake
-    package libtool
-    package file-devel
-    package systemd-devel
-    package bison
-  fi
-
-  install_boost
-  install_gflags
-  install_glog
-  install_google_benchmark
-
-  install_snappy
-  install_rocksdb
-  install_thrift
-  install_yara
-  install_asio
-  install_cppnetlib
-  install_sleuthkit
-
-  # Device mapper uses the exact version as the ABI.
-  # We will build and install a static version.
-  remove_package device-mapper-devel
-  install_device_mapper
-
-  package libgcrypt-devel
-  package gettext-devel
-  install_libcryptsetup
-  install_iptables_dev
-
-  package audit-libs-devel
-  package audit-libs-static
-
-  gem_install fpm -v 1.3.3
-
-  install_aws_sdk
+  local_brew_dependency libdevmapper
+  local_brew_dependency libaptpkg
+  local_brew_dependency libiptables
+  local_brew_dependency libgcrypt
+  local_brew_dependency libcryptsetup
+  local_brew_dependency libudev
+  local_brew_dependency libaudit
+  local_brew_dependency libdpkg
 }

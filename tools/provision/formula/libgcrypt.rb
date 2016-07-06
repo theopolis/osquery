@@ -1,9 +1,9 @@
 class Libgcrypt < Formula
   desc "Cryptographic library based on the code from GnuPG"
   homepage "https://directory.fsf.org/wiki/Libgcrypt"
-  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.7.0.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.7.0.tar.bz2"
-  sha256 "b0e67ea74474939913c4d9d9ef4ef5ec378efbe2bebe36389dee319c79bffa92"
+  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.6.5.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.5.tar.bz2"
+  sha256 "f49ebc5842d455ae7019def33eb5a014a0f07a2a8353dc3aa50a76fd1dafa924"
 
   option :universal
 
@@ -23,11 +23,16 @@ class Libgcrypt < Formula
       "--disable-dependency-tracking",
       "--disable-silent-rules",
       "--disable-avx-support",
+      "--disable-avx2-support",
+      "--disable-drng-support",
+      "--disable-pclmul-support",
+      "--disable-shared",
       "--enable-static",
-      "--without-libgpg-error",
+      # "--without-libgpg-error",
       "--prefix=#{prefix}",
       "--disable-asm",
       "--with-libgpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}",
+      "--with-gpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}",
     ]
 
     system "./configure", *args
@@ -36,8 +41,25 @@ class Libgcrypt < Formula
       system "ed -s - config.h <config.h.ed"
     end
 
-    # Parallel builds work, but only when run as separate steps
-    system "make"
-    system "make", "install"
+    cd "cipher" do
+      system "make"
+    end
+
+    cd "random" do
+      system "make"
+    end
+
+    cd "mpi" do
+      system "make"
+    end
+
+    cd "compat" do
+      system "make"
+    end
+
+    cd "src" do
+      system "make"
+      system "make", "install"
+    end
   end
 end
