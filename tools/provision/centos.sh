@@ -11,6 +11,7 @@ function distro_main() {
   package git
   package gawk
   package ruby
+  oackage ruby-irb
   package gcc
 
   # GCC 5x bootstrapping.

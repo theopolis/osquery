@@ -17,9 +17,9 @@ function distro_main() {
 
   # GCC 5x bootstrapping.
   brew_tool patchelf
+  brew_tool zlib
   brew_tool binutils
   brew_tool linux-headers
-  brew_tool zlib
   brew_tool glibc
   brew_tool xz
   brew_tool gmp
