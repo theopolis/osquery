@@ -27,8 +27,9 @@
 namespace pt = boost::property_tree;
 
 namespace osquery {
+
 /// Init function for tests and benchmarks.
-void initTesting();
+void initTesting(bool disable_db = true);
 
 /// Cleanup/stop function for tests and benchmarks.
 void shutdownTesting();

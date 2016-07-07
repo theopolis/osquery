@@ -10,10 +10,12 @@
 
 #include <benchmark/benchmark.h>
 
+#include <osquery/database.h>
+
 #include "osquery/tests/test_util.h"
 
 int main(int argc, char *argv[]) {
-  osquery::initTesting();
+  osquery::initTesting(false);
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
   // Optionally enable Goggle Logging

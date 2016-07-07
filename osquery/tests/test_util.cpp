@@ -57,7 +57,7 @@ DECLARE_bool(disable_database);
 
 typedef std::chrono::high_resolution_clock chrono_clock;
 
-void initTesting() {
+void initTesting(bool disable_db) {
   // Allow unit test execution from anywhere in the osquery source/build tree.
   while (osquery::kTestDataPath != "/") {
     if (!fs::exists(osquery::kTestDataPath)) {
@@ -84,7 +84,10 @@ void initTesting() {
   FLAGS_extensions_autoload = kTestWorkingDirectory + "unittests-ext.load";
   FLAGS_modules_autoload = kTestWorkingDirectory + "unittests-mod.load";
   FLAGS_disable_logging = true;
-  FLAGS_disable_database = true;
+
+  if (disable_db) {
+    FLAGS_disable_database = true;
+  }
 
   // Tests need a database plugin.
   // Set up the database instance for the unittests.
