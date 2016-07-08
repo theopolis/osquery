@@ -41,6 +41,7 @@ class Thrift < Formula
       "--without-go",
       "--without-qt",
       "--without-qt4",
+      "--without-node",
       "--with-cpp",
       "--with-python",
       "--with-openssl=#{Formula["openssl"]}"

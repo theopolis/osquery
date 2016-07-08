@@ -14,7 +14,7 @@ class Asio < Formula
   depends_on "openssl"
 
   def install
-    ENV.cxx11 if build.cxx11?
+    ENV.cxx11 if build.cxx11? or true
     if build.head?
       cd "asio"
       system "./autogen.sh"
@@ -30,6 +30,6 @@ class Asio < Formula
 
     system "./configure", *args
     system "make", "install"
-    pkgshare.install "src/examples"
+    #pkgshare.install "src/examples"
   end
 end

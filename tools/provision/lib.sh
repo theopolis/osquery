@@ -19,7 +19,7 @@ function setup_brew() {
   # Checkout new brew in local deps dir
   DEPS="$1"
   if [[ ! -d "$DEPS/.git" ]]; then
-    log "setting up new brew"
+    log "setting up new brew in $DEPS"
     git clone $BREW .
   else
     log "checking for updates to brew"

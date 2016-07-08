@@ -424,7 +424,8 @@ else()
   set(PYTHON_EXECUTABLE "/usr/bin/python")
 
   include_directories("${BUILD_DEPS}/include")
-  link_directories("${BUILD_DEPS}/lib")
+  # The CMakeLibs should provide link-path discovery macros.
+  # link_directories("${BUILD_DEPS}/lib")
 endif()
 
 # Make sure the generated paths exist 
@@ -432,7 +433,6 @@ execute_process(COMMAND mkdir ${MKDIR_OPTS} "${CMAKE_BINARY_DIR}/generated")
 
 # We need to link some packages as dynamic/dependent.
 set(CMAKE_FIND_LIBRARY_SUFFIXES .dll .dylib .so .a)
-
 
 # Most dependent packages/libs we want static.
 if(NOT DEFINED ENV{BUILD_LINK_SHARED})
