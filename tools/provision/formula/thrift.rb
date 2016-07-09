@@ -20,6 +20,13 @@ class Thrift < Formula
     end
   end
 
+  bottle do
+    prefix "/opt/osquery-deps"
+    cellar "/opt/osquery-deps/Cellar"
+    revision 1
+    sha256 "58ae256c8f1e5483cf3e26e02a3f4da4810897527cfc650168ddfca0faa44356" => :x86_64_linux
+  end
+
   depends_on "bison" => :build
   depends_on "openssl"
   depends_on :python => :optional

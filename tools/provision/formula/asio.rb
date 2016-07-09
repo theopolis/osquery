@@ -5,7 +5,12 @@ class Asio < Formula
   sha256 "e0d71c40a7b1f6c1334008fb279e7361b32a063e020efd21e40d9d8ff037195e"
   head "https://github.com/chriskohlhoff/asio.git"
 
-  option :cxx11
+  bottle do
+    cellar :any_skip_relocation
+    revision 1
+    sha256 "7cef838bc58e8b395e8fde19472510ee39decfa51975f47d585a81bbf0b1e522" => :x86_64_linux
+  end
+
   needs :cxx11
 
   depends_on "autoconf" => :build
@@ -14,7 +19,7 @@ class Asio < Formula
   depends_on "openssl"
 
   def install
-    ENV.cxx11 if build.cxx11? or true
+    ENV.cxx11
     if build.head?
       cd "asio"
       system "./autogen.sh"

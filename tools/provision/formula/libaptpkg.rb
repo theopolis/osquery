@@ -3,6 +3,11 @@ class Libaptpkg < Formula
   homepage "https://apt.alioth.debian.org/python-apt-doc/library/apt_pkg.html"
   url "https://osquery-packages.s3.amazonaws.com/deps/apt-1.2.6.tar.gz"
 
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "b2ab5711cb2368f668fa5c5d1d8eaaa723f492e7d1176f9882acae3a7edcae81" => :x86_64_linux
+  end
+
   option "with-static", "Build with static linking"
 
   def install

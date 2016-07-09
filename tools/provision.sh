@@ -78,14 +78,14 @@ function main() {
     source "$SCRIPT_DIR/provision/debian.sh"
   else
     fatal "could not detect the current operating system. exiting."
-  fi  
+  fi
 
   # Setup the osquery dependency directory
   # One can use a non-build location using OSQUERY_DEPS=/path/to/deps
   if [[ -e "$OSQUERY_DEPS" ]]; then
     DEPS_DIR="$OSQUERY_DEPS"
   else
-    DEPS_DIR="$BUILD_DIR/deps_${BREW_TYPE}"
+    DEPS_DIR="/usr/local/osquery"
   fi
   mkdir -p "$DEPS_DIR"
   chown $SUDO_USER:$SUDO_GID "$DEPS_DIR" > /dev/null 2>&1 || true

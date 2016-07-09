@@ -3,6 +3,11 @@ class Libcryptsetup < Formula
   homepage "https://gitlab.com/cryptsetup/cryptsetup"
   url "https://osquery-packages.s3.amazonaws.com/deps/cryptsetup-1.6.7.tar.gz"
 
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "aad26654d31e60c1f9d2578e327c320d82ac875b42ce93a38da511a05d79f796" => :x86_64_linux
+  end
+
   option "with-static", "Build with static linking"
 
   def install

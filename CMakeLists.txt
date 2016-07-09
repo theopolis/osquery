@@ -96,11 +96,9 @@ if(APPLE)
   # Special compile flags for Objective-C++
   set(OBJCXX_COMPILE_FLAGS
     "-x objective-c++ -fobjc-arc -Wno-c++11-extensions")
-  set(BUILD_DEPS "darwin")
 elseif(WIN32)
   # Windows
   # C++11 features should be on by default in 2012 and beyond.
-  set(BUILD_DEPS "windows")
 else()
   set(CXX_COMPILE_FLAGS "${CXX_COMPILE_FLAGS} -std=c++11")
   set(OS_WHOLELINK_PRE "-Wl,-whole-archive")
@@ -111,11 +109,9 @@ else()
     set(FREEBSD TRUE)
     set(LINUX FALSE)
     set(ENV{SKIP_BENCHMARKS} "TRUE")
-    set(BUILD_DEPS "freebsd")
   else()
     set(LINUX TRUE)
     set(FREEBSD FALSE)
-    set(BUILD_DEPS "linux")
   endif()
 endif()
 
@@ -123,7 +119,7 @@ endif()
 if(DEFINED ENV{OSQUERY_DEPS})
   set(BUILD_DEPS "$ENV{OSQUERY_DEPS}")
 else()
-  set(BUILD_DEPS "${CMAKE_SOURCE_DIR}/build/deps_${BUILD_DEPS}")
+  set(BUILD_DEPS "/usr/local/osquery")
 endif()
 
 # BUILD BUG: See issue #2112

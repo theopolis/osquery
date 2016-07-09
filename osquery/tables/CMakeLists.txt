@@ -66,7 +66,7 @@ else()
     set(LIBDPKG_VERSION_NUMBER "1018004")
     add_definitions(-DLIBDPKG_VERSION=${LIBDPKG_VERSION_NUMBER})
 
-    ADD_OSQUERY_LINK_ADDITIONAL("apt-pkg dpkg lzma lz4")
+    ADD_OSQUERY_LINK_ADDITIONAL("apt-pkg dpkg lzma lz4 bz2")
     ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup devmapper")
     #ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
   endif()

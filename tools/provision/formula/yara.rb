@@ -3,6 +3,12 @@ class Yara < Formula
   homepage "https://github.com/plusvic/yara/"
   head "https://github.com/plusvic/yara.git"
 
+  bottle do
+    cellar :any_skip_relocation
+    revision 1
+    sha256 "6df59915befaaf685a7cfdab61178f9871f3c048423727d8ea9ab1683168d88c" => :x86_64_linux
+  end
+
   stable do
     url "https://github.com/plusvic/yara/archive/v3.4.0.tar.gz"
     sha256 "528571ff721364229f34f6d1ff0eedc3cd5a2a75bb94727dc6578c6efe3d618b"

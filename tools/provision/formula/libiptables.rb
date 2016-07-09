@@ -4,6 +4,11 @@ class Libiptables < Formula
   url "https://osquery-packages.s3.amazonaws.com/deps/iptables-1.4.21.tar.gz"
   sha256 "ce1335c91764dc87a26978bd3725c510c2564853184c6e470e0a0f785f420f89"
 
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "17440ce341d4f5c31504ab3f9b7e6d18ad40e736ef3edb9fe40cad80388e37ec" => :x86_64_linux
+  end
+
   option "with-static", "Build with static linking"
 
   patch :DATA

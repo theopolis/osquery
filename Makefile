@@ -28,9 +28,9 @@ endif
 ifneq ($(OSQUERY_DEPS),)
 	DEPS_DIR = $(OSQUERY_DEPS)
 else
-	DEPS_DIR = build/deps_$(BUILD_DIR)
+	DEPS_DIR = /usr/local/osquery
 endif
-CMAKE := LDFLAGS=-L$(DEPS_DIR)/lib PATH="$(PATH):$(DEPS_DIR)/bin" cmake ../../
+CMAKE := PATH="$(PATH):$(DEPS_DIR)/bin" cmake ../../
 
 DEFINES := CTEST_OUTPUT_ON_FAILURE=1
 .PHONY: docs build

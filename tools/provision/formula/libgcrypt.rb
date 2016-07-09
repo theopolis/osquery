@@ -5,6 +5,11 @@ class Libgcrypt < Formula
   mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.5.tar.bz2"
   sha256 "f49ebc5842d455ae7019def33eb5a014a0f07a2a8353dc3aa50a76fd1dafa924"
 
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "f73e181ec7d21a10680bfee95fd4e3a133ae8d8ccfef07cde1dfd5d265162b88" => :x86_64_linux
+  end
+
   option :universal
 
   depends_on "libgpg-error"

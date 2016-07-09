@@ -5,6 +5,11 @@ class CppNetlib < Formula
   version "0.12.0"
   sha256 "d66e264240bf607d51b8d0e743a1fa9d592d96183d27e2abdaf68b0a87e64560"
 
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "aa89a2e6a02730dba0314dd27ce5373b3d75642c8a664b03da9b055739277cd3" => :x86_64_linux
+  end
+
   depends_on "cmake" => :build
   depends_on "openssl"
 

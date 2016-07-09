@@ -3,6 +3,11 @@ class AwsSdkCpp < Formula
   homepage "https://github.com/aws/aws-sdk-cpp"
   url "https://osquery-packages.s3.amazonaws.com/deps/aws-sdk-cpp-0.12.4.tar.gz"
 
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "a41941b974e23b32e93873c90952bf5e27f593f2834acba9a32493fe12b309aa" => :x86_64_linux
+  end
+
   option "with-static", "Build with static linking"
   option "without-http-client", "Don't include the libcurl HTTP client"
   option "with-logging-only", "Only build logging-related SDKs"

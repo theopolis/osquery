@@ -20,6 +20,11 @@ class Boost < Formula
     sha256 "1a470c3a2738af409f68e3301eaecd8d07f27a8965824baf8aee0adef463b844"
   end
 
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "46896192dd3be9f5b494e9d606e729eb1b2d9617b1b30e43b4e00a16f7831a23" => :x86_64_linux
+  end
+
   env :userpaths
 
   option :universal

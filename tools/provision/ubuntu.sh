@@ -17,16 +17,21 @@ function distro_main() {
 
   # GCC 5x bootstrapping.
   brew_tool patchelf
-  brew_tool zlib
+  core_brew_tool zlib
   brew_tool binutils
   brew_tool linux-headers
-  brew_tool glibc
+
   brew_tool xz
   brew_tool gmp
   brew_tool gpatch
   brew_tool mpfr
   brew_tool libmpc
   brew_tool isl
+  brew_tool berkeley-db
+
+  # Build a bottle of glibc
+  local_brew_tool glibc
+  $BREW postinstall glibc
 
   # GCC 5x.
   brew_tool gcc
@@ -36,13 +41,20 @@ function distro_main() {
 
   # GCC-compiled (C) dependencies.
   brew_tool pkg-config
-  brew_tool ncurses
-  brew_tool bzip2
+
+  # Build a bottle for ncurses
+  local_brew_tool ncurses
+
+  core_brew_tool bzip2
   brew_tool unzip
   brew_tool readline
   brew_tool sqlite
   brew_tool makedepend
+
+  # Build a bottle for perl and openssl
+  local_brew_tool perl --without-test
   brew_tool openssl
+
   brew_tool libxml2
   brew_tool libedit
   brew_tool libidn
@@ -56,35 +68,26 @@ function distro_main() {
   brew_tool automake
 
   # LLVM dependencies.
-  # brew_tool curl
-  # brew_tool perl --without-test
-  # brew_tool python
-  brew_tool cmake --ignore-dependencies
+  local_brew_tool curl
+  local_brew_tool python
+  core_brew_tool cmake --ignore-dependencies
 
   # LLVM.
-  brew_tool llvm -v --with-clang --with-clang-extra --with-compiler-rt
-
-  # Now that the compiler toolchain is modern, unlink libs.
-  # $BREW unlink zlib
-  $BREW unlink glibc
-  # $BREW unlink bzip2
-  # $BREW unlink sqlite
-
-  set_cc clang
-  set_cxx clang++
+  local_brew_tool llvm -v --with-clang --with-clang-extra --with-compiler-rt
 
   # Install custom formulas, build with LLVM/clang.
   local_brew_dependency boost
 
   # asio needs gdbm perl autoconf automake
-  local_brew_dependency asio --ignore-dependencies
+  local_brew_dependency asio
   local_brew_dependency cpp-netlib
   local_brew_dependency google-benchmark
 
-  brew_dependency lz4
-  brew_dependency snappy
-  brew_dependency sleuthkit
-  brew_dependency libmagic
+  local_brew_dependency pcre
+  local_brew_dependency lz4
+  local_brew_dependency snappy
+  local_brew_dependency sleuthkit
+  local_brew_dependency libmagic
 
   local_brew_dependency thrift
   local_brew_dependency rocksdb
@@ -95,7 +98,7 @@ function distro_main() {
 
   # This begins the linux-specific dependencies.
   # This provides the libblkid libraries.
-  brew_dependency util-linux
+  local_brew_dependency util-linux
 
   local_brew_dependency libdevmapper
   local_brew_dependency libaptpkg
