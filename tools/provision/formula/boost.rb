@@ -22,7 +22,7 @@ class Boost < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "46896192dd3be9f5b494e9d606e729eb1b2d9617b1b30e43b4e00a16f7831a23" => :x86_64_linux
+    sha256 "4cd3083e5080b72b74eb8dcc9064713b451e3a962724418f0cb1a701c3d32dbd" => :x86_64_linux
   end
 
   env :userpaths
@@ -37,7 +37,7 @@ class Boost < Formula
 
   def install
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     ENV.universal_binary if build.universal? or true
 

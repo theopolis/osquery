@@ -7,7 +7,7 @@ class Libgcrypt < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "f73e181ec7d21a10680bfee95fd4e3a133ae8d8ccfef07cde1dfd5d265162b88" => :x86_64_linux
+    sha256 "c46b8922cfa52d613934db6586a69109ed17e351aaf20dffeab559f50cd4f85f" => :x86_64_linux
   end
 
   option :universal
@@ -21,7 +21,7 @@ class Libgcrypt < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.universal_binary if build.universal? or true
 
     args = [

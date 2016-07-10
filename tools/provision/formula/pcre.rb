@@ -7,8 +7,7 @@ class Pcre < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "3bbd538abdba4756c2584ea8e79e1e6af860bf5f661feee807d8ea10ee082751" => :x86_64_linux
+    sha256 "5fc84867a35bd61a25c05e39d5f45074315c79d2b52481a1007c6c71ba3f661e" => :x86_64_linux
   end
 
   head do
@@ -31,6 +30,7 @@ class Pcre < Formula
   depends_on "zlib" unless OS.mac?
 
   def install
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.universal_binary if build.universal?
 
     system "./autogen.sh" if build.head?

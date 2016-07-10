@@ -5,8 +5,7 @@ class Yara < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "6df59915befaaf685a7cfdab61178f9871f3c048423727d8ea9ab1683168d88c" => :x86_64_linux
+    sha256 "53be9156489716c31595a8f91e935d5f5b94decbb46db3b3f79a2f1db915dc85" => :x86_64_linux
   end
 
   stable do
@@ -29,7 +28,7 @@ class Yara < Formula
 
   def install
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     # Use of "inline" requires gnu89 semantics
     ENV.append "CFLAGS", "-std=gnu89" if ENV.compiler == :clang

@@ -64,10 +64,8 @@ if(APPLE)
   ADD_OSQUERY_LINK_CORE("-Wl,-dead_strip")
   ADD_OSQUERY_LINK_CORE("-mmacosx-version-min=${OSX_VERSION_MIN}")
 elseif(LINUX OR FREEBSD)
-  ADD_OSQUERY_LINK_CORE("-Wl,-zrelro -Wl,-znow")
-  if(NOT ${OSQUERY_BUILD_DISTRO} STREQUAL "rhel6" AND
-     NOT ${OSQUERY_BUILD_DISTRO} STREQUAL "centos6" AND
-     NOT ${OSQUERY_BUILD_DISTRO} STREQUAL "scientific6")
+  ADD_OSQUERY_LINK_CORE("-Wl,-zrelro -Wl,-znow -shared -Wl,-pie")
+  if(NOT ${REDHAT_BASED})
     ADD_OSQUERY_LINK_CORE("-Wl,--gc-sections")
   endif()
   ADD_OSQUERY_LINK_CORE("librt.so")
@@ -178,11 +176,17 @@ if(NOT ${OSQUERY_BUILD_SDK_ONLY})
   ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_additional_amalgamation ${AMALGAMATION})
   ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_foreign_amalgamation ${AMALGAMATION_FOREIGN})
 
-
   # Create the static libosquery_additional.
   add_library(libosquery_additional STATIC ${OSQUERY_ADDITIONAL_SOURCES})
   target_link_libraries(libosquery_additional ${OSQUERY_ADDITIONAL_LINKS})
   set_target_properties(libosquery_additional PROPERTIES OUTPUT_NAME osquery_additional)
+
+  # Create the dynamic libosquery.
+  #add_library(libosquery_dynamic SHARED main/lib.cpp)
+  #TARGET_OSQUERY_LINK_WHOLE(libosquery_dynamic libosquery_additional)
+  #TARGET_OSQUERY_LINK_WHOLE(libosquery_dynamic libosquery)
+  #SET_OSQUERY_COMPILE(libosquery_dynamic "${CXX_COMPILE_FLAGS}")
+  #set_target_properties(libosquery_dynamic PROPERTIES OUTPUT_NAME osquery_dynamic)
 
   add_executable(shell devtools/shell.cpp main/shell.cpp)
   TARGET_OSQUERY_LINK_WHOLE(shell libosquery)

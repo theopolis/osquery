@@ -6,14 +6,13 @@ class Libdevmapper < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "0d7516ddf19b57f2a900e5f720d9411f4d66ac1f92579c67832dd25b202f19a3" => :x86_64_linux
+    sha256 "2a045224ba36d9e6423c232b1bde734f86620644c62ae9e5470d4f01b465c7d5" => :x86_64_linux
   end
 
   option "with-static", "Build with static linking"
 
   def install
-    ENV.append_to_cflags "-fPIC"
-    ENV.append_to_cflags "-DNDEBUG" if build.without? "debug"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = [
       "--with-lvm1=none",

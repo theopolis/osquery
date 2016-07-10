@@ -5,14 +5,13 @@ class Libcryptsetup < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "aad26654d31e60c1f9d2578e327c320d82ac875b42ce93a38da511a05d79f796" => :x86_64_linux
+    sha256 "3a4ae69082c11b1df0b101a97e09af62a08bf01186996d3e873e9a98cf3ddc32" => :x86_64_linux
   end
 
   option "with-static", "Build with static linking"
 
   def install
-    ENV.append_to_cflags "-fPIC"
-    ENV.append_to_cflags "-DNDEBUG" if build.without? "debug"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = [
       "--disable-selinux",

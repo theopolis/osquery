@@ -7,8 +7,7 @@ class Asio < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "7cef838bc58e8b395e8fde19472510ee39decfa51975f47d585a81bbf0b1e522" => :x86_64_linux
+    sha256 "8f693bfb9b82f373726dbbff76ce40fa26243c571a0e858ec7992ae19b804119" => :x86_64_linux
   end
 
   needs :cxx11
@@ -20,6 +19,8 @@ class Asio < Formula
 
   def install
     ENV.cxx11
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
+
     if build.head?
       cd "asio"
       system "./autogen.sh"

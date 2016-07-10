@@ -66,30 +66,36 @@ macro(ADD_OSQUERY_LINK IS_CORE LINK)
 endmacro(ADD_OSQUERY_LINK)
 
 macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
-  set(LINK_PATHS
+  set(LINK_PATHS_RELATIVE
     "${BUILD_DEPS}/lib"
     "${CMAKE_BUILD_DIR}/third-party/*/lib"
     ${LINK_PATHS}
     "/usr/lib"
     "/usr/lib/x86_64-linux-gnu/"
-    "$ENV{HOME}")
+    "$ENV{HOME}"
+  )
+  set(LINK_PATHS_SYSTEM
+    ${LINK_PATHS}
+    "/usr/lib"
+    "/usr/lib/x86_64-linux-gnu/"
+  )
+
   if(NOT "${LINK}" MATCHES "(^[-/].*)")
     string(REPLACE " " ";" ITEMS "${LINK}")
     foreach(ITEM ${ITEMS})
       if(NOT DEFINED ${${ITEM}_library})
-        if(NOT DEFINED ENV{BUILD_LINK_SHARED})
+        if("${ITEM}" MATCHES "(^lib.*)" OR DEFINED ENV{BUILD_LINK_SHARED})
+          # Use a system-provided library
+          set(ITEM_SYSTEM TRUE)
+        else()
+          set(ITEM_SYSTEM FALSE)
+        endif()
+        if(NOT ${ITEM_SYSTEM})
           find_library("${ITEM}_library"
-            NAMES "lib${ITEM}.a" "${ITEM}"
-            HINTS 
-              "${BUILD_DEPS}/lib"
-              "${CMAKE_BUILD_DIR}/third-party/*/lib"
-              ${LINK_PATHS}
-              "/usr/lib"
-              "/usr/lib/x86_64-linux-gnu/"
-              "$ENV{HOME}")
+            NAMES "lib${ITEM}.a" "${ITEM}" HINTS ${LINK_PATHS_RELATIVE})
         else()
           find_library("${ITEM}_library"
-            NAMES "lib${ITEM}.so" "lib${ITEM}.dylib" "${ITEM}" ${LINK_PATHS})
+            NAMES "lib${ITEM}.so" "lib${ITEM}.dylib" "${ITEM}" HINTS ${LINK_PATHS_SYSTEM})
         endif()
         LOG_LIBRARY(${ITEM} "${${ITEM}_library}")
         if("${${ITEM}_library}" STREQUAL "${${ITEM}_library}-NOTFOUND")

@@ -6,7 +6,7 @@ class Gflags < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "b458b47a92e941e3f01bda73b044d71720c5dfbc9950710797687fe95a5571bf" => :x86_64_linux
+    sha256 "50edd3a4a03f0371e3a9bd4652b8a900b20112616208a5a4d160fb9ee57018b7" => :x86_64_linux
   end
 
   option "with-static", "Build gflags as a static (instead of shared) library."
@@ -15,8 +15,8 @@ class Gflags < Formula
 
   def install
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC"
-    
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
+
     args = std_cmake_args
     if build.with? "static" or true
       args << "-DBUILD_SHARED_LIBS=OFF"

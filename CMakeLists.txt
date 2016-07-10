@@ -8,6 +8,8 @@ macro(LOG MESSAGE)
   message("-- ${MESSAGE}")
 endmacro(LOG)
 
+message("$ENV{PATH}")
+
 # If no explicit compiler override and clang++ exists, prefer clang.
 find_file(CLANGXX_EXISTS "clang++")
 if(DEFINED ENV{CC})
@@ -40,13 +42,8 @@ else()
     -Werror=format-security
     -Wabi-tag
     -fstack-protector-all
-    -fPIE
-    -fpie
     -fPIC
-    -fpic
     -pipe
-    -fdata-sections
-    -ffunction-sections
   )
 endif()
 
@@ -294,6 +291,7 @@ endif()
 
 # Set various platform/platform-version/build version/etc defines.
 add_definitions(
+  -fPIC
   -DOSQUERY_BUILD_SDK_VERSION=${OSQUERY_BUILD_SDK_VERSION}
   -DOSQUERY_BUILD_PLATFORM=${OSQUERY_BUILD_PLATFORM}
   -DOSQUERY_BUILD_DISTRO=${OSQUERY_BUILD_DISTRO}
@@ -360,6 +358,18 @@ elseif(DEBIAN_BASED)
   add_definitions(-DDEBIAN_BASED=1)
 endif()
 
+# Add sysroot overrides for each platform/distro.
+# These should be prioritized over all other includes.
+if(APPLE)
+  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/darwin")
+elseif(LINUX)
+  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/linux")
+endif()
+
+include_directories("${CMAKE_SOURCE_DIR}/third-party/sqlite3")
+include_directories("${CMAKE_SOURCE_DIR}/include")
+include_directories("${CMAKE_SOURCE_DIR}")
+
 set(MKDIR_OPTS "")
 if(WIN32)
   set(PROCESS_FAMILY "windows")
@@ -416,8 +426,8 @@ else()
   set(PROCESS_FAMILY "posix")
   set(MKDIR_OPTS "-p")
 
-  set(THRIFT_COMPILER "${BUILD_DEPS}/bin/thrift")
-  set(PYTHON_EXECUTABLE "/usr/bin/python")
+  find_program(THRIFT_COMPILER "thrift")
+  find_program(PYTHON_EXECUTABLE "python")
 
   include_directories("${BUILD_DEPS}/include")
   # The CMakeLibs should provide link-path discovery macros.
@@ -452,17 +462,6 @@ enable_testing()
 
 include(Packages)
 include(Thrift)
-
-include_directories("${CMAKE_SOURCE_DIR}/third-party/sqlite3")
-include_directories("${CMAKE_SOURCE_DIR}/include")
-include_directories("${CMAKE_SOURCE_DIR}")
-
-# Add sysroot overrides for each platform/distro.
-if(APPLE)
-  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/darwin")
-elseif(LINUX)
-  include_directories("${CMAKE_SOURCE_DIR}/third-party/sysroots/linux")
-endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/sqlite3")
 add_subdirectory(osquery)

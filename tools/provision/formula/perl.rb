@@ -9,10 +9,9 @@ class Perl < Formula
   head "https://perl5.git.perl.org/perl.git", :branch => "blead"
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    revision 1
-    sha256 "1f6dca7bb45885ae92c7c415170856296c7b0bd632ca0ac8d8e714f29d35ff52" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "a980312494c7919f99ae5a4f3758e17be54e1ef3aa328b2fffff0da250667f2c" => :x86_64_linux
   end
 
   option "with-dtrace", "Build with DTrace probes"

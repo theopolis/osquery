@@ -8,11 +8,12 @@ class Lz4 < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "455ba3b63cc25f25da1520b4a535a8e42d042dea402cc8e07145c912362a2036" => :x86_64_linux
+    sha256 "67dd3f13c112463f9d43812e42cd44a883b26d0c246312064460d1f650a5abbd" => :x86_64_linux
   end
 
   def install
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
+
     system "make", "install", "PREFIX=#{prefix}"
   end
 

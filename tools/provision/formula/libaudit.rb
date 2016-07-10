@@ -4,11 +4,11 @@ class Libaudit < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "ba2891e10f2393484a50fc4e4e53b930beb37243f5d33c4a80e73c2bc513bd33" => :x86_64_linux
+    sha256 "93c234daa64560b91f0938af1d277f85afd1fa8a92937080603bde4aa1ed53ee" => :x86_64_linux
   end
 
   def install
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     system "./autogen.sh"
     system "./configure", "--prefix=#{prefix}"

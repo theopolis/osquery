@@ -16,11 +16,21 @@ function setup_brew() {
     BREW=https://github.com/Homebrew/brew
   fi
 
-  # Checkout new brew in local deps dir
+  # Check if DEPS directory exists.
   DEPS="$1"
+  if [[ ! -d "$DEPS" ]]; then
+    log "the build directory: $DEPS does not exist"
+    sudo mkdir "$DEPS"
+    sudo chown $USER "$DEPS"
+  fi
+
+  # Checkout new brew in local deps dir
   if [[ ! -d "$DEPS/.git" ]]; then
     log "setting up new brew in $DEPS"
     git clone $BREW .
+    log "installing local tap: homebrew-osquery-local"
+    mkdir -p "$DEPS/Library/Taps/osquery/"
+    ln -sf "$FORMULA_DIR" "$DEPS/Library/Taps/osquery/homebrew-osquery-local" 
   else
     log "checking for updates to brew"
     git pull
@@ -48,9 +58,9 @@ function brew_tool() {
   shift
 
   if [[ -z "$OSQUERY_DEPS_BUILD" && -z "$OSQUERY_DEPS_ONETIME" ]]; then
-    unset OSQUERY_DEPS_ONETIME
     return
   fi
+  unset OSQUERY_DEPS_ONETIME
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   log "brew tool $TOOL"
   $BREW install $@ "$TOOL"
@@ -72,7 +82,7 @@ function local_brew_tool() {
   log "brew (build) tool $TOOL"
   ARGS="$@"
   if [[ ! -z "$OSQUERY_DEPS_BUILD" ]]; then
-    ARGS="$ARGS --build-bottle"
+    ARGS="$ARGS --build-bottle --ignore-dependencies"
   else
     ARGS="--ignore-dependencies --from-bottle"
   fi
@@ -87,7 +97,7 @@ function brew_dependency() {
   log "brew dependency $TOOL"
   ARGS="$@"
   if [[ ! -z $OSQUERY_DEPS_BUILD ]]; then
-    ARGS="$ARGS --build-bottle --cc=clang"
+    ARGS="$ARGS --build-bottle --cc=clang --universal"
   else
     ARGS="--ignore-dependencies --from-bottle"
   fi
@@ -109,7 +119,7 @@ function local_brew_dependency() {
   FROM_BOTTLE=false
   ARGS="$@"
   if [[ ! -z $OSQUERY_DEPS_BUILD ]]; then
-    ARGS="$ARGS -v --build-bottle --cc=clang"
+    ARGS="$ARGS -v --build-bottle --cc=clang --universal --ignore-dependencies"
   else
     ARGS="--ignore-dependencies --from-bottle"
   fi

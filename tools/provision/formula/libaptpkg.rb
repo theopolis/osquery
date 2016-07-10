@@ -5,14 +5,13 @@ class Libaptpkg < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "b2ab5711cb2368f668fa5c5d1d8eaaa723f492e7d1176f9882acae3a7edcae81" => :x86_64_linux
+    sha256 "91d0ccdb8e1e03fd4846afdeccdb1a3fdf89f9b8cabad39eb31f9330750626dd" => :x86_64_linux
   end
 
   option "with-static", "Build with static linking"
 
   def install
-    ENV.append_to_cflags "-fPIC"
-    ENV.append_to_cflags "-DNDEBUG" if build.without? "debug"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = []
     args << "STATICLIBS=1" if build.with? "static" or true

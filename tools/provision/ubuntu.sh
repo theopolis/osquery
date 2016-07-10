@@ -14,27 +14,28 @@ function distro_main() {
   package autopoint
   package python-dev
   package python-pip
+  package realpath
 
   # GCC 5x bootstrapping.
   brew_tool patchelf
   core_brew_tool zlib
-  brew_tool binutils
-  brew_tool linux-headers
-
-  brew_tool xz
-  brew_tool gmp
-  brew_tool gpatch
-  brew_tool mpfr
-  brew_tool libmpc
-  brew_tool isl
-  brew_tool berkeley-db
+  core_brew_tool binutils
+  core_brew_tool linux-headers
 
   # Build a bottle of glibc
   local_brew_tool glibc
   $BREW postinstall glibc
 
+  brew_tool xz
+  core_brew_tool gmp
+  brew_tool gpatch
+  core_brew_tool mpfr
+  core_brew_tool libmpc
+  core_brew_tool isl
+  brew_tool berkeley-db
+
   # GCC 5x.
-  brew_tool gcc
+  core_brew_tool gcc
 
   set_cc gcc
   set_cxx g++
@@ -49,11 +50,11 @@ function distro_main() {
   brew_tool unzip
   brew_tool readline
   brew_tool sqlite
-  brew_tool makedepend
+  core_brew_tool makedepend
 
   # Build a bottle for perl and openssl
   local_brew_tool perl --without-test
-  brew_tool openssl
+  local_brew_tool openssl
 
   brew_tool libxml2
   brew_tool libedit
@@ -61,6 +62,7 @@ function distro_main() {
 
   # osquery tool dependencies
   brew_tool libtool
+  brew_tool m4
   brew_tool bison
   brew_tool libgpg-error
   brew_tool popt

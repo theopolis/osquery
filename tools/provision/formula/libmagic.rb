@@ -6,10 +6,9 @@ class Libmagic < Formula
   sha256 "3735381563f69fb4239470b8c51b876a80425348b8285a7cded8b61d6b890eca"
 
   bottle do
-    sha256 "d3a6cdd08087e9b489335a0a8356e2e2fbff451f6a0e6a235fb9e85ad47db7d3" => :el_capitan
-    sha256 "e036124db97064c7dba5641c48b427f6932c66caebb5b4f708fe1f7651750483" => :yosemite
-    sha256 "11d5a175b69618acfb80aa5832f66afe57c7bb23b9487785ab8512eeedce860e" => :mavericks
-    sha256 "0cc1ec776dca2c37765d9de3c4cc78a5fad9ccc99445ce7748be5f5d22cfa47f" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "9bd89a1fa8f85e458087032b456a012721acd87e6a1596a196b75f11958fe682" => :x86_64_linux
   end
 
   option :universal
@@ -17,6 +16,7 @@ class Libmagic < Formula
   depends_on :python => :optional
 
   def install
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.universal_binary if build.universal?
 
     # Clean up "src/magic.h" as per http://bugs.gw.com/view.php?id=330

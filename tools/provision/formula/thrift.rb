@@ -21,10 +21,9 @@ class Thrift < Formula
   end
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    revision 1
-    sha256 "58ae256c8f1e5483cf3e26e02a3f4da4810897527cfc650168ddfca0faa44356" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "2cb8f242394ff575949d7734f3feb014d70112b280a30dfbf792e7274a142403" => :x86_64_linux
   end
 
   depends_on "bison" => :build
@@ -33,7 +32,7 @@ class Thrift < Formula
 
   def install
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV["PY_PREFIX"] = prefix
 
     exclusions = [

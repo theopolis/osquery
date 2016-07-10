@@ -6,9 +6,9 @@ class Python < Formula
   sha256 "82929b96fd6afc8da838b149107078c02fa1744b7e60999a8babbc0d3fa86fc6"
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    sha256 "b735328f0e3f33cc82a73b4f2ab3831e38fd99c1e3089b6b9dab7afd62aa8361" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "3a16c7672a56d21968f6d77cad8d14bb497d093c9970a0e3fd7e25e3073a9ffd" => :x86_64_linux
   end
 
   # Homebrew doesn't accept a wide/ucs4 option because narrow build is the de facto standard

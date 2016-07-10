@@ -6,8 +6,7 @@ class Snappy < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "05364b62629f00139e5bd66054c36cd12726eefac634e8ff6664213bc0f926d9" => :x86_64_linux
+    sha256 "59945fa416c70d21e9159f00adbf4af65896bc104746678fb05d321bb7f4d549" => :x86_64_linux
   end
 
 
@@ -23,6 +22,7 @@ class Snappy < Formula
   depends_on "pkg-config" => :build
 
   def install
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.universal_binary if build.universal?
     ENV.j1 if build.stable?
 

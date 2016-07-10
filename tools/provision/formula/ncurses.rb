@@ -7,9 +7,9 @@ class Ncurses < Formula
   revision 1
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    sha256 "241d3c4e53164eedf06504597c5af1bb4cf8690406915651a4a58190c1eb6000" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "b04323cbde7dbae5c097ba0414401ced390b648be99700605950f5b2bbfa7b0e" => :x86_64_linux
   end
 
   keg_only :provided_by_osx
@@ -19,6 +19,7 @@ class Ncurses < Formula
   depends_on "pkg-config" => :build
 
   def install
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.universal_binary if build.universal?
 
     # Fix the build for GCC 5.1

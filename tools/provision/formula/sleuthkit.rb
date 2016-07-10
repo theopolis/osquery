@@ -7,8 +7,7 @@ class Sleuthkit < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "b717d13f38a23cbb428256b962dfb47f86786b043368714d769efb5e12a29ad9" => :x86_64_linux
+    sha256 "f03ecf0188958960e19214af4b88bf34fa0dcb08ed595e89bc7dfad986372121" => :x86_64_linux
   end
 
   conflicts_with "irods", :because => "both install `ils`"
@@ -31,7 +30,7 @@ class Sleuthkit < Formula
     :because => "both install a 'ffind' executable."
 
   def install
-    ENV.append_to_cflags "-DNDEBUG" if build.without? "debug"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.java_cache if build.with? "jni"
 
     system "./bootstrap"

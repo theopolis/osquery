@@ -5,7 +5,7 @@ class AwsSdkCpp < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "a41941b974e23b32e93873c90952bf5e27f593f2834acba9a32493fe12b309aa" => :x86_64_linux
+    sha256 "9ab0bb9efacbbc7a9f22e0b7378dbecb119d3c9fa3ec59f9dd5aa99b8504e0da" => :x86_64_linux
   end
 
   option "with-static", "Build with static linking"
@@ -17,7 +17,7 @@ class AwsSdkCpp < Formula
 
   def install
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = std_cmake_args
     args << "-DSTATIC_LINKING=1" if build.with? "static" or true

@@ -7,8 +7,7 @@ class GoogleBenchmark < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "0a7f140d18ec59db58e3ba1320d4bcaa65f0df4a7b81806df3f4876f69111d24" => :x86_64_linux
+    sha256 "56ba044f1eb012b9c539c6564d4c92ca44bd16845f87b2790fb2ac09e277cd61" => :x86_64_linux
   end
 
   depends_on "cmake" => :build
@@ -18,6 +17,7 @@ class GoogleBenchmark < Formula
   def install
     ENV.cxx11
     ENV.append_to_cflags "-Wno-zero-length-array"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     system "cmake", *std_cmake_args
     system "make"

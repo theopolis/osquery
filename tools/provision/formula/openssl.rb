@@ -7,10 +7,9 @@ class Openssl < Formula
   sha256 "1d4007e53aad94a5b2002fe045ee7bb0b3d98f1a47f8b2bc851dcd1c74332919"
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    revision 1
-    sha256 "14dbc9fb923accc9a7095900937e94f6daf2b145ca5e1651a74cbb60f2d36404" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "996a51fcb1b7878dffee11fa868c9340d584cb62d7967a847bb1240979650ff6" => :x86_64_linux
   end
 
   resource "cacert" do
@@ -52,6 +51,8 @@ class Openssl < Formula
   end
 
   def install
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
+
     # Load zlib from an explicit path instead of relying on dyld's fallback
     # path, which is empty in a SIP context. This patch will be unnecessary
     # when we begin building openssl with no-comp to disable TLS compression.

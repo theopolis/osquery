@@ -6,13 +6,14 @@ class UtilLinux < Formula
   head "https://github.com/karelzak/util-linux.git"
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    revision 1
-    sha256 "107f14d18397743cdfdefb2d568e79fc97aae130cf2f28dcb08ee1b63017d468" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "30768c7c552ae70de32a2fd78e188ad3b54ede324ced4838b1448b2375d97067" => :x86_64_linux
   end
 
   def install
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
+
     system "./configure",
       "--disable-debug",
       "--disable-dependency-tracking",

@@ -7,7 +7,7 @@ class CppNetlib < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "aa89a2e6a02730dba0314dd27ce5373b3d75642c8a664b03da9b055739277cd3" => :x86_64_linux
+    sha256 "1bec2a7f0625827ed07b23a1d219d9bdb1b7e36dac3b9be7284d87fb5aec1b01" => :x86_64_linux
   end
 
   depends_on "cmake" => :build
@@ -17,7 +17,7 @@ class CppNetlib < Formula
 
   def install
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = [
       "-DCPP-NETLIB_BUILD_TESTS=OFF",

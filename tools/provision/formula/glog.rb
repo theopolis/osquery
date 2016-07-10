@@ -6,15 +6,14 @@ class Glog < Formula
 
   bottle do
     cellar :any_skip_relocation
-    revision 1
-    sha256 "36700e80c671f94471dd703572e4bebe3b6ebd1b669ad84073173861d994dcc4" => :x86_64_linux
+    sha256 "83c3d990acbcf7ffe0d90fb9e0c3017735687c1223d679824ecfe5db076c40e1" => :x86_64_linux
   end
 
   depends_on "gflags"
 
   def install
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"

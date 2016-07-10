@@ -3,16 +3,12 @@ class Glibc < Formula
   homepage "https://www.gnu.org/software/libc/download.html"
   url "http://ftpmirror.gnu.org/glibc/glibc-2.19.tar.bz2"
   sha256 "2e293f714187044633264cd9ce0183c70c3aa960a2f77812a6390a3822694d15"
-  # tag "linuxbrew"
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    revision 1
-    sha256 "c28d96cb80baf5fb61f95f8d7dd9df769199389c3c3c5990e0f60f3a1e6a19b9" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "480e457f90c1fc665c93b1d93c804bd58cc4d268db8361ff20ef9fc81b0d5097" => :x86_64_linux
   end
-
-  option "with-current-kernel", "Compile for compatibility with kernel not older than your current one"
 
   # binutils 2.20 or later is required
   depends_on "binutils" => [:build, :recommended]
@@ -28,11 +24,10 @@ class Glibc < Formula
         "--disable-silent-rules",
         "--prefix=#{prefix}",
         "--enable-obsolete-rpc",
-        "--without-selinux"] # Fix error: selinux/selinux.h: No such file or directory
-      kernel_version = `uname -r`.chomp.split("-")[0]
-      args << "--enable-kernel=#{kernel_version}" if build.with? "current-kernel"
-      args << "--with-binutils=#{Formula["binutils"].bin}" if build.with? "binutils"
-      args << "--with-headers=#{Formula["linux-headers"].include}" if build.with? "linux-headers"
+        "--without-selinux"
+      ] # Fix error: selinux/selinux.h: No such file or directory
+      args << "--with-binutils=#{Formula["binutils"].bin}" if build.with? "binutils" or true
+      args << "--with-headers=#{Formula["linux-headers"].include}" if build.with? "linux-headers" or true
       system "../configure", *args
 
       system "make" # Fix No rule to make target libdl.so.2 needed by sprof

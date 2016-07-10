@@ -6,7 +6,7 @@ class Libiptables < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "17440ce341d4f5c31504ab3f9b7e6d18ad40e736ef3edb9fe40cad80388e37ec" => :x86_64_linux
+    sha256 "974205c4e7cce71ae443d65d2ffedefc3a059a2377d2c569f9fb4c6d34e2a376" => :x86_64_linux
   end
 
   option "with-static", "Build with static linking"
@@ -14,8 +14,7 @@ class Libiptables < Formula
   patch :DATA
 
   def install
-    ENV.append_to_cflags "-fPIC"
-    ENV.append_to_cflags "-DNDEBUG" if build.without? "debug"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = []
     args << "--disable-shared" if build.with? "static" or true

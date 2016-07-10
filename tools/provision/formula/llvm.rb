@@ -57,9 +57,9 @@ class Llvm < Formula
   end
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    sha256 "771436d16eba56506f66c4b15a059f7b1de4a04cb7b1f954a2cc779fa1f245d0" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "e0bf7d3327647a789370d58c05642a161b3c59ff2164ea5bcae549f14ebfdfd8" => :x86_64_linux
   end
 
   head do

@@ -4,14 +4,13 @@ class Libudev < Formula
   url "http://pkgs.fedoraproject.org/repo/pkgs/udev/udev-173.tar.bz2/91a88a359b60bbd074b024883cc0dbde/udev-173.tar.bz2"
 
   bottle do
-    prefix "/opt/osquery-deps"
-    cellar "/opt/osquery-deps/Cellar"
-    sha256 "1fbb394997deb9719e5d21758c9d79fbca842db861b07d7a428f1cb033e524e7" => :x86_64_linux
+    prefix "/usr/local/osquery"
+    cellar "/usr/local/osquery/Cellar"
+    sha256 "9d0dba8a2acda7ece3ae9551ea66fddc420a9b2b2b2d1ae4913ab5c3427ee060" => :x86_64_linux
   end
 
   def install
-    ENV.append_to_cflags "-fPIC"
-    ENV.append_to_cflags "-DNDEBUG" if build.without? "debug"
+    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = [
       "--disable-introspection",
