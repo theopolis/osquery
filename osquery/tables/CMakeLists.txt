@@ -53,9 +53,9 @@ else()
       ${OSQUERY_REDHAT_TABLES}
     )
 
-    ADD_OSQUERY_LINK_ADDITIONAL("rpm rpmio")
+    #ADD_OSQUERY_LINK_ADDITIONAL("rpm rpmio")
     ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup devmapper")
-    ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
+    #ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
   elseif(DEBIAN_BASED)
     # Ubuntu specific tables
     file(GLOB OSQUERY_UBUNTU_TABLES "*/ubuntu/*.cpp")

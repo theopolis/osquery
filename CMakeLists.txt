@@ -8,6 +8,17 @@ macro(LOG MESSAGE)
   message("-- ${MESSAGE}")
 endmacro(LOG)
 
+# Set expected directory for within-build dependencies
+if(DEFINED ENV{OSQUERY_DEPS})
+  set(BUILD_DEPS "$ENV{OSQUERY_DEPS}")
+else()
+  set(BUILD_DEPS "/usr/local/osquery")
+endif()
+# Add the BUILD_DEPS library folder to CMake's link flags.
+# This allows CMake's compile tests to complete, but should be removed to
+# assure universal libc/libgcc linking.
+SET(CMAKE_CXX_FLAGS "-L${BUILD_DEPS}/lib -Qunused-arguments")
+
 # If no explicit compiler override and clang++ exists, prefer clang.
 find_file(CLANGXX_EXISTS "clang++")
 if(DEFINED ENV{CC})
@@ -110,17 +121,6 @@ else()
     set(FREEBSD FALSE)
   endif()
 endif()
-
-# Set expected directory for within-build dependencies
-if(DEFINED ENV{OSQUERY_DEPS})
-  set(BUILD_DEPS "$ENV{OSQUERY_DEPS}")
-else()
-  set(BUILD_DEPS "/usr/local/osquery")
-endif()
-# Add the BUILD_DEPS library folder to CMake's link flags.
-# This allows CMake's compile tests to complete, but should be removed to
-# assure universal libc/libgcc linking.
-SET(CMAKE_CXX_FLAGS "-L${BUILD_DEPS}/lib -Qunused-arguments")
 
 # BUILD BUG: See issue #2112
 set(ENV{SKIP_BENCHMARKS} TRUE)
@@ -429,8 +429,8 @@ else()
   set(PROCESS_FAMILY "posix")
   set(MKDIR_OPTS "-p")
 
-  find_program(THRIFT_COMPILER "thrift")
-  find_program(PYTHON_EXECUTABLE "python")
+  find_program(THRIFT_COMPILER "thrift" HINTS "${BUILD_DEPS}")
+  find_program(PYTHON_EXECUTABLE "python" HINTS "${BUILD_DEPS}")
 
   include_directories("${BUILD_DEPS}/include")
   # The CMakeLibs should provide link-path discovery macros.
