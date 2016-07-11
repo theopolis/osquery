@@ -26,7 +26,7 @@ function distro_main() {
   local_brew_tool glibc
   $BREW postinstall glibc
 
-  brew_tool xz
+  local_brew_tool xz
   core_brew_tool gmp
   brew_tool gpatch
   core_brew_tool mpfr
@@ -46,9 +46,9 @@ function distro_main() {
   # Build a bottle for ncurses
   local_brew_tool ncurses
 
-  core_brew_tool bzip2
+  local_brew_tool bzip2
   brew_tool unzip
-  brew_tool readline
+  local_brew_tool readline
   brew_tool sqlite
   core_brew_tool makedepend
 
@@ -64,7 +64,7 @@ function distro_main() {
   brew_tool libtool
   brew_tool m4
   brew_tool bison
-  brew_tool libgpg-error
+  local_brew_tool libgpg-error
   brew_tool popt
   brew_tool autoconf
   brew_tool automake

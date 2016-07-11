@@ -6,19 +6,20 @@ class Libdevmapper < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "2a045224ba36d9e6423c232b1bde734f86620644c62ae9e5470d4f01b465c7d5" => :x86_64_linux
+    sha256 "b47ac6681a082e108ae38046f3e41b64874e27631a689238fad3e521de3d2bc7" => :x86_64_linux
   end
-
-  option "with-static", "Build with static linking"
 
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
 
+    # When building with LLVM/clang do not expect symbol versioning information.
+    inreplace "lib/misc/lib.h", "defined(__GNUC__)", "defined(__GNUC__) && !defined(__clang__)"
+
     args = [
       "--with-lvm1=none",
       "--disable-selinux",
+      "--enable-static_link",
     ]
-    args << "--enable-static_link" if build.with? "static" or true
 
     system "./configure", "--prefix=#{prefix}", *args
     system "make", "libdm.device-mapper"
