@@ -43,6 +43,7 @@ else()
     -Wabi-tag
     -fstack-protector-all
     -fPIC
+    -fPIE
     -pipe
   )
 endif()
