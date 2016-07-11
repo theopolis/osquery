@@ -17,7 +17,7 @@ function distro_main() {
   package realpath
 
   # GCC 5x bootstrapping.
-  brew_tool patchelf
+  core_brew_tool patchelf
   core_brew_tool zlib
   core_brew_tool binutils
   core_brew_tool linux-headers
