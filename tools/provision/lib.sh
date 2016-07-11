@@ -57,7 +57,7 @@ function brew_tool() {
   TOOL=$1
   shift
 
-  if [[ -z "$OSQUERY_DEPS_BUILD" && -z "$OSQUERY_DEPS_ONETIME" ]]; then
+  if [[ -z "$OSQUERY_BUILD_DEPS" && -z "$OSQUERY_DEPS_ONETIME" ]]; then
     return
   fi
   unset OSQUERY_DEPS_ONETIME
@@ -81,7 +81,7 @@ function local_brew_tool() {
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   log "brew (build) tool $TOOL"
   ARGS="$@"
-  if [[ ! -z "$OSQUERY_DEPS_BUILD" ]]; then
+  if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     ARGS="$ARGS --build-bottle --ignore-dependencies"
   else
     ARGS="--ignore-dependencies --from-bottle"
@@ -96,7 +96,7 @@ function brew_dependency() {
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   log "brew dependency $TOOL"
   ARGS="$@"
-  if [[ ! -z $OSQUERY_DEPS_BUILD ]]; then
+  if [[ ! -z $OSQUERY_BUILD_DEPS ]]; then
     ARGS="$ARGS --build-bottle --cc=clang --universal"
   else
     ARGS="--ignore-dependencies --from-bottle"
@@ -118,7 +118,7 @@ function local_brew_dependency() {
   # Could improve this detection logic to remove from-bottle.
   FROM_BOTTLE=false
   ARGS="$@"
-  if [[ ! -z $OSQUERY_DEPS_BUILD ]]; then
+  if [[ ! -z $OSQUERY_BUILD_DEPS ]]; then
     ARGS="$ARGS -v --build-bottle --cc=clang --universal --ignore-dependencies"
   else
     ARGS="--ignore-dependencies --from-bottle"
@@ -194,66 +194,12 @@ function package() {
   fi
 }
 
-function remove_package() {
-  if [[ $FAMILY = "debian" ]]; then
-    if [[ -n "$(dpkg --get-selections | grep $1)" ]]; then
-      log "removing $1"
-      sudo apt-get remove $1 -y
-    else
-      log "Removing: $1 is not installed. skipping."
-    fi
-  elif [[ $FAMILY = "redhat" ]]; then
-    if [[ -n "$(rpm -qa | grep $1)" ]]; then
-      log "removing $1"
-      sudo yum remove $1 -y
-    else
-      log "Removing: $1 is not installed. skipping."
-    fi
-  elif [[ $OS = "darwin" ]]; then
-    if [[ -n "$(brew list | grep $1)" ]]; then
-      log "removing $1"
-      brew uninstall $1
-    else
-      log "Removing: $1 is not installed. skipping."
-    fi
-  elif [[ $OS = "freebsd" ]]; then
-    if ! pkg info -q $1; then
-      log "removing $1"
-      sudo pkg delete -y $1
-    else
-      log "Removing: $1 is not installed. skipping."
-    fi
-  fi
-}
-
 function gem_install() {
   if [[ -n "$(gem list | grep $1)" ]]; then
     log "$1 is already installed. skipping."
   else
     sudo gem install $@
   fi
-}
-
-function provision() {
-  local _name=$1
-  local _install_check=$2
-
-  if [[ ! -f $_install_check ]]; then
-    log "$_name is not installed/provisioned. installing..."
-    if [[ ! -f $TARBALL ]]; then
-      log "$_name has not been downloaded. downloading..."
-      wget "$URL"
-    else
-      log "$_name is already downloaded. skipping download."
-    fi
-    if [[ ! -d $SOURCE ]]; then
-      log "$_name has not been extracted. extracting..."
-      tar -xzf $TARBALL
-    fi
-    return 0
-  fi
-  log "$_name is already installed. skipping provision."
-  return 1
 }
 
 function check() {

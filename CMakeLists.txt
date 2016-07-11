@@ -8,8 +8,6 @@ macro(LOG MESSAGE)
   message("-- ${MESSAGE}")
 endmacro(LOG)
 
-message("$ENV{PATH}")
-
 # If no explicit compiler override and clang++ exists, prefer clang.
 find_file(CLANGXX_EXISTS "clang++")
 if(DEFINED ENV{CC})
@@ -119,6 +117,10 @@ if(DEFINED ENV{OSQUERY_DEPS})
 else()
   set(BUILD_DEPS "/usr/local/osquery")
 endif()
+# Add the BUILD_DEPS library folder to CMake's link flags.
+# This allows CMake's compile tests to complete, but should be removed to
+# assure universal libc/libgcc linking.
+SET(CMAKE_CXX_FLAGS "-L${BUILD_DEPS}/lib -Qunused-arguments")
 
 # BUILD BUG: See issue #2112
 set(ENV{SKIP_BENCHMARKS} TRUE)
