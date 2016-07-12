@@ -129,34 +129,49 @@ function platform_darwin_main() {
   brew_tool xz
   # brew_tool perl --without-test # Needs -lgdbm
   brew_tool sphinx-doc
+  brew_tool readline # local on Linux
+  brew_tool sqlite
+  core_brew_tool makedepend
 
-  brew_dependency sqlite
-  brew_dependency readline
   # brew_dependency zlib this is not available on Darwin
   # brew_dependency bzip2 this is also not available on Darwin
-  brew_dependency openssl
-
+  local_brew_dependency openssl --without-test
   $BREW link --force openssl
 
   brew_tool pkg-config
   brew_tool cmake
+  brew_tool autoconf
+  brew_tool automake
+  brew_tool libtool
+  brew_tool m4
+  brew_tool bison
 
   local_brew_dependency boost
+
+  # List of LLVM-compiled dependencies.
   local_brew_dependency asio
   local_brew_dependency cpp-netlib
-
-  brew_dependency google-benchmark
-  brew_dependency snappy
-  brew_dependency sleuthkit
-  brew_dependency libmagic
-
-  # Yara will pull in lz4, bz2, and libpcre.
-  local_brew_dependency yara
-  local_brew_dependency glog
+  local_brew_dependency google-benchmark
+  local_brew_dependency pcre
+  local_brew_dependency lz4
+  local_brew_dependency snappy
+  local_brew_dependency sleuthkit
+  local_brew_dependency libmagic
   local_brew_dependency thrift
   local_brew_dependency rocksdb
   local_brew_dependency gflags
   local_brew_dependency aws-sdk-cpp
+  local_brew_dependency yara
+  local_brew_dependency glog
+  # local_brew_dependency util-linux
+  # local_brew_dependency libdevmapper
+  # local_brew_dependency libaptpkg
+  # local_brew_dependency libiptables
+  # local_brew_dependency libgcrypt
+  # local_brew_dependency libcryptsetup
+  # local_brew_dependency libudev
+  # local_brew_dependency libaudit
+  # local_brew_dependency libdpkg
 }
 
 function main() {
@@ -208,8 +223,7 @@ function main() {
   fi
   cd "$DEPS_DIR"
 
-  log "setting up brew within $DEPS_DIR"
-  PATH="$DEPS_DIR/bin:$PATH"
+  export PATH="$DEPS_DIR/bin:$PATH"
   setup_brew "$DEPS_DIR" "$BREW_TYPE"
 
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then

@@ -5,6 +5,7 @@ class Curl < Formula
   sha256 "864e7819210b586d42c674a1fdd577ce75a78b3dda64c63565abe5aefd72c753"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "6d96efe3d0eb764cca3905e02328cacc1820103a045de471ea820b2ade93a379" => :x86_64_linux

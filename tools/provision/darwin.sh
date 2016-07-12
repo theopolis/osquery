@@ -11,4 +11,5 @@ function distro_main() {
   #type pip >/dev/null 2>&1 || {
   #  fatal "could not find pip. please install it using 'sudo easy_install pip'";
   #}
+  true
 }

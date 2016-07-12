@@ -6,6 +6,7 @@ class UtilLinux < Formula
   head "https://github.com/karelzak/util-linux.git"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "30768c7c552ae70de32a2fd78e188ad3b54ede324ced4838b1448b2375d97067" => :x86_64_linux

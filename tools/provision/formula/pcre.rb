@@ -6,6 +6,7 @@ class Pcre < Formula
   sha256 "b9e02d36e23024d6c02a2e5b25204b3a4fa6ade43e0a5f869f254f49535079df"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "5fc84867a35bd61a25c05e39d5f45074315c79d2b52481a1007c6c71ba3f661e" => :x86_64_linux
   end

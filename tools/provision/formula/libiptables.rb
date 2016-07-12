@@ -5,6 +5,7 @@ class Libiptables < Formula
   sha256 "ce1335c91764dc87a26978bd3725c510c2564853184c6e470e0a0f785f420f89"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "974205c4e7cce71ae443d65d2ffedefc3a059a2377d2c569f9fb4c6d34e2a376" => :x86_64_linux
   end

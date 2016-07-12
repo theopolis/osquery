@@ -51,14 +51,6 @@ elseif(FREEBSD)
   ADD_OSQUERY_LINK_CORE("icuuc")
 endif()
 
-# Add default linking details (the first argument means SDK + core).
-ADD_OSQUERY_LINK_CORE("-rdynamic")
-foreach(DISTRO ${OSQUERY_REQUIRE_RUNTIMES})
-  if(${OSQUERY_BUILD_DISTRO} STREQUAL ${DISTRO})
-    ADD_OSQUERY_LINK_ADDITIONAL("-static-libstdc++")
-  endif()
-endforeach()
-
 # The platform-specific SDK + core libraries.
 if(APPLE)
   ADD_OSQUERY_LINK_CORE("-Wl,-dead_strip")
@@ -73,6 +65,7 @@ elseif(LINUX OR FREEBSD)
 endif()
 
 if(LINUX)
+  ADD_OSQUERY_LINK_ADDITIONAL("-static-libstdc++")
   # For Ubuntu/CentOS packages add the build SHA1.
   ADD_OSQUERY_LINK_CORE("-Wl,--build-id")
 endif()

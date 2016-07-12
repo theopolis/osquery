@@ -3,6 +3,7 @@ class Libaudit < Formula
   url "https://github.com/Distrotech/libaudit/archive/audit-2.4.2.tar.gz"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "93c234daa64560b91f0938af1d277f85afd1fa8a92937080603bde4aa1ed53ee" => :x86_64_linux
   end

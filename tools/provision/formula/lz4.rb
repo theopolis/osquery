@@ -7,6 +7,7 @@ class Lz4 < Formula
   head "https://github.com/Cyan4973/lz4.git"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "67dd3f13c112463f9d43812e42cd44a883b26d0c246312064460d1f650a5abbd" => :x86_64_linux
   end

@@ -5,6 +5,7 @@ class Rocksdb < Formula
   sha256 "b6cf3d99b552fb5daae4710952640810d3d810aa677821a9c7166a870669c572"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "60104cf4d60d0a2f5967cc15b505ad698357ff2b18c501f29aa00e5a8749bead" => :x86_64_linux

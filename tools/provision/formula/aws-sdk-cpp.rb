@@ -4,6 +4,7 @@ class AwsSdkCpp < Formula
   url "https://osquery-packages.s3.amazonaws.com/deps/aws-sdk-cpp-0.12.4.tar.gz"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "9ab0bb9efacbbc7a9f22e0b7378dbecb119d3c9fa3ec59f9dd5aa99b8504e0da" => :x86_64_linux
   end

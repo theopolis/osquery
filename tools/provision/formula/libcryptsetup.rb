@@ -4,6 +4,7 @@ class Libcryptsetup < Formula
   url "https://osquery-packages.s3.amazonaws.com/deps/cryptsetup-1.6.7.tar.gz"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "3a4ae69082c11b1df0b101a97e09af62a08bf01186996d3e873e9a98cf3ddc32" => :x86_64_linux
   end

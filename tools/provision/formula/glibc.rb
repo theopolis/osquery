@@ -5,6 +5,7 @@ class Glibc < Formula
   sha256 "2e293f714187044633264cd9ce0183c70c3aa960a2f77812a6390a3822694d15"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "480e457f90c1fc665c93b1d93c804bd58cc4d268db8361ff20ef9fc81b0d5097" => :x86_64_linux

@@ -7,6 +7,7 @@ class Readline < Formula
   sha256 "56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "bf34aeafeb8bb10cba63b7ca83fa2e5f7184c889b14ccfd3352d344d24f763b5" => :x86_64_linux
   end

@@ -39,6 +39,7 @@ function setup_brew() {
   export HOMEBREW_MAKE_JOBS=$THREADS
   export HOMEBREW_NO_EMOJI=1
   export BREW="$DEPS/bin/brew"
+  log "installing homebrew dupes"
   $BREW tap homebrew/dupes
 }
 
@@ -83,6 +84,9 @@ function local_brew_tool() {
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     ARGS="$ARGS --build-bottle --ignore-dependencies"
+    if [[ "$OS" = "darwin" ]]; then
+      ARGS="$ARGS --env=std"
+    fi
   else
     ARGS="--ignore-dependencies --from-bottle"
   fi
@@ -98,9 +102,13 @@ function brew_dependency() {
   ARGS="$@"
   if [[ ! -z $OSQUERY_BUILD_DEPS ]]; then
     ARGS="$ARGS --build-bottle --cc=clang --universal"
+    if [[ "$OS" = "darwin" ]]; then
+      ARGS="$ARGS --env=std"
+    fi
   else
     ARGS="--ignore-dependencies --from-bottle"
   fi
+
   $BREW install $ARGS "$TOOL"
 }
 
@@ -120,6 +128,9 @@ function local_brew_dependency() {
   ARGS="$@"
   if [[ ! -z $OSQUERY_BUILD_DEPS ]]; then
     ARGS="$ARGS -v --build-bottle --cc=clang --universal --ignore-dependencies"
+    if [[ "$OS" = "darwin" ]]; then
+      ARGS="$ARGS --env=std"
+    fi
   else
     ARGS="--ignore-dependencies --from-bottle"
   fi

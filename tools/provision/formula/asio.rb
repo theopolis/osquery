@@ -6,6 +6,7 @@ class Asio < Formula
   head "https://github.com/chriskohlhoff/asio.git"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "8f693bfb9b82f373726dbbff76ce40fa26243c571a0e858ec7992ae19b804119" => :x86_64_linux
   end
@@ -25,7 +26,7 @@ class Asio < Formula
       cd "asio"
       system "./autogen.sh"
     else
-      system "autoconf"
+      system "autoconf" unless OS.mac?
     end
     args = %W[
       --disable-dependency-tracking

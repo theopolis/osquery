@@ -6,6 +6,7 @@ class Libmagic < Formula
   sha256 "3735381563f69fb4239470b8c51b876a80425348b8285a7cded8b61d6b890eca"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "9bd89a1fa8f85e458087032b456a012721acd87e6a1596a196b75f11958fe682" => :x86_64_linux

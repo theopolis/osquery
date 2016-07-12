@@ -142,18 +142,6 @@ if(${OSQUERY_BUILD_DISTRO} STREQUAL "wheezy")
   set (CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu")
 endif()
 
-# Provisioning installs non-default C++11 runtimes on build hosts.
-# List those distros that include a non-system-default runtime.
-set(OSQUERY_REQUIRE_RUNTIMES
-  "lucid"
-  "precise"
-  "centos6"
-  "scientific6"
-  "rhel6"
-  "oracle6"
-  "wheezy"
-)
-
 # make debug (environment variable from Makefile)
 if(DEFINED ENV{DEBUG})
   set(DEBUG TRUE)

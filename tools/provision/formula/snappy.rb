@@ -5,6 +5,7 @@ class Snappy < Formula
   sha256 "2f1e82adf0868c9e26a5a7a3115111b6da7e432ddbac268a7ca2fae2a247eef3"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "59945fa416c70d21e9159f00adbf4af65896bc104746678fb05d321bb7f4d549" => :x86_64_linux
   end

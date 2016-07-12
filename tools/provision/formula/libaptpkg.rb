@@ -4,6 +4,7 @@ class Libaptpkg < Formula
   url "https://osquery-packages.s3.amazonaws.com/deps/apt-1.2.6.tar.gz"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "91d0ccdb8e1e03fd4846afdeccdb1a3fdf89f9b8cabad39eb31f9330750626dd" => :x86_64_linux
   end

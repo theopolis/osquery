@@ -21,6 +21,7 @@ class Boost < Formula
   end
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "4cd3083e5080b72b74eb8dcc9064713b451e3a962724418f0cb1a701c3d32dbd" => :x86_64_linux
   end

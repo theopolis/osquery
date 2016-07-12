@@ -4,6 +4,7 @@ class Yara < Formula
   head "https://github.com/plusvic/yara.git"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "53be9156489716c31595a8f91e935d5f5b94decbb46db3b3f79a2f1db915dc85" => :x86_64_linux
   end

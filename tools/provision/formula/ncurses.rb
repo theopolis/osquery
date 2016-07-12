@@ -7,6 +7,7 @@ class Ncurses < Formula
   revision 1
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "b04323cbde7dbae5c097ba0414401ced390b648be99700605950f5b2bbfa7b0e" => :x86_64_linux

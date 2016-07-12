@@ -57,6 +57,7 @@ class Llvm < Formula
   end
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "e0bf7d3327647a789370d58c05642a161b3c59ff2164ea5bcae549f14ebfdfd8" => :x86_64_linux

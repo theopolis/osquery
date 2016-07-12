@@ -6,6 +6,7 @@ class Libdpkg < Formula
   sha256 "fe89243868888ce715bf45861f26264f767d4e4dbd0d6f1a26ce60bbbbf106da"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "93a7b3d13f0be22591511563c274ab7c5eabe3d08a247e9b2363685a1ebcd2c2" => :x86_64_linux

@@ -6,6 +6,7 @@ class Libgcrypt < Formula
   sha256 "f49ebc5842d455ae7019def33eb5a014a0f07a2a8353dc3aa50a76fd1dafa924"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "c46b8922cfa52d613934db6586a69109ed17e351aaf20dffeab559f50cd4f85f" => :x86_64_linux
   end

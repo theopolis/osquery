@@ -5,6 +5,7 @@ class Bzip2 < Formula
   sha256 "a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "3ddbc5d48a58566aea701441373c945625350c3150adc9abe924d78b3b11f9ca" => :x86_64_linux

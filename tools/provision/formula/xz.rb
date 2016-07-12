@@ -8,6 +8,7 @@ class Xz < Formula
   sha256 "73df4d5d34f0468bd57d09f2d8af363e95ed6cc3a4a86129d2f2c366259902a2"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "ffe8cb687caa6bb1b8c448333d632672b093001cbcba913729caef71d1abe1a7" => :x86_64_linux

@@ -5,6 +5,7 @@ class Gflags < Formula
   sha256 "d8331bd0f7367c8afd5fcb5f5e85e96868a00fd24b7276fa5fcee1e5575c2662"
 
   bottle do
+    root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "50edd3a4a03f0371e3a9bd4652b8a900b20112616208a5a4d160fb9ee57018b7" => :x86_64_linux
   end
