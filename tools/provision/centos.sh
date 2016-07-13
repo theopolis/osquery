@@ -10,9 +10,13 @@
 function distro_main() {
   do_sudo yum update -y
 
+  package wget
   package git
+  package unzip
   package gawk
+  package xz
   package ruby
   package ruby-irb
   package gcc
+  package bzip2
 }
