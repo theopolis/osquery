@@ -9,13 +9,11 @@ class Libaptpkg < Formula
     sha256 "91d0ccdb8e1e03fd4846afdeccdb1a3fdf89f9b8cabad39eb31f9330750626dd" => :x86_64_linux
   end
 
-  option "with-static", "Build with static linking"
-
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = []
-    args << "STATICLIBS=1" if build.with? "static" or true
+    args << "STATICLIBS=1"
 
     system "make", "clean"
     system "./configure", "--prefix=#{prefix}"

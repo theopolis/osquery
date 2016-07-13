@@ -145,6 +145,10 @@ function platform_darwin_main() {
   brew_tool libtool
   brew_tool m4
   brew_tool bison
+  $BREW link --force bison
+
+  local_brew_tool python
+  $BREW postinstall python
 
   local_brew_dependency boost
 

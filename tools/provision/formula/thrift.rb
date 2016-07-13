@@ -24,6 +24,7 @@ class Thrift < Formula
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
+    sha256 "8919afc41074b787620077621df2c80c83b41fc507ba0034b0b0f86f805b8b3a" => :el_capitan
     sha256 "2cb8f242394ff575949d7734f3feb014d70112b280a30dfbf792e7274a142403" => :x86_64_linux
   end
 

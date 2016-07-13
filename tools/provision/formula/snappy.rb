@@ -7,9 +7,9 @@ class Snappy < Formula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
+    sha256 "1b72b4a0fddf11a68bcb2501f3e3c6542874ea1b2b18d2ed6c359e41bf57cae3" => :el_capitan
     sha256 "59945fa416c70d21e9159f00adbf4af65896bc104746678fb05d321bb7f4d549" => :x86_64_linux
   end
-
 
   head do
     url "https://github.com/google/snappy.git"

@@ -6,6 +6,7 @@ class Yara < Formula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
+    sha256 "fe1a36ffe1a3fc52a14cc241661fce34ad16588ea80d4cb33e8d677bc0a70646" => :el_capitan
     sha256 "53be9156489716c31595a8f91e935d5f5b94decbb46db3b3f79a2f1db915dc85" => :x86_64_linux
   end
 

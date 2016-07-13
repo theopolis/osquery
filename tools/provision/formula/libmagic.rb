@@ -9,16 +9,15 @@ class Libmagic < Formula
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
+    sha256 "c53b9b47992343473d191f4cda7e6eb76cabb948519f8d1f5734b01dc848ea0c" => :el_capitan
     sha256 "9bd89a1fa8f85e458087032b456a012721acd87e6a1596a196b75f11958fe682" => :x86_64_linux
   end
-
-  option :universal
 
   depends_on :python => :optional
 
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
-    ENV.universal_binary if build.universal?
+    ENV.universal_binary
 
     # Clean up "src/magic.h" as per http://bugs.gw.com/view.php?id=330
     rm "src/magic.h"

@@ -15,13 +15,11 @@ class Ncurses < Formula
 
   keg_only :provided_by_osx
 
-  option :universal
-
   depends_on "pkg-config" => :build
 
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
-    ENV.universal_binary if build.universal?
+    ENV.universal_binary
 
     # Fix the build for GCC 5.1
     # error: expected ')' before 'int' in definition of macro 'mouse_trafo'

@@ -10,15 +10,14 @@ class Libiptables < Formula
     sha256 "974205c4e7cce71ae443d65d2ffedefc3a059a2377d2c569f9fb4c6d34e2a376" => :x86_64_linux
   end
 
-  option "with-static", "Build with static linking"
-
   patch :DATA
 
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
 
-    args = []
-    args << "--disable-shared" if build.with? "static" or true
+    args = [
+      "--disable-shared",
+    ]
 
     system "./configure", "--prefix=#{prefix}", *args
     cd "libiptc" do

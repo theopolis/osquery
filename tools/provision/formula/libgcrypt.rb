@@ -11,8 +11,6 @@ class Libgcrypt < Formula
     sha256 "c46b8922cfa52d613934db6586a69109ed17e351aaf20dffeab559f50cd4f85f" => :x86_64_linux
   end
 
-  option :universal
-
   depends_on "libgpg-error"
 
   resource "config.h.ed" do
@@ -23,7 +21,7 @@ class Libgcrypt < Formula
 
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
-    ENV.universal_binary if build.universal? or true
+    ENV.universal_binary
 
     args = [
       "--disable-dependency-tracking",

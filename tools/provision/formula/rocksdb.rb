@@ -8,10 +8,9 @@ class Rocksdb < Formula
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
+    sha256 "83b0a6f000efbf84a3e83eab99253f785be92e474f295b66eb09b12036eb5a6d" => :el_capitan
     sha256 "60104cf4d60d0a2f5967cc15b505ad698357ff2b18c501f29aa00e5a8749bead" => :x86_64_linux
   end
-
-  option "with-lite", "Build mobile/non-flash optimized lite version"
 
   needs :cxx11
   depends_on "snappy"
@@ -23,9 +22,10 @@ class Rocksdb < Formula
     ENV.cxx11
     ENV.append_to_cflags "-fPIC -DNDEBUG"
 
-    ENV["PORTABLE"] = "1" if build.bottle?
-    ENV["LIBNAME"] = "librocksdb_lite" if build.with? "lite" or true
-    ENV.append_to_cflags "-DROCKSDB_LITE=1" if build.with? "lite" or true
+    ENV["PORTABLE"] = "1"
+    ENV["LIBNAME"] = "librocksdb_lite"
+    ENV.append_to_cflags "-DROCKSDB_LITE=1"
+
     system "env"
     system "make", "clean"
     system "make", "static_lib"

@@ -10,6 +10,7 @@ class Openssl < Formula
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
+    sha256 "9f261a25f0e20c615a00b0482890c8a9d82048166c0a359886c4ab5746820dcc" => :el_capitan
     sha256 "996a51fcb1b7878dffee11fa868c9340d584cb62d7967a847bb1240979650ff6" => :x86_64_linux
   end
 

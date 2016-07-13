@@ -8,6 +8,7 @@ class CppNetlib < Formula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
+    sha256 "642ae5394d94776223c882a89300434c3f840aa4ba270a6fa0071f7dc6ff0d2f" => :el_capitan
     sha256 "1bec2a7f0625827ed07b23a1d219d9bdb1b7e36dac3b9be7284d87fb5aec1b01" => :x86_64_linux
   end
 

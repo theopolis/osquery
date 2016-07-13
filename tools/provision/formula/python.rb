@@ -1,25 +1,29 @@
 class Python < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org"
+  url "https://www.python.org/ftp/python/2.7.12/Python-2.7.12.tar.xz"
+  sha256 "d7837121dd5652a05fef807c361909d255d173280c4e1a4ded94d73d80a1f978"
   head "https://hg.python.org/cpython", :using => :hg, :branch => "2.7"
-  url "https://www.python.org/ftp/python/2.7.11/Python-2.7.11.tgz"
-  sha256 "82929b96fd6afc8da838b149107078c02fa1744b7e60999a8babbc0d3fa86fc6"
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
+    sha256 "b12088e1e08fdb42583069238b62374c9bb686156d989edf0583dd658659ebbc" => :el_capitan
+
+    # This is invalid, need to rebuild.
     sha256 "3a16c7672a56d21968f6d77cad8d14bb497d093c9970a0e3fd7e25e3073a9ffd" => :x86_64_linux
   end
+
+  option :universal
+  option "with-quicktest", "Run `make quicktest` after the build (for devs; may fail)"
+  option "with-tcl-tk", "Use Homebrew's Tk instead of OS X Tk (has optional Cocoa and threads support)"
+  option "with-poll", "Enable select.poll, which is not fully implemented on OS X (https://bugs.python.org/issue5154)"
 
   # Homebrew doesn't accept a wide/ucs4 option because narrow build is the de facto standard
   # on Windows and OSX, but wide seems to be the default for linux
   # More details in: https://github.com/Homebrew/homebrew/pull/32368
   option "with-unicode-ucs4", "Build unicode support with UCS4"
-  option :universal
-  option "with-quicktest", "Run `make quicktest` after the build (for devs; may fail)"
-  option "with-tcl-tk", "Use Homebrew's Tk instead of OS X Tk (has optional Cocoa and threads support)"
-  option "with-poll", "Enable select.poll, which is not fully implemented on OS X (https://bugs.python.org/issue5154)"
 
   deprecated_option "quicktest" => "with-quicktest"
   deprecated_option "with-brewed-tk" => "with-tcl-tk"
@@ -38,18 +42,18 @@ class Python < Formula
   skip_clean "bin/easy_install", "bin/easy_install-2.7"
 
   resource "setuptools" do
-    url "https://pypi.python.org/packages/source/s/setuptools/setuptools-19.4.tar.gz"
-    sha256 "214bf29933f47cf25e6faa569f710731728a07a19cae91ea64f826051f68a8cf"
+    url "https://files.pythonhosted.org/packages/9f/7c/0a33c528164f1b7ff8cf0684cf88c2e733c8ae0119ceca4a3955c7fc059d/setuptools-23.1.0.tar.gz"
+    sha256 "4e269d36ba2313e6236f384b36eb97b3433cf99a16b94c74cca7eee2b311f2be"
   end
 
   resource "pip" do
-    url "https://pypi.python.org/packages/source/p/pip/pip-8.0.2.tar.gz"
-    sha256 "46f4bd0d8dfd51125a554568d646fe4200a3c2c6c36b9f2d06d2212148439521"
+    url "https://files.pythonhosted.org/packages/e7/a8/7556133689add8d1a54c0b14aeff0acb03c64707ce100ecd53934da1aa13/pip-8.1.2.tar.gz"
+    sha256 "4d24b03ffa67638a3fa931c09fd9e0273ffa904e95ebebe7d4b1a54c93d7b732"
   end
 
   resource "wheel" do
-    url "https://pypi.python.org/packages/source/w/wheel/wheel-0.26.0.tar.gz"
-    sha256 "eaad353805c180a47545a256e6508835b65a8e830ba1093ed8162f19a50a530c"
+    url "https://files.pythonhosted.org/packages/c9/1d/bd19e691fd4cfe908c76c429fe6e4436c9e83583c4414b54f6c85471954a/wheel-0.29.0.tar.gz"
+    sha256 "1ebb8ad7e26b448e9caa4773d2357849bf80ff9e313964bcaf79cbf0201a1648"
   end
 
   # Patch for pyport.h macro issue
@@ -63,14 +67,6 @@ class Python < Formula
   # Patch to disable the search for Tk.framework, since Homebrew's Tk is
   # a plain unix build. Remove `-lX11`, too because our Tk is "AquaTk".
   patch :DATA if build.with? "tcl-tk"
-
-  # Fix extension module builds against Xcode 7 SDKs
-  # https://github.com/Homebrew/homebrew/issues/41085
-  # https://bugs.python.org/issue25136
-  patch do
-    url "https://bugs.python.org/file40479/xcode-stubs-2.7.patch"
-    sha256 "86714b750c887065952cd556f4d23246edf3124384f579356c8e377bc6ff2f83"
-  end
 
   def lib_cellar
     prefix / (OS.mac? ? "Frameworks/Python.framework/Versions/2.7" : "") /
@@ -89,7 +85,11 @@ class Python < Formula
   # setuptools remembers the build flags python is built with and uses them to
   # build packages later. Xcode-only systems need different flags.
   pour_bottle? do
-    reason "The bottle needs the Xcode CLT to be installed."
+    reason <<-EOS.undent
+    The bottle needs the Apple Command Line Tools to be installed.
+      You can install them, if desired, with:
+        xcode-select --install
+    EOS
     satisfy { MacOS::CLT.installed? }
   end
 
@@ -111,6 +111,7 @@ class Python < Formula
       #{OS.mac? ? "--enable-framework=#{frameworks}" : "--enable-shared"}
       --without-ensurepip
     ]
+
     args << "--without-gcc" if ENV.compiler == :clang
     args << "--enable-unicode=ucs4" if build.with? "unicode-ucs4"
 

@@ -20,11 +20,9 @@ class Libcryptsetup < Formula
       "--disable-veritysetup",
       "--disable-nls",
       "--disable-kernel_crypto",
+      "--enable-static",
+      "--disable-shared",
     ]
-
-    if build.with? "static" or true
-      args << "--enable-static" << "--disable-shared"
-    end
 
     system "./autogen.sh", "--prefix=#{prefix}", *args
     cd "lib" do

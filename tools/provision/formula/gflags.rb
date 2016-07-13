@@ -7,10 +7,9 @@ class Gflags < Formula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
+    sha256 "0634c6eb2078ea35cdcacfdc1c0de09cd3fa287901671d0ac6a850e2def904a4" => :el_capitan
     sha256 "50edd3a4a03f0371e3a9bd4652b8a900b20112616208a5a4d160fb9ee57018b7" => :x86_64_linux
   end
-
-  option "with-static", "Build gflags as a static (instead of shared) library."
 
   depends_on "cmake" => :build
 
@@ -19,11 +18,7 @@ class Gflags < Formula
     ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = std_cmake_args
-    if build.with? "static" or true
-      args << "-DBUILD_SHARED_LIBS=OFF"
-    else
-      args << "-DBUILD_SHARED_LIBS=ON"
-    end
+    args << "-DBUILD_SHARED_LIBS=OFF"
 
     mkdir "buildroot" do
       system "cmake", "..", *args

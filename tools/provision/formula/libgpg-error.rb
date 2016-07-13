@@ -12,11 +12,9 @@ class LibgpgError < Formula
     sha256 "c0bbc752400eb6b792b0985cecd5fc250ba02251146a6358cd9c9c6ef1abfea0" => :x86_64_linux
   end
 
-  option :universal
-
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
-    ENV.universal_binary if build.universal?
+    ENV.universal_binary
 
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
