@@ -16,4 +16,6 @@ function distro_main() {
   package xz
   package ruby
   package ruby-irb
+  package gcc
+  package bzip2
 }
