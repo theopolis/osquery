@@ -70,13 +70,19 @@ macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
     "${BUILD_DEPS}/lib"
     "${CMAKE_BUILD_DIR}/third-party/*/lib"
     ${LINK_PATHS}
+    "/lib"
+    "/lib64"
     "/usr/lib"
+    "/usr/lib64"
     "/usr/lib/x86_64-linux-gnu/"
     "$ENV{HOME}"
   )
   set(LINK_PATHS_SYSTEM
     ${LINK_PATHS}
+    "/lib"
+    "/lib64"
     "/usr/lib"
+    "/usr/lib64"
     "/usr/lib/x86_64-linux-gnu/"
   )
 

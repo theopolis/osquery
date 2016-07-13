@@ -449,6 +449,7 @@ if(NOT WIN32)
   endif()
 endif()
 
+find_package(Gtest REQUIRED)
 enable_testing()
 
 include(Packages)
