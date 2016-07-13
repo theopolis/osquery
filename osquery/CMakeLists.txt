@@ -29,55 +29,34 @@ else()
 endif()
 
 if(WIN32)
-  set(OS_CORE_LIBS
-    netapi32.lib
-    shlwapi.lib
-  )
+  ADD_OSQUERY_LINK_CORE("netapi32.lib")
+  ADD_OSQUERY_LINK_CORE("shlwapi.lib")
 else()
-  set(OS_CORE_LIBS
-    pthread
-    z
-  )
+  ADD_OSQUERY_LINK_CORE("libpthread")
+  ADD_OSQUERY_LINK_CORE("libz")
 endif()
 
-# The core set of osquery libraries most discovered with find_package.
-set(OSQUERY_LIBS
-  ${OS_CORE_LIBS}
-)
-
 if(APPLE OR LINUX)
-  set(OSQUERY_LIBS ${OSQUERY_LIBS} dl)
+  ADD_OSQUERY_LINK_CORE("libdl")
 elseif(FREEBSD)
   ADD_OSQUERY_LINK_CORE("icuuc")
 endif()
 
-# The platform-specific SDK + core libraries.
-if(APPLE)
-  ADD_OSQUERY_LINK_CORE("-Wl,-dead_strip")
-  ADD_OSQUERY_LINK_CORE("-mmacosx-version-min=${OSX_VERSION_MIN}")
-elseif(LINUX OR FREEBSD)
-  ADD_OSQUERY_LINK_CORE("-Wl,-zrelro -Wl,-znow")
-  ADD_OSQUERY_LINK_CORE("-pie")
-  if(NOT ${REDHAT_BASED})
-    ADD_OSQUERY_LINK_CORE("-Wl,--gc-sections")
-  endif()
-  ADD_OSQUERY_LINK_CORE("librt.so")
+if(LINUX OR FREEBSD)
+  ADD_OSQUERY_LINK_CORE("librt")
 endif()
 
-if(LINUX)
-  ADD_OSQUERY_LINK_ADDITIONAL("-static-libstdc++")
-  # For Ubuntu/CentOS packages add the build SHA1.
-  ADD_OSQUERY_LINK_CORE("-Wl,--build-id")
-endif()
+if(APPLE)
+  ADD_OSQUERY_LINK_CORE("liblzma libbz2 liblz4")
+else()
+  ADD_OSQUERY_LINK_CORE("lzma bz2 lz4")
+endif()  
 
 ADD_OSQUERY_LINK_CORE("rocksdb_lite")
 ADD_OSQUERY_LINK_CORE("snappy")
-
-# The remaining boost libraries are discovered with find_library.
 ADD_OSQUERY_LINK_CORE("thrift")
 ADD_OSQUERY_LINK_CORE("gflags")
 ADD_OSQUERY_LINK_CORE("glog")
-
 ADD_OSQUERY_LINK_CORE("boost_system-mt")
 ADD_OSQUERY_LINK_CORE("boost_filesystem-mt")
 ADD_OSQUERY_LINK_CORE("boost_regex-mt")
@@ -92,8 +71,25 @@ ADD_OSQUERY_LINK_ADDITIONAL("cppnetlib-uri")
 ADD_OSQUERY_LINK_ADDITIONAL("cppnetlib-client-connections")
 ADD_OSQUERY_LINK_ADDITIONAL("ssl")
 ADD_OSQUERY_LINK_ADDITIONAL("crypto")
-ADD_OSQUERY_LINK_ADDITIONAL("readline ncurses")
-ADD_OSQUERY_LINK_CORE("lzma bz2 lz4")
+ADD_OSQUERY_LINK_ADDITIONAL("readline")
+ADD_OSQUERY_LINK_ADDITIONAL("ncurses")
+
+# The platform-specific SDK + core linker flags.
+if(APPLE)
+  ADD_OSQUERY_LINK_CORE("-Wl,-dead_strip")
+  ADD_OSQUERY_LINK_CORE("-mmacosx-version-min=${OSX_VERSION_MIN}")
+elseif(LINUX OR FREEBSD)
+  ADD_OSQUERY_LINK_CORE("-Wl,-zrelro -Wl,-znow -pie")
+  if(NOT ${REDHAT_BASED})
+    ADD_OSQUERY_LINK_CORE("-Wl,--gc-sections")
+  endif()
+endif()
+
+if(LINUX)
+  ADD_OSQUERY_LINK_ADDITIONAL("-static-libstdc++")
+  # For Ubuntu/CentOS packages add the build SHA1.
+  ADD_OSQUERY_LINK_CORE("-Wl,--build-id")
+endif()
 
 if(DEFINED ENV{SANITIZE})
   if(DEFINED ENV{SANITIZE_THREAD})

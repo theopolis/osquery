@@ -95,7 +95,8 @@ macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
             NAMES "lib${ITEM}.a" "${ITEM}" HINTS ${LINK_PATHS_RELATIVE})
         else()
           find_library("${ITEM}_library"
-            NAMES "lib${ITEM}.so" "lib${ITEM}.dylib" "${ITEM}" HINTS ${LINK_PATHS_SYSTEM})
+            NAMES "lib${ITEM}.so" "lib${ITEM}.dylib" "${ITEM}.so" "${ITEM}.dylib" "${ITEM}"
+            HINTS ${LINK_PATHS_SYSTEM})
         endif()
         LOG_LIBRARY(${ITEM} "${${ITEM}_library}")
         if("${${ITEM}_library}" STREQUAL "${${ITEM}_library}-NOTFOUND")
