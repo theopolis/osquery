@@ -8,7 +8,7 @@ class Pcre < Formula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
-    sha256 "642ae5394d94776223c882a89300434c3f840aa4ba270a6fa0071f7dc6ff0d2f" => :el_capitan
+    sha256 "ad20f3f1296589d85908c7a4643440faeb6fe316a967896ca7cbb546ddb7e799" => :el_capitan
     sha256 "5fc84867a35bd61a25c05e39d5f45074315c79d2b52481a1007c6c71ba3f661e" => :x86_64_linux
   end
 

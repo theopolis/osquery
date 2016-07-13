@@ -139,13 +139,15 @@ function platform_darwin_main() {
   $BREW link --force openssl
 
   brew_tool pkg-config
-  brew_tool cmake
+  core_brew_tool cmake
   brew_tool autoconf
   brew_tool automake
   brew_tool libtool
   brew_tool m4
   brew_tool bison
-  $BREW link --force bison
+  if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
+    $BREW link --force bison
+  fi
 
   local_brew_tool python
   $BREW postinstall python
