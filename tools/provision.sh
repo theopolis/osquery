@@ -123,6 +123,7 @@ function platform_linux_main() {
   local_brew_dependency libudev
   local_brew_dependency libaudit
   local_brew_dependency libdpkg
+  local_brew_dependency librpm
 }
 
 function platform_darwin_main() {
@@ -169,15 +170,6 @@ function platform_darwin_main() {
   local_brew_dependency aws-sdk-cpp
   local_brew_dependency yara
   local_brew_dependency glog
-  # local_brew_dependency util-linux
-  # local_brew_dependency libdevmapper
-  # local_brew_dependency libaptpkg
-  # local_brew_dependency libiptables
-  # local_brew_dependency libgcrypt
-  # local_brew_dependency libcryptsetup
-  # local_brew_dependency libudev
-  # local_brew_dependency libaudit
-  # local_brew_dependency libdpkg
 }
 
 function main() {
