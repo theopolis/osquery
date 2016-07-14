@@ -26,13 +26,18 @@ class CppNetlib < Formula
       "-DCPP-NETLIB_BUILD_EXAMPLES=OFF",
     ]
 
-    system "echo", "\"$PATH\""
-    system "env"
-
     # NB: Do not build examples or tests as they require submodules.
     args += std_cmake_args
     system "cmake", *args
     system "make"
     system "make", "install"
+
+    # Move lib64/* to lib/ on Linuxbrew
+    lib64 = Pathname.new "#{lib}64"
+    if lib64.directory?
+      mkdir_p lib
+      system "mv #{lib64}/* #{lib}/"
+      rmdir lib64
+    end
   end
 end
