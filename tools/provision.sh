@@ -123,6 +123,17 @@ function platform_linux_main() {
   local_brew_dependency libudev
   local_brew_dependency libaudit
   local_brew_dependency libdpkg
+
+  # This will need NSS and NSPR
+  core_brew_tool nspr
+  if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
+    $BREW link --force nspr
+  fi
+  core_brew_tool nss
+  # Maybe autopoint for autogen.sh?
+  brew_tool gettext
+  core_brew_tool libarchive
+
   local_brew_dependency librpm
 }
 
