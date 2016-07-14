@@ -53,31 +53,28 @@ else()
       ${OSQUERY_REDHAT_TABLES}
     )
 
-    #ADD_OSQUERY_LINK_ADDITIONAL("rpm rpmio")
-    ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup devmapper")
-    #ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
-  elseif(DEBIAN_BASED)
-    # Ubuntu specific tables
-    file(GLOB OSQUERY_UBUNTU_TABLES "*/ubuntu/*.cpp")
-    ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_tables_ubuntu
-      ${OSQUERY_UBUNTU_TABLES}
-    )
-
-    set(LIBDPKG_VERSION_NUMBER "1018004")
-    add_definitions(-DLIBDPKG_VERSION=${LIBDPKG_VERSION_NUMBER})
-
-    ADD_OSQUERY_LINK_ADDITIONAL("apt-pkg dpkg lzma lz4 bz2")
-    ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup devmapper")
-    #ADD_OSQUERY_LINK_ADDITIONAL("libselinux.so")
+    ADD_OSQUERY_LINK_ADDITIONAL("librpm librpmio")
   endif()
 
-  ADD_OSQUERY_LINK_ADDITIONAL("libresolv.so")
+  # Ubuntu specific tables (also work on RHEL-based)
+  file(GLOB OSQUERY_UBUNTU_TABLES "*/ubuntu/*.cpp")
+  ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_tables_ubuntu
+    ${OSQUERY_UBUNTU_TABLES}
+  )
+
+  set(LIBDPKG_VERSION_NUMBER "1018004")
+  add_definitions(-DLIBDPKG_VERSION=${LIBDPKG_VERSION_NUMBER})
+
+  ADD_OSQUERY_LINK_ADDITIONAL("apt-pkg dpkg lzma lz4 bz2")
+  ADD_OSQUERY_LINK_ADDITIONAL("cryptsetup devmapper")
   ADD_OSQUERY_LINK_ADDITIONAL("gcrypt gpg-error")
   ADD_OSQUERY_LINK_ADDITIONAL("blkid")
   ADD_OSQUERY_LINK_ADDITIONAL("uuid")
   ADD_OSQUERY_LINK_ADDITIONAL("ip4tc")
   ADD_OSQUERY_LINK_ADDITIONAL("magic")
   ADD_OSQUERY_LINK_ADDITIONAL("tsk")
+
+  ADD_OSQUERY_LINK_ADDITIONAL("libresolv.so")
 endif()
 
 file(GLOB OSQUERY_CROSS_APPLICATIONS_TABLES "applications/*.cpp")

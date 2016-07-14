@@ -91,6 +91,8 @@ function platform_linux_main() {
   # Curl and Python are needed for LLVM mostly.
   local_brew_tool curl
   local_brew_tool python
+  $BREW postinstall python
+
   core_brew_tool cmake --ignore-dependencies
 
   # LLVM/Clang.
@@ -98,8 +100,6 @@ function platform_linux_main() {
 
   # Install custom formulas, build with LLVM/clang.
   local_brew_dependency boost
-
-  # List of LLVM-compiled dependencies.
   local_brew_dependency asio
   local_brew_dependency cpp-netlib
   local_brew_dependency google-benchmark
@@ -124,24 +124,22 @@ function platform_linux_main() {
   local_brew_dependency libaudit
   local_brew_dependency libdpkg
 
+  # The following are only for RH-based distributions.
+  # They may still be installed on all Linux hosts, but RH-based distributions
+  # will link and include the relative tables.
   # This will need NSS and NSPR
-  core_brew_tool nspr
+  brew_tool nspr
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     $BREW link --force nspr
   fi
-  core_brew_tool nss
-  # Maybe autopoint for autogen.sh?
-  brew_tool gettext
-  core_brew_tool libarchive
-
+  brew_tool nss
   local_brew_dependency librpm
 }
 
 function platform_darwin_main() {
   brew_tool xz
-  # brew_tool perl --without-test # Needs -lgdbm
   brew_tool sphinx-doc
-  brew_tool readline # local on Linux
+  brew_tool readline
   brew_tool sqlite
   core_brew_tool makedepend
 
@@ -151,7 +149,6 @@ function platform_darwin_main() {
   $BREW link --force openssl
 
   brew_tool pkg-config
-  core_brew_tool cmake
   brew_tool autoconf
   brew_tool automake
   brew_tool libtool
@@ -163,10 +160,9 @@ function platform_darwin_main() {
 
   local_brew_tool python
   $BREW postinstall python
+  core_brew_tool cmake
 
   local_brew_dependency boost
-
-  # List of LLVM-compiled dependencies.
   local_brew_dependency asio
   local_brew_dependency cpp-netlib
   local_brew_dependency google-benchmark

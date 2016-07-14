@@ -10,9 +10,7 @@ class Python < Formula
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "b12088e1e08fdb42583069238b62374c9bb686156d989edf0583dd658659ebbc" => :el_capitan
-
-    # This is invalid, need to rebuild.
-    sha256 "3a16c7672a56d21968f6d77cad8d14bb497d093c9970a0e3fd7e25e3073a9ffd" => :x86_64_linux
+    sha256 "4c492a053433e30bf022396971ed81cc843f579798907d94092ff333f819277b" => :x86_64_linux
   end
 
   option :universal

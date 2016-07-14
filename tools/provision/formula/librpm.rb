@@ -8,33 +8,34 @@ class Librpm < Formula
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
-    sha256 "038a8f25463cfd002d734dd2ddcfbc564373f35237fcc499f98638d9f3f75345" => :x86_64_linux
+    sha256 "abc08ac0b701ebc7da9e1334e73f4175fe652ee54bfdd3036ef0e36b77cd59a7" => :x86_64_linux
   end
 
   def install
     ENV.append_to_cflags "-fPIC -DNDEBUG"
-    ENV.append_to_cflags "-I#{Formula["nss"].include}"
-    ENV.append_to_cflags "-I#{Formula["nspr"].include}"
+    ENV.append_to_cflags "-I#{Formula["nss"].include}/nss"
+    ENV.append_to_cflags "-I#{Formula["nspr"].include}/nspr"
+    ENV.append_to_cflags "-I#{Formula["berkeley-db"].include}"
 
     args = [
-      "--disable-plugins",
-      "--disable-nls",
+      "--with-external-db",
       "--disable-dependency-tracking",
       "--disable-silent-rules",
-      "--without-nss",
-      "--without-archive",
+      "--disable-plugins",
+      "--disable-nls",
       "--disable-python",
       "--disable-ndb",
       "--disable-nss",
       "--disable-shared",
+      "--without-nss",
+      "--without-archive",
       "--without-beecrypt",
-      "--without-external-db",
       "--without-lua",
       "--without-cap",
       "--without-selinux",
       "--without-libintl-prefix",
       "--without-libiconv-prefix",
-      ""
+      "CFLAGS=#{ENV.cflags}",
     ]
 
     system "./configure", "--prefix=#{prefix}", *args
