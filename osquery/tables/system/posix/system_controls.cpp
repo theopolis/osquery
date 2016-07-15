@@ -22,10 +22,8 @@ namespace tables {
 const std::vector<std::string> kControlSettingsFiles = {"/etc/sysctl.conf"};
 
 const std::vector<std::string> kControlSettingsDirs = {
-    "/run/sysctl.d/%.conf",
-    "/etc/sysctl.d/%.conf",
-    "/usr/local/lib/sysctl.d/%.conf",
-    "/usr/lib/sysctl.d/%.conf",
+    "/run/sysctl.d/%.conf",           "/etc/sysctl.d/%.conf",
+    "/usr/local/lib/sysctl.d/%.conf", "/usr/lib/sysctl.d/%.conf",
     "/lib/sysctl.d/%.conf",
 };
 
