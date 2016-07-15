@@ -31,29 +31,29 @@ ADD_OSQUERY_LIBRARY(TRUE osquery_events
 if(NOT WIN32)
   file(GLOB OSQUERY_EVENTS_TESTS "tests/*.cpp")
   ADD_OSQUERY_TEST(TRUE ${OSQUERY_EVENTS_TESTS})
-  
+
   file(GLOB OSQUERY_EVENTS_BENCHMARKS "benchmarks/*.cpp")
   ADD_OSQUERY_BENCHMARK(${OSQUERY_EVENTS_BENCHMARKS})
-  
+
   # Kernel-related userland code.
   file(GLOB OSQUERY_EVENTS_KERNEL "kernel/*.cpp")
   ADD_OSQUERY_LIBRARY(FALSE osquery_events_kernel
     kernel.cpp
     ${OSQUERY_EVENTS_KERNEL}
   )
-  
+
   # Special kernel test define when building non-SDK and non-Release.
   if(NOT OSQUERY_BUILD_RELEASE AND NOT OSQUERY_BUILD_SDK_ONLY)
     set_target_properties(osquery_events_kernel
       PROPERTIES COMPILE_DEFINITIONS "KERNEL_TEST=1")
   endif()
-  
+
   file(GLOB OSQUERY_EVENTS_KERNEL_TESTS "kernel/tests/*.cpp")
   ADD_OSQUERY_KERNEL_TEST(${OSQUERY_EVENTS_KERNEL_TESTS})
-  
+
   file(GLOB OSQUERY_EVENTS_KERNEL_BENCHMARKS "kernel/benchmarks/*.cpp")
   ADD_OSQUERY_KERNEL_BENCHMARK(${OSQUERY_EVENTS_KERNEL_BENCHMARKS})
-  
+
   if(APPLE)
     file(GLOB OSQUERY_DARWIN_EVENTS_TESTS "darwin/tests/*.cpp")
     ADD_OSQUERY_TEST(FALSE ${OSQUERY_DARWIN_EVENTS_TESTS})

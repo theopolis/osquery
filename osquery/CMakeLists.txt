@@ -185,7 +185,6 @@ if(NOT ${OSQUERY_BUILD_SDK_ONLY})
   GENERATE_TABLES("${CMAKE_SOURCE_DIR}")
   AMALGAMATE("${CMAKE_SOURCE_DIR}" "additional" AMALGAMATION)
   AMALGAMATE("${CMAKE_SOURCE_DIR}" "foreign" AMALGAMATION_FOREIGN)
-  
   ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_additional_amalgamation ${AMALGAMATION})
   ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_foreign_amalgamation ${AMALGAMATION_FOREIGN})
 
@@ -200,7 +199,9 @@ if(NOT ${OSQUERY_BUILD_SDK_ONLY})
   TARGET_OSQUERY_LINK_WHOLE(shell libosquery_additional)
   SET_OSQUERY_COMPILE(shell "${CXX_COMPILE_FLAGS}")
   set_target_properties(shell PROPERTIES OUTPUT_NAME osqueryi)
-  target_link_libraries(shell "linenoise.lib")
+  if(WIN32)
+    target_link_libraries(shell "linenoise.lib")
+  endif()
   add_dependencies(shell osquery_tools)
 
   add_executable(daemon main/${PROCESS_FAMILY}/daemon.cpp)

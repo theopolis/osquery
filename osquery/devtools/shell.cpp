@@ -26,7 +26,6 @@
 #endif
 
 #include <linenoise.h>
-
 #include <sqlite3.h>
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -137,7 +136,11 @@ static sqlite3_int64 timeOfDay(void) {
   return t;
 }
 
-#ifndef WIN32
+#ifdef WIN32
+#define BEGIN_TIMER
+#define END_TIMER
+#define HAS_TIMER 0
+#else
 // Saved resource information for the beginning of an operation
 static struct rusage sBegin; // CPU time at start
 static sqlite3_int64 iBegin; // Wall-clock time at start
@@ -171,13 +174,6 @@ static void endTimer(void) {
 #define BEGIN_TIMER beginTimer()
 #define END_TIMER endTimer()
 #define HAS_TIMER 1
-
-#else
-
-#define BEGIN_TIMER
-#define END_TIMER
-#define HAS_TIMER 0
-
 #endif
 
 // Used to prevent warnings about unused parameters
