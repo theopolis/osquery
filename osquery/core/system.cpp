@@ -66,6 +66,18 @@ FLAG(string,
 
 FLAG(bool, utc, false, "Convert all UNIX times to UTC");
 
+#ifdef WIN32
+struct tm *gmtime_r(time_t *t, struct tm *result) {
+	_gmtime64_s(result, t);
+	return result;
+}
+
+struct tm *localtime_r(time_t *t, struct tm *result) {
+	_localtime64_s(result, t);
+	return result;
+}
+#endif
+
 std::string getHostname() {
 #ifdef WIN32
   long size = 256;

@@ -23,7 +23,7 @@ DECLARE_bool(utc);
 
 namespace tables {
 
-QueryData genTime(QueryContext& context) {
+QueryData genTime(QueryContext &context) {
   Row r;
   // Request UNIX time (a wrapper around std::time).
   auto local_time = std::time(nullptr);
