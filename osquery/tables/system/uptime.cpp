@@ -8,15 +8,19 @@
  *
  */
 
-#include <osquery/tables.h>
-
 #if defined(__APPLE__)
 #include <time.h>
 #include <errno.h>
 #include <sys/sysctl.h>
 #elif defined(__linux__)
 #include <sys/sysinfo.h>
+#elif defined(WIN32)
+#include <Windows.h>
 #endif
+
+#include <chrono>
+
+#include <osquery/tables.h>
 
 namespace osquery {
 namespace tables {
@@ -43,6 +47,9 @@ long getUptime() {
   }
 
   return sys_info.uptime;
+#elif defined(WIN32)
+  auto boot_time = std::chrono::milliseconds(GetTickCount64());
+  return std::chrono::duration_cast<std::chrono::seconds>(boot_time).count();
 #endif
 
   return -1;
