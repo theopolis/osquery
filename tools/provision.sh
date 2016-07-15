@@ -34,7 +34,7 @@ function platform_linux_main() {
 
   # Build a bottle of glibc.
   local_brew_tool glibc
-  $BREW postinstall glibc
+  local_brew_postinstall glibc
 
   # Need LZMA for final builds.
   local_brew_tool xz
@@ -84,14 +84,14 @@ function platform_linux_main() {
   local_brew_tool libgpg-error
 
   # More LLVM dependencies.
-  brew_tool popt
+  brew_tool popt # This could be a core_ if building RPM libs.
   brew_tool autoconf
   brew_tool automake
 
   # Curl and Python are needed for LLVM mostly.
   local_brew_tool curl
   local_brew_tool python
-  $BREW postinstall python
+  local_brew_postinstall python
 
   core_brew_tool cmake --ignore-dependencies
 
@@ -128,12 +128,12 @@ function platform_linux_main() {
   # They may still be installed on all Linux hosts, but RH-based distributions
   # will link and include the relative tables.
   # This will need NSS and NSPR
-  brew_tool nspr
-  if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    $BREW link --force nspr
-  fi
-  brew_tool nss
-  local_brew_dependency librpm
+  # brew_tool nspr
+  # if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
+  #   $BREW link --force nspr
+  # fi
+  # brew_tool nss
+  # local_brew_dependency librpm
 }
 
 function platform_darwin_main() {
@@ -159,7 +159,7 @@ function platform_darwin_main() {
   fi
 
   local_brew_tool python
-  $BREW postinstall python
+  local_brew_postinstall python
   core_brew_tool cmake
 
   local_brew_dependency boost
@@ -246,6 +246,7 @@ function main() {
   cd "$SCRIPT_DIR/../"
 
   # Pip may have just been installed.
+  # If Pip complains about compilers the setup of Python was incorrect.
   log "upgrading pip and installing python dependencies"
   PIP=`which pip`
   $PIP install --upgrade pip

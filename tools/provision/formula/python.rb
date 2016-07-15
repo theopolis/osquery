@@ -10,7 +10,7 @@ class Python < Formula
     prefix "/usr/local/osquery"
     cellar "/usr/local/osquery/Cellar"
     sha256 "b12088e1e08fdb42583069238b62374c9bb686156d989edf0583dd658659ebbc" => :el_capitan
-    sha256 "4c492a053433e30bf022396971ed81cc843f579798907d94092ff333f819277b" => :x86_64_linux
+    sha256 "6cf33d9959a380fb23ca9c81a6268efe3443ddcb1e82efc557536b15aacf43af" => :x86_64_linux
   end
 
   option :universal

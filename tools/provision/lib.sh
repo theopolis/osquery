@@ -93,6 +93,11 @@ function local_brew_tool() {
   $BREW install $ARGS "${FORMULA_DIR}/${TOOL}.rb"
 }
 
+function local_brew_postinstall() {
+  TOOL=$1
+  $BREW postinstall "${FORMULA_DIR}/${TOOL}.rb"
+}
+
 function brew_dependency() {
   TOOL=$1
   shift

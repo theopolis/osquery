@@ -105,9 +105,8 @@ function initialize() {
 
   # Reset any work or artifacts from build tests in TP.
   (cd third-party && git reset --hard HEAD)
-  git submodule init
-  git submodule update
-
+  git submodule update --init
+ 
   # Remove any previously-cached variables
   rm build/$DISTRO/CMakeCache.txt >/dev/null 2>&1 || true
 }
