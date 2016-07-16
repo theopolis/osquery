@@ -242,7 +242,7 @@ macro(ADD_OSQUERY_EXTENSION TARGET)
   add_executable(${TARGET} ${ARGN})
   TARGET_OSQUERY_LINK_WHOLE(${TARGET} libosquery)
   # TODO #2252: Remove this linkage dependency.
-  TARGET_OSQUERY_LINK_WHOLE(${TARGET} libosquery_additional)
+  TARGET_OSQUERY_LINK_WHOLE(${TARGET} ${crypto_library})
   set_target_properties(${TARGET} PROPERTIES COMPILE_FLAGS "${CXX_COMPILE_FLAGS}")
   set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "${TARGET}.ext")
 endmacro(ADD_OSQUERY_EXTENSION)

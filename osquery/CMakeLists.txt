@@ -262,7 +262,7 @@ if(NOT DEFINED ENV{SKIP_TESTS})
   add_executable(osquery_tests main/tests.cpp ${OSQUERY_TESTS})
   TARGET_OSQUERY_LINK_WHOLE(osquery_tests libosquery)
   # TODO #2252: Remove this linkage dependency.
-  TARGET_OSQUERY_LINK_WHOLE(osquery_tests libosquery_additional)
+  TARGET_OSQUERY_LINK_WHOLE(osquery_tests ${crypto_library})
   target_link_libraries(osquery_tests gtest libosquery_testing)
   SET_OSQUERY_COMPILE(osquery_tests "${CXX_COMPILE_FLAGS} -DGTEST_HAS_TR1_TUPLE=0")
   add_test(osquery_tests osquery_tests)
