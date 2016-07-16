@@ -88,6 +88,11 @@ elseif(LINUX OR FREEBSD)
 endif()
 
 if(LINUX)
+  if(DEFINED ENV{OSQUERY_BUILD_SHARED})
+    ADD_OSQUERY_LINK_CORE("stdc++")
+    ADD_OSQUERY_LINK_ADDITIONAL("stdc++")
+  endif()
+  ADD_OSQUERY_LINK_CORE("-static-libstdc++")
   ADD_OSQUERY_LINK_ADDITIONAL("-static-libstdc++")
   # For Ubuntu/CentOS packages add the build SHA1.
   ADD_OSQUERY_LINK_CORE("-Wl,--build-id")
