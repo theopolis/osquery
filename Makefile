@@ -30,7 +30,8 @@ ifneq ($(OSQUERY_DEPS),)
 else
 	DEPS_DIR = /usr/local/osquery
 endif
-CMAKE := PATH="$(DEPS_DIR)/bin:$(PATH)" cmake ../../
+CMAKE := PATH="$(DEPS_DIR)/bin:$(PATH)" CXXFLAGS="-L$(DEPS_DIR)/lib -Qunused-arguments" \
+		cmake ../../
 
 DEFINES := CTEST_OUTPUT_ON_FAILURE=1
 .PHONY: docs build

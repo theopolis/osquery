@@ -15,13 +15,6 @@ else()
   set(BUILD_DEPS "/usr/local/osquery")
 endif()
 
-# Add the BUILD_DEPS library folder to CMake's link flags.
-# This allows CMake's compile tests to complete, but should be removed to
-# assure universal libc/libgcc linking.
-if(LINUX)
-  set(CMAKE_CXX_FLAGS "-L${BUILD_DEPS}/lib -Qunused-arguments")
-endif()
-
 # If no explicit compiler override and clang++ exists, prefer clang.
 find_file(CLANGXX_EXISTS "clang++")
 if(DEFINED ENV{CC})
