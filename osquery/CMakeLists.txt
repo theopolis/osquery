@@ -44,6 +44,7 @@ endif()
 
 if(LINUX OR FREEBSD)
   ADD_OSQUERY_LINK_CORE("librt")
+  ADD_OSQUERY_LINK_CORE("libc")
 endif()
 
 if(APPLE)
