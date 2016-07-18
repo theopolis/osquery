@@ -78,6 +78,12 @@ class Gcc < Formula
   def install
     # GCC will suffer build errors if forced to use a particular linker.
     ENV.delete "LD"
+    ENV.delete "LD_RUN_PATH"
+    #ENV.delete "CXXFLAGS"
+    ENV.delete "CFLAGS"
+    ENV.delete "CPATH"
+    #ENV.delete "CPPFLAGS"
+    #ENV["CFLAGS"] = "-march=core2"
 
     if OS.mac? && MacOS.version < :leopard
       ENV["AS"] = ENV["AS_FOR_TARGET"] = "#{Formula["cctools"].bin}/as"
@@ -125,24 +131,24 @@ class Gcc < Formula
       "--with-mpc=#{Formula["libmpc"].opt_prefix}",
       "--with-isl=#{Formula["isl"].opt_prefix}",
       "--with-system-zlib",
-      # "--enable-libstdcxx-time=yes",
-      # "--enable-stage1-checking",
-      # "--enable-checking=release",
-      # "--enable-lto",
+      "--enable-libstdcxx-time=yes",
+      "--enable-stage1-checking",
+      "--enable-checking=release",
+      "--enable-lto",
       # Use 'bootstrap-debug' build configuration to force stripping of object
       # files prior to comparison during bootstrap (broken by Xcode 6.3).
       # "--with-build-config=bootstrap-debug",
-      # "--disable-werror",
+      "--disable-werror",
       "--with-pkgversion=Homebrew #{name} #{pkg_version} #{build.used_options*" "}".strip,
       "--with-bugurl=https://github.com/Homebrew/homebrew/issues",
     ]
 
     # Fix cc1: error while loading shared libraries: libisl.so.15
-    # args << "--with-boot-ldflags=-static-libstdc++ -static-libgcc #{ENV["LDFLAGS"]}" if OS.linux?
+    args << "--with-boot-ldflags=-static-libstdc++ -static-libgcc #{ENV["LDFLAGS"]}" if OS.linux?
 
     # "Building GCC with plugin support requires a host that supports
     # -fPIC, -shared, -ldl and -rdynamic."
-    # args << "--enable-plugin" if !OS.mac? || MacOS.version > :tiger
+    args << "--enable-plugin" if !OS.mac? || MacOS.version > :tiger
 
     # The pre-Mavericks toolchain requires the older DWARF-2 debugging data
     # format to avoid failure during the stage 3 comparison of object files.
@@ -175,9 +181,10 @@ class Gcc < Formula
         args << "--with-sysroot=#{MacOS.sdk_path}"
       end
 
-      system "env"
+      #system "env"
       system "../configure", *args
-      system "kmake", "bootstrap"
+      #system "kmake", "bootstrap"
+      system "make", "bootstrap"
       system "make", "install"
 
       if build.with?("fortran") || build.with?("all-languages")
