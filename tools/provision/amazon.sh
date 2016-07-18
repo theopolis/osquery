@@ -19,4 +19,8 @@ function distro_main() {
   package ruby-irb
   package gcc
   package bzip2
+
+  # RPM libs are not yet built universally.
+  package rpm-devel
+  package rpm-build
 }

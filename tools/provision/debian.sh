@@ -15,4 +15,5 @@ function distro_main() {
   package autotools-dev
   package autopoint
   package realpath
+  pacakge g++
 }

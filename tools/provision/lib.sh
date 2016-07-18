@@ -64,7 +64,7 @@ function brew_tool() {
   unset OSQUERY_DEPS_ONETIME
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   log "brew tool $TOOL"
-  $BREW install $@ "$TOOL"
+  $BREW install --ignore-dependencies $@ "$TOOL"
 }
 
 function core_brew_tool() {
@@ -75,14 +75,14 @@ function core_brew_tool() {
 function local_brew_link() {
   TOOL=$1
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    $BREW link --force $TOOL
+    $BREW link --force "${FORMULA_DIR}/${TOOL}.rb"
   fi
 }
 
 function local_brew_postinstall() {
   TOOL=$1
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    $BREW postinstall $TOOL
+    $BREW postinstall "${FORMULA_DIR}/${TOOL}.rb"
   fi
 }
 

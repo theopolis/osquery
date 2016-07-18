@@ -33,7 +33,7 @@ function platform_linux_main() {
   core_brew_tool linux-headers
 
   # Build a bottle of glibc.
-  local_brew_tool glibc
+  local_brew_tool glibc -v
   local_brew_postinstall glibc
 
   # Need LZMA for final builds.
@@ -48,7 +48,7 @@ function platform_linux_main() {
   brew_tool berkeley-db
 
   # GCC 5x.
-  core_brew_tool gcc
+  local_brew_tool gcc -v --with-glibc --without-nls --without-multilib
 
   # Discover and set newly installed GCC 5x.
   set_cc gcc

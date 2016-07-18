@@ -18,6 +18,7 @@ function distro_main() {
   package ruby
   package ruby-irb
   package gcc
+  package gcc-c++
   package bzip2
 
   package rpm-devel
