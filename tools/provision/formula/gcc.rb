@@ -41,12 +41,15 @@ class Gcc < Formula
 
   depends_on "zlib" unless OS.mac?
   depends_on "binutils" if build.with? "glibc"
-  depends_on "glibc" => Formula["glibc"].installed? || (OS.linux? && !GlibcRequirement.new.satisfied?) ? :recommended : :optional
   depends_on "gmp"
   depends_on "libmpc"
   depends_on "mpfr"
   depends_on "isl"
   depends_on "ecj" if build.with?("java") || build.with?("all-languages")
+
+  # osquery: We add a requirement for glibc-legacy instead of glibc.
+  # We want the osquery toolchain to use a "more-available" C runtime.
+  depends_on "glibc-legacy"
 
   if MacOS.version < :leopard && OS.mac?
     # The as that comes with Tiger isn't capable of dealing with the
@@ -78,12 +81,6 @@ class Gcc < Formula
   def install
     # GCC will suffer build errors if forced to use a particular linker.
     ENV.delete "LD"
-    ENV.delete "LD_RUN_PATH"
-    #ENV.delete "CXXFLAGS"
-    ENV.delete "CFLAGS"
-    ENV.delete "CPATH"
-    #ENV.delete "CPPFLAGS"
-    #ENV["CFLAGS"] = "-march=core2"
 
     if OS.mac? && MacOS.version < :leopard
       ENV["AS"] = ENV["AS_FOR_TARGET"] = "#{Formula["cctools"].bin}/as"
@@ -117,7 +114,7 @@ class Gcc < Formula
         "--with-build-time-tools=#{binutils}",
       ]
       # Set the search path for glibc libraries and objects.
-      ENV["LIBRARY_PATH"] = "/usr/local/osquery/lib"
+      ENV["LIBRARY_PATH"] = "#{Formula["cctools"]}.lib"
     end
 
     args += [
@@ -173,6 +170,23 @@ class Gcc < Formula
     # see discussion in https://github.com/Homebrew/homebrew/pull/34303
     inreplace "libgcc/config/t-slibgcc-darwin", "@shlib_slibdir@", "#{HOMEBREW_PREFIX}/lib/gcc/#{version_suffix}"
 
+    # osquery: experimentation
+    args << "--disable-bootstrap"
+    args << "--disable-libgomp"
+
+    # osquery: Remove several environment variables that cause MPX/GOMP to fail.
+    ENV.delete "LD_RUN_PATH"
+    #ENV.delete "CXXFLAGS"
+    ENV.delete "CFLAGS"
+    ENV.delete "CPATH"
+    #ENV.delete "CPPFLAGS"
+    #ENV["CFLAGS"] = "-march=core2"
+
+    # osquery: add the legacy glibc library search path.
+    ENV.prepend "LDFLAGS", "-L#{Formula["glibc-legacy"].lib}"
+    ENV.prepend "CPPFLAGS", "-isystem#{Formula["glibc-legacy"].include}"
+    ENV.prepend_path "LIBRARY_PATH", "#{Formula["glibc-legacy"].lib}"
+
     mkdir "build" do
       if OS.mac? && !MacOS::CLT.installed?
         # For Xcode-only systems, we need to tell the sysroot path.
@@ -184,7 +198,8 @@ class Gcc < Formula
       #system "env"
       system "../configure", *args
       #system "kmake", "bootstrap"
-      system "make", "bootstrap"
+      #system "make", "bootstrap"
+      system "make"
       system "make", "install"
 
       if build.with?("fortran") || build.with?("all-languages")

@@ -13,10 +13,12 @@ function distro_main() {
   package wget
   package git
   package unzip
+  package gawk
   package xz
   package ruby
   package ruby-irb
   package gcc
+  package gcc-c++
   package bzip2
 
   package rpm-devel

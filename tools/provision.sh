@@ -32,23 +32,25 @@ function platform_linux_main() {
   core_brew_tool binutils
   core_brew_tool linux-headers
 
-  # Build a bottle of glibc.
-  local_brew_tool glibc -v
+  # Build a bottle of a modern glibc.
+  local_brew_tool glibc
   local_brew_postinstall glibc
+
+  # Build a bottle for a legacy glibc.
+  local_brew_tool glibc-legacy -vd --env=legacy
 
   # Need LZMA for final builds.
   local_brew_tool xz
 
   # Additional GCC 5x bootstrapping.
   core_brew_tool gmp
-  brew_tool gpatch
   core_brew_tool mpfr
   core_brew_tool libmpc
   core_brew_tool isl
   brew_tool berkeley-db
 
   # GCC 5x.
-  local_brew_tool gcc -v --with-glibc --without-nls --without-multilib
+  local_brew_tool gcc --with-glibc --without-nls --without-multilib -vd
 
   # Discover and set newly installed GCC 5x.
   set_cc gcc
@@ -69,7 +71,7 @@ function platform_linux_main() {
 
   # Build a bottle for perl and openssl.
   # OpenSSL is needed for the final build.
-  local_brew_tool perl --without-test
+  # local_brew_tool perl -vd --without-test
   local_brew_tool openssl
   $BREW link --force openssl
 
@@ -92,7 +94,7 @@ function platform_linux_main() {
   # Curl and Python are needed for LLVM mostly.
   local_brew_tool curl
   local_brew_tool python
-  core_brew_tool cmake --ignore-dependencies
+  core_brew_tool cmake
 
   # LLVM/Clang.
   local_brew_tool llvm -v --with-clang --with-clang-extra --with-compiler-rt

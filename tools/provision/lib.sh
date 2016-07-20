@@ -33,7 +33,7 @@ function setup_brew() {
     ln -sf "$FORMULA_DIR" "$DEPS/Library/Taps/osquery/homebrew-osquery-local" 
   else
     log "checking for updates to brew"
-    git pull
+    #git pull
   fi
 
   export HOMEBREW_MAKE_JOBS=$THREADS
@@ -64,7 +64,7 @@ function brew_tool() {
   unset OSQUERY_DEPS_ONETIME
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   log "brew tool $TOOL"
-  $BREW install --ignore-dependencies $@ "$TOOL"
+  $BREW install --force-bottle --ignore-dependencies $@ "$TOOL"
 }
 
 function core_brew_tool() {
@@ -98,11 +98,9 @@ function local_brew_tool() {
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     ARGS="$ARGS --build-bottle --ignore-dependencies"
-    if [[ "$OS" = "darwin" ]]; then
-      ARGS="$ARGS --env=std"
-    fi
+    ARGS="$ARGS --env=legacy"
   else
-    ARGS="--ignore-dependencies --from-bottle"
+    ARGS="--ignore-dependencies --force-bottle"
   fi
   $BREW install $ARGS "${FORMULA_DIR}/${TOOL}.rb"
 }
@@ -114,13 +112,11 @@ function brew_dependency() {
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
   log "brew dependency $TOOL"
   ARGS="$@"
-  if [[ ! -z $OSQUERY_BUILD_DEPS ]]; then
+  if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     ARGS="$ARGS --build-bottle --cc=clang --universal"
-    if [[ "$OS" = "darwin" ]]; then
-      ARGS="$ARGS --env=std"
-    fi
+    ARGS="$ARGS --env=legacy"
   else
-    ARGS="--ignore-dependencies --from-bottle"
+    ARGS="--ignore-dependencies --force-bottle"
   fi
 
   $BREW install $ARGS "$TOOL"
@@ -140,13 +136,11 @@ function local_brew_dependency() {
   # Could improve this detection logic to remove from-bottle.
   FROM_BOTTLE=false
   ARGS="$@"
-  if [[ ! -z $OSQUERY_BUILD_DEPS ]]; then
+  if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     ARGS="$ARGS -v --build-bottle --cc=clang --universal --ignore-dependencies"
-    if [[ "$OS" = "darwin" ]]; then
-      ARGS="$ARGS --env=std"
-    fi
+    ARGS="$ARGS --env=legacy"
   else
-    ARGS="--ignore-dependencies --from-bottle"
+    ARGS="--ignore-dependencies --force-bottle"
   fi
 
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
