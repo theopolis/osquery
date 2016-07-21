@@ -197,12 +197,14 @@ void WatcherRunner::start() {
       Watcher::removeExtensionPath(failed_extension);
     }
 
-    auto status = isWatcherHealthy(*watcher, watcher_state);
-    if (!status.ok()) {
-      Initializer::requestShutdown(EXIT_CATASTROPHIC,
-                                   "Watcher has become unhealthy: " +
-                                       status.getMessage());
-      break;
+    if (use_worker_) {
+      auto status = isWatcherHealthy(*watcher, watcher_state);
+      if (!status.ok()) {
+        Initializer::requestShutdown(EXIT_CATASTROPHIC,
+                                     "Watcher has become unhealthy: " +
+                                         status.getMessage());
+        break;
+      }
     }
     pauseMilli(getWorkerLimit(INTERVAL) * 1000);
   } while (!interrupted() && ok());
@@ -210,8 +212,7 @@ void WatcherRunner::start() {
 
 bool WatcherRunner::watch(const PlatformProcess& child) const {
   int process_status = 0;
-
-  ProcessState result = checkChildProcessStatus(child, process_status);
+  ProcessState result = child.checkStatus(process_status);
   if (Watcher::fatesBound()) {
     // A signal was handled while the watcher was watching.
     return false;
@@ -225,8 +226,9 @@ bool WatcherRunner::watch(const PlatformProcess& child) const {
     auto status = isChildSane(child);
     if (!status.ok()) {
       LOG(WARNING) << "osqueryd worker (" << child.pid()
-                   << "):" << status.getMessage();
+                   << "): " << status.getMessage();
       stopChild(child);
+      printf("would stop\n");
       return false;
     }
     return true;
@@ -312,8 +314,7 @@ static bool exceededCyclesLimit(const PerformanceChange& change) {
 
 Status WatcherRunner::isWatcherHealthy(const PlatformProcess& watcher,
                                        PerformanceState& watcher_state) const {
-  auto rows =
-      SQL::selectAllFrom("processes", "pid", EQUALS, INTEGER(watcher.pid()));
+  auto rows = getProcessRow(watcher.pid());
   if (rows.size() == 0) {
     // Could not find worker process?
     return Status(1, "Cannot find watcher process");
@@ -327,9 +328,12 @@ Status WatcherRunner::isWatcherHealthy(const PlatformProcess& watcher,
   return Status(0);
 }
 
+QueryData WatcherRunner::getProcessRow(pid_t pid) const {
+  return SQL::selectAllFrom("processes", "pid", EQUALS, INTEGER(pid));
+}
+
 Status WatcherRunner::isChildSane(const PlatformProcess& child) const {
-  auto rows =
-      SQL::selectAllFrom("processes", "pid", EQUALS, INTEGER(child.pid()));
+  auto rows = getProcessRow(child.pid());
   if (rows.size() == 0) {
     // Could not find worker process?
     return Status(1, "Cannot find worker process");

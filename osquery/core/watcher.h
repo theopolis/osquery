@@ -19,6 +19,7 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <osquery/database.h>
 #include <osquery/dispatcher.h>
 #include <osquery/flags.h>
 
@@ -165,7 +166,7 @@ class Watcher : private boost::noncopyable {
   /// Check the status of the last worker.
   static int getWorkerStatus() { return instance().worker_status_; }
 
- private:
+ protected:
   /// Do not request the lock until extensions are used.
   Watcher()
       : worker_(std::make_shared<PlatformProcess>()),
@@ -254,7 +255,7 @@ class WatcherRunner : public InternalRunnable {
     (void)argc_;
   }
 
- private:
+ protected:
   /// Dispatcher (this service thread's) entry point.
   void start();
 
@@ -265,21 +266,24 @@ class WatcherRunner : public InternalRunnable {
   bool watch(const PlatformProcess& child) const;
 
   /// Inspect into the memory, CPU, and other worker/extension process states.
-  Status isChildSane(const PlatformProcess& child) const;
+  virtual Status isChildSane(const PlatformProcess& child) const;
 
   /// Inspect into the memory and CPU of the watcher process.
-  Status isWatcherHealthy(const PlatformProcess& watcher,
-                          PerformanceState& watcher_state) const;
+  virtual Status isWatcherHealthy(const PlatformProcess& watcher,
+                                  PerformanceState& watcher_state) const;
 
- private:
+  /// Get row data from the processes table for a given pid.
+  virtual QueryData getProcessRow(pid_t pid) const;
+
+ protected:
   /// Fork and execute a worker process.
-  void createWorker();
+  virtual void createWorker();
 
   /// Fork an extension process.
-  bool createExtension(const std::string& extension);
+  virtual bool createExtension(const std::string& extension);
 
   /// If a worker/extension has otherwise gone insane, stop it.
-  void stopChild(const PlatformProcess& child) const;
+  virtual void stopChild(const PlatformProcess& child) const;
 
  private:
   /// Keep the invocation daemon's argc to iterate through argv.

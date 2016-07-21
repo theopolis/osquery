@@ -109,10 +109,9 @@ TEST_F(BufferedLogForwarderTests, test_basic) {
   runner.logString("baz");
   EXPECT_CALL(runner, send(ElementsAre("bar", "baz"), "result"))
       .WillOnce(Return(Status(0)));
-  EXPECT_CALL(
-      runner,
-      send(ElementsAre(MatchesStatus(log1), MatchesStatus(log2)), "status"))
-      .WillOnce(Return(Status(0)));
+  EXPECT_CALL(runner,
+              send(ElementsAre(MatchesStatus(log1), MatchesStatus(log2)),
+                   "status")).WillOnce(Return(Status(0)));
   runner.check();
   // This call should not result in sending again
   runner.check();
@@ -138,16 +137,14 @@ TEST_F(BufferedLogForwarderTests, test_retry) {
   runner.logString("bar");
   EXPECT_CALL(runner, send(ElementsAre("foo", "bar"), "result"))
       .WillOnce(Return(Status(0)));
-  EXPECT_CALL(
-      runner,
-      send(ElementsAre(MatchesStatus(log1), MatchesStatus(log2)), "status"))
-      .WillOnce(Return(Status(1, "fail")));
+  EXPECT_CALL(runner,
+              send(ElementsAre(MatchesStatus(log1), MatchesStatus(log2)),
+                   "status")).WillOnce(Return(Status(1, "fail")));
   runner.check();
 
-  EXPECT_CALL(
-      runner,
-      send(ElementsAre(MatchesStatus(log1), MatchesStatus(log2)), "status"))
-      .WillOnce(Return(Status(0)));
+  EXPECT_CALL(runner,
+              send(ElementsAre(MatchesStatus(log1), MatchesStatus(log2)),
+                   "status")).WillOnce(Return(Status(0)));
   runner.check();
 
   // This call should not send again because the previous was successful
