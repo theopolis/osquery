@@ -114,7 +114,7 @@ class Gcc < Formula
         "--with-build-time-tools=#{binutils}",
       ]
       # Set the search path for glibc libraries and objects.
-      ENV["LIBRARY_PATH"] = "#{Formula["cctools"]}.lib"
+      ENV["LIBRARY_PATH"] = "#{Formula["glibc-legacy"].lib}:#{Formula["cctools"].lib}"
     end
 
     args += [
@@ -134,7 +134,7 @@ class Gcc < Formula
       "--enable-lto",
       # Use 'bootstrap-debug' build configuration to force stripping of object
       # files prior to comparison during bootstrap (broken by Xcode 6.3).
-      # "--with-build-config=bootstrap-debug",
+      "--with-build-config=bootstrap-debug",
       "--disable-werror",
       "--with-pkgversion=Homebrew #{name} #{pkg_version} #{build.used_options*" "}".strip,
       "--with-bugurl=https://github.com/Homebrew/homebrew/issues",
@@ -171,21 +171,21 @@ class Gcc < Formula
     inreplace "libgcc/config/t-slibgcc-darwin", "@shlib_slibdir@", "#{HOMEBREW_PREFIX}/lib/gcc/#{version_suffix}"
 
     # osquery: experimentation
-    args << "--disable-bootstrap"
+    # args << "--disable-bootstrap"
     args << "--disable-libgomp"
 
     # osquery: Remove several environment variables that cause MPX/GOMP to fail.
-    ENV.delete "LD_RUN_PATH"
+    ENV.delete "LD_RUN_PATH" # legacy
     #ENV.delete "CXXFLAGS"
-    ENV.delete "CFLAGS"
-    ENV.delete "CPATH"
+    ENV.delete "CFLAGS" # legacy
+    ENV.delete "CPATH" # legacy
     #ENV.delete "CPPFLAGS"
     #ENV["CFLAGS"] = "-march=core2"
 
     # osquery: add the legacy glibc library search path.
-    ENV.prepend "LDFLAGS", "-L#{Formula["glibc-legacy"].lib}"
-    ENV.prepend "CPPFLAGS", "-isystem#{Formula["glibc-legacy"].include}"
-    ENV.prepend_path "LIBRARY_PATH", "#{Formula["glibc-legacy"].lib}"
+    # ENV.prepend "LDFLAGS", "-L#{Formula["glibc-legacy"].lib}" # legacy
+    # ENV.prepend "CPPFLAGS", "-isystem#{Formula["glibc-legacy"].include}" # legacy
+    # ENV.prepend_path "LIBRARY_PATH", "#{Formula["glibc-legacy"].lib}" # legacy
 
     mkdir "build" do
       if OS.mac? && !MacOS::CLT.installed?
@@ -198,8 +198,8 @@ class Gcc < Formula
       #system "env"
       system "../configure", *args
       #system "kmake", "bootstrap"
-      #system "make", "bootstrap"
-      system "make"
+      system "make", "bootstrap"
+      #system "make"
       system "make", "install"
 
       if build.with?("fortran") || build.with?("all-languages")

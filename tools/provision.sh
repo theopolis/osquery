@@ -50,7 +50,7 @@ function platform_linux_main() {
   brew_tool berkeley-db
 
   # GCC 5x.
-  local_brew_tool gcc --with-glibc --without-nls --without-multilib -vd
+  local_brew_tool gcc --env=legacy --with-glibc --without-nls --without-multilib -vd
 
   # Discover and set newly installed GCC 5x.
   set_cc gcc
