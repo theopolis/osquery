@@ -134,7 +134,7 @@ class Gcc < Formula
       "--enable-lto",
       # Use 'bootstrap-debug' build configuration to force stripping of object
       # files prior to comparison during bootstrap (broken by Xcode 6.3).
-      "--with-build-config=bootstrap-debug",
+      #"--with-build-config=bootstrap-debug",
       "--disable-werror",
       "--with-pkgversion=Homebrew #{name} #{pkg_version} #{build.used_options*" "}".strip,
       "--with-bugurl=https://github.com/Homebrew/homebrew/issues",
@@ -171,7 +171,7 @@ class Gcc < Formula
     inreplace "libgcc/config/t-slibgcc-darwin", "@shlib_slibdir@", "#{HOMEBREW_PREFIX}/lib/gcc/#{version_suffix}"
 
     # osquery: experimentation
-    # args << "--disable-bootstrap"
+    args << "--disable-bootstrap"
     args << "--disable-libgomp"
 
     # osquery: Remove several environment variables that cause MPX/GOMP to fail.
@@ -198,8 +198,8 @@ class Gcc < Formula
       #system "env"
       system "../configure", *args
       #system "kmake", "bootstrap"
-      system "make", "bootstrap"
-      #system "make"
+      #system "make", "bootstrap"
+      system "make"
       system "make", "install"
 
       if build.with?("fortran") || build.with?("all-languages")
@@ -253,43 +253,45 @@ class Gcc < Formula
   end
 
   def post_install
-    if OS.linux?
-      # Create cc and c++ symlinks, unless they already exist
-      homebrew_bin = Pathname.new "#{HOMEBREW_PREFIX}/bin"
-      homebrew_bin.install_symlink "gcc" => "cc" unless (homebrew_bin/"cc").exist?
-      homebrew_bin.install_symlink "g++" => "c++" unless (homebrew_bin/"c++").exist?
+    return unless OS.linux?
 
-      # Create the GCC specs file
-      # See https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
+    # Create cc and c++ symlinks, unless they already exist
+    homebrew_bin = Pathname.new "#{HOMEBREW_PREFIX}/bin"
+    homebrew_bin.install_symlink "gcc" => "cc" unless (homebrew_bin/"cc").exist?
+    homebrew_bin.install_symlink "g++" => "c++" unless (homebrew_bin/"c++").exist?
 
-      # Locate the specs file
-      gcc = "gcc-#{version_suffix}"
-      specs = Pathname.new(`#{bin}/#{gcc} -print-libgcc-file-name`).dirname/"specs"
-      ohai "Creating the GCC specs file: #{specs}"
-      raise "command failed: #{gcc} -print-libgcc-file-name" if $?.exitstatus != 0
-      specs_orig = Pathname.new("#{specs}.orig")
-      rm_f [specs_orig, specs]
+    # Create the GCC specs file
+    # See https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
 
-      # Save a backup of the default specs file
-      specs_string = `#{bin}/#{gcc} -dumpspecs`
-      raise "command failed: #{gcc} -dumpspecs" if $?.exitstatus != 0
-      specs_orig.write specs_string
+    # Locate the specs file
+    gcc = "gcc-#{version_suffix}"
+    specs = Pathname.new(`#{bin}/#{gcc} -print-libgcc-file-name`).dirname/"specs"
+    ohai "Creating the GCC specs file: #{specs}"
+    raise "command failed: #{gcc} -print-libgcc-file-name" if $?.exitstatus != 0
+    specs_orig = Pathname.new("#{specs}.orig")
+    rm_f [specs_orig, specs]
 
-      # Set the library search path
-      glibc = Formula["glibc"]
-      libgcc = lib/"gcc/x86_64-unknown-linux-gnu"/version
-      specs.write specs_string + <<-EOS.undent
-        *cpp_unique_options:
-        + -isystem #{HOMEBREW_PREFIX}/include
+    # Save a backup of the default specs file
+    specs_string = `#{bin}/#{gcc} -dumpspecs`
+    raise "command failed: #{gcc} -dumpspecs" if $?.exitstatus != 0
+    specs_orig.write specs_string
 
-        *link_libgcc:
-        #{glibc.installed? ? "-nostdlib -L#{libgcc}" : "+"} -L#{HOMEBREW_PREFIX}/lib
+    # Set the library search path
+    glibc = Formula["glibc-legacy"]
+    glibc.include.unlink
 
-        *link:
-        + --dynamic-linker #{HOMEBREW_PREFIX}/lib/ld.so -rpath #{HOMEBREW_PREFIX}/lib
+    libgcc = lib/"gcc/x86_64-unknown-linux-gnu"/version
+    specs.write specs_string + <<-EOS.undent
+      *cpp_unique_options:
+      + -isystem #{HOMEBREW_PREFIX}/include
 
-      EOS
-    end
+      *link_libgcc:
+      #{glibc.installed? ? "-nostdlib -L#{libgcc}" : "+"} -L#{HOMEBREW_PREFIX}/lib
+
+      *link:
+      + --dynamic-linker #{HOMEBREW_PREFIX}/lib/ld.so -rpath #{HOMEBREW_PREFIX}/lib
+
+    EOS
   end
 
   def caveats
