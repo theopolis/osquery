@@ -120,7 +120,7 @@ function local_brew_dependency() {
   FROM_BOTTLE=false
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    ARGS="$ARGS -v --build-bottle --cc=clang --ignore-dependencies"
+    ARGS="$ARGS -vd --build-bottle --cc=clang --ignore-dependencies"
     ARGS="$ARGS --env=std"
   else
     ARGS="--ignore-dependencies --force-bottle"

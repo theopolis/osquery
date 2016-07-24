@@ -97,6 +97,7 @@ function platform_linux_main() {
   # Curl and Python are needed for LLVM mostly.
   local_brew_tool curl
   local_brew_tool python -vd
+  local_brew_postinstall python
   local_brew_tool cmake --without-docs -vd
 
   # LLVM/Clang.
@@ -169,7 +170,7 @@ function platform_darwin_main() {
   local_brew_dependency boost
 
   # List of LLVM-compiled dependencies.
-  local_brew_dependency asio
+  local_brew_dependency asio -vd
   local_brew_dependency cpp-netlib
   local_brew_dependency google-benchmark
   local_brew_dependency pcre
