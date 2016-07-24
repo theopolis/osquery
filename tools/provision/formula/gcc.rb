@@ -21,9 +21,9 @@ class Gcc < Formula
 
   desc "GNU compiler collection"
   homepage "https://gcc.gnu.org"
-  url "http://ftpmirror.gnu.org/gcc/gcc-6.1.0/gcc-6.1.0.tar.bz2"
-  mirror "https://ftp.gnu.org/gnu/gcc/gcc-6.1.0/gcc-6.1.0.tar.bz2"
-  #sha256 "b84f5592e9218b73dbae612b5253035a7b34a9a1f7688d2e1bfaaf7267d5c4db"
+  url "http://ftpmirror.gnu.org/gcc/gcc-5.3.0/gcc-5.3.0.tar.bz2"
+  mirror "https://ftp.gnu.org/gnu/gcc/gcc-5.3.0/gcc-5.3.0.tar.bz2"
+  sha256 "b84f5592e9218b73dbae612b5253035a7b34a9a1f7688d2e1bfaaf7267d5c4db"
 
   head "svn://gcc.gnu.org/svn/gcc/trunk"
 
@@ -49,7 +49,7 @@ class Gcc < Formula
 
   # osquery: We add a requirement for glibc-legacy instead of glibc.
   # We want the osquery toolchain to use a "more-available" C runtime.
-  depends_on "glibc-legacy"
+  depends_on "glibc-legacy" => :optional
 
   if MacOS.version < :leopard && OS.mac?
     # The as that comes with Tiger isn't capable of dealing with the
@@ -102,15 +102,17 @@ class Gcc < Formula
 
     args = []
     args << "--build=#{arch}-apple-darwin#{osmajor}" if OS.mac?
-    if build.with? "glibc"
+    if build.with? "glibc-legacy" or true
+      puts "hello friend"
       # Fix for GCC 4.4 and older that do not support -static-libstdc++
       # gengenrtl: error while loading shared libraries: libstdc++.so.6
       mkdir_p lib
       ln_s ["/usr/lib64/libstdc++.so.6", "/lib64/libgcc_s.so.1"], lib
       binutils = Formula["binutils"].prefix/"x86_64-pc-linux-gnu/bin"
       args += [
-        "--with-native-system-header-dir=#{HOMEBREW_PREFIX}/include",
-        "--with-local-prefix=#{HOMEBREW_PREFIX}/local",
+        #"--with-native-system-header-dir=#{HOMEBREW_PREFIX}/include",
+        "--with-native-system-header-dir=#{Formula["glibc-legacy"].include}",
+        "--with-local-prefix=#{HOMEBREW_PREFIX}",
         "--with-build-time-tools=#{binutils}",
       ]
       # Set the search path for glibc libraries and objects.
@@ -166,6 +168,9 @@ class Gcc < Formula
 
     args << "--enable-host-shared" if build.with?("jit") || build.with?("all-languages")
 
+    # osquery testing:
+    # args << "--enable-ld=yes"
+
     # Ensure correct install names when linking against libgcc_s;
     # see discussion in https://github.com/Homebrew/homebrew/pull/34303
     inreplace "libgcc/config/t-slibgcc-darwin", "@shlib_slibdir@", "#{HOMEBREW_PREFIX}/lib/gcc/#{version_suffix}"
@@ -174,18 +179,10 @@ class Gcc < Formula
     args << "--disable-bootstrap"
     args << "--disable-libgomp"
 
-    # osquery: Remove several environment variables that cause MPX/GOMP to fail.
-    ENV.delete "LD_RUN_PATH" # legacy
-    #ENV.delete "CXXFLAGS"
-    ENV.delete "CFLAGS" # legacy
-    ENV.delete "CPATH" # legacy
+    #ENV.delete "LD_RUN_PATH"
+    #ENV.delete "CFLAGS"
+    #ENV.delete "CPATH"
     #ENV.delete "CPPFLAGS"
-    #ENV["CFLAGS"] = "-march=core2"
-
-    # osquery: add the legacy glibc library search path.
-    # ENV.prepend "LDFLAGS", "-L#{Formula["glibc-legacy"].lib}" # legacy
-    # ENV.prepend "CPPFLAGS", "-isystem#{Formula["glibc-legacy"].include}" # legacy
-    # ENV.prepend_path "LIBRARY_PATH", "#{Formula["glibc-legacy"].lib}" # legacy
 
     mkdir "build" do
       if OS.mac? && !MacOS::CLT.installed?

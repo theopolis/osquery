@@ -16,7 +16,7 @@ else()
 endif()
 
 # If no explicit compiler override and clang++ exists, prefer clang.
-find_file(CLANGXX_EXISTS "clang++")
+find_program(CLANGXX_EXISTS "clang++" ENV PATH)
 if(DEFINED ENV{CC})
   set(CMAKE_C_COMPILER "$ENV{CC}")
   LOG("Overriding C compiler from clang to $ENV{CC}")
@@ -74,6 +74,11 @@ endif()
 # osquery additional compiler flags added by CMake.
 set(C_COMPILE_FLAGS "")
 set(CXX_COMPILE_FLAGS "")
+
+if(NOT WIN32)
+  find_program(THRIFT_COMPILER "thrift" ENV PATH)
+  find_program(PYTHON_EXECUTABLE "python" ENV PATH)
+endif()
 
 # Use osquery language to set platform/os
 if(DEFINED ENV{OSQUERY_PLATFORM})
@@ -423,9 +428,6 @@ if(WIN32)
 else()
   set(PROCESS_FAMILY "posix")
   set(MKDIR_OPTS "-p")
-
-  find_program(THRIFT_COMPILER "thrift" HINTS "${BUILD_DEPS}")
-  find_program(PYTHON_EXECUTABLE "python" HINTS "${BUILD_DEPS}")
 
   include_directories("${BUILD_DEPS}/include")
   include_directories("${BUILD_DEPS}/include/openssl")

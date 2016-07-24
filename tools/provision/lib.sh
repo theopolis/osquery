@@ -105,23 +105,6 @@ function local_brew_tool() {
   $BREW install $ARGS "${FORMULA_DIR}/${TOOL}.rb"
 }
 
-function brew_dependency() {
-  TOOL=$1
-  shift
-
-  export HOMEBREW_OPTIMIZATION_LEVEL=-Os
-  log "brew dependency $TOOL"
-  ARGS="$@"
-  if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    ARGS="$ARGS --build-bottle --cc=clang --universal"
-    ARGS="$ARGS --env=legacy"
-  else
-    ARGS="--ignore-dependencies --force-bottle"
-  fi
-
-  $BREW install $ARGS "$TOOL"
-}
-
 # local_brew NAME
 #   1: formula name
 function local_brew_dependency() {
@@ -137,8 +120,8 @@ function local_brew_dependency() {
   FROM_BOTTLE=false
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    ARGS="$ARGS -v --build-bottle --cc=clang --universal --ignore-dependencies"
-    ARGS="$ARGS --env=legacy"
+    ARGS="$ARGS -v --build-bottle --cc=clang --ignore-dependencies"
+    ARGS="$ARGS --env=std"
   else
     ARGS="--ignore-dependencies --force-bottle"
   fi

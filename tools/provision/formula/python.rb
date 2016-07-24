@@ -149,6 +149,9 @@ class Python < Formula
       s.gsub! "/usr/include/db4", Formula["berkeley-db4"].opt_include
     end
 
+    # osquery: multiarch paths will shadow our legacy runtime.
+    inreplace "setup.py", "self.add_multiarch_paths()", "'''multiarch paths not wanted'''"
+
     if build.universal?
       ENV.universal_binary
       args << "--enable-universalsdk=/" << "--with-universal-archs=intel"

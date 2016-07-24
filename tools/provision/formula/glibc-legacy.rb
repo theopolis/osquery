@@ -28,7 +28,7 @@ class GlibcLegacy < Formula
   def install
     ENV["CFLAGS"] = "-U_FORTIFY_SOURCE -fno-stack-protector -O2"
 
-    # May not need this.
+    # osquery: Remove several environment variables
     ENV.delete "LD_RUN_PATH"
     ENV.delete "LIBRARY_PATH"
     ENV.delete "CPATH"

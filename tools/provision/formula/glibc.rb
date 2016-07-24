@@ -2,7 +2,7 @@ class Glibc < Formula
   desc "The GNU C Library"
   homepage "https://www.gnu.org/software/libc/download.html"
   url "http://ftpmirror.gnu.org/glibc/glibc-2.19.tar.bz2"
-  sha256 "0173c92a0545e6d99a46a4fbed2da00ba26556f5c6198e2f9f1631ed5318dbb2"
+  sha256 "2e293f714187044633264cd9ce0183c70c3aa960a2f77812a6390a3822694d15"
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -16,6 +16,8 @@ class Glibc < Formula
 
   # Linux kernel headers 2.6.19 or later are required
   depends_on "linux-headers" => [:build, :recommended]
+
+  keg_only "osquery runtime"
 
   def install
     ENV["CFLAGS"] = "-U_FORTIFY_SOURCE -fno-stack-protector -O2"

@@ -14,6 +14,7 @@ class Bzip2 < Formula
   keg_only :provided_by_osx
 
   def install
+    #Formula["glibc"].include.unlink
     ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     inreplace "Makefile", "$(PREFIX)/man", "$(PREFIX)/share/man"
@@ -24,11 +25,13 @@ class Bzip2 < Formula
 
     if OS.linux?
       # Install the shared library.
-      system "make", "-f", "Makefile-libbz2_so", "clean"
-      system "make", "-f", "Makefile-libbz2_so"
-      lib.install "libbz2.so.1.0.6", "libbz2.so.1.0"
-      lib.install_symlink "libbz2.so.1.0.6" => "libbz2.so.1"
-      lib.install_symlink "libbz2.so.1.0.6" => "libbz2.so"
+
+      # osquery: Remove installing the shared library
+      # system "make", "-f", "Makefile-libbz2_so", "clean"
+      # system "make", "-f", "Makefile-libbz2_so"
+      # lib.install "libbz2.so.1.0.6", "libbz2.so.1.0"
+      # lib.install_symlink "libbz2.so.1.0.6" => "libbz2.so.1"
+      # lib.install_symlink "libbz2.so.1.0.6" => "libbz2.so"
     end
   end
 

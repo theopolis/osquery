@@ -30,6 +30,12 @@ class Ncurses < Formula
     # Disable linemarker output of cpp
     ENV.append "CPPFLAGS", "-P"
 
+    # osquery: Unknown why the legacy environment is preventing configure
+    # from discovering the local include directories.
+    ENV.append "CFLAGS", "-I../ncurses -I../progs"
+    ENV.append "CPPFLAGS", "-I../c++"
+    ENV.deparallelize
+
     (lib/"pkgconfig").mkpath
 
     system "./configure", "--prefix=#{prefix}",

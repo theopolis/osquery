@@ -37,7 +37,7 @@ function platform_linux_main() {
   local_brew_postinstall glibc
 
   # Build a bottle for a legacy glibc.
-  local_brew_tool glibc-legacy -vd --env=legacy
+  local_brew_tool glibc-legacy -vd
 
   # Need LZMA for final builds.
   local_brew_tool xz
@@ -50,7 +50,10 @@ function platform_linux_main() {
   brew_tool berkeley-db
 
   # GCC 5x.
-  local_brew_tool gcc --env=legacy --with-glibc --without-nls --without-multilib -vd
+  #$BREW link --force glibc-legacy
+  local_brew_tool gcc --with-glibc-legacy --without-fortran -vd
+  #$BREW unlink glibc
+  #$BREW link --force glibc-legacy
 
   # Discover and set newly installed GCC 5x.
   set_cc gcc
@@ -60,10 +63,10 @@ function platform_linux_main() {
   brew_tool pkg-config
 
   # Build a bottle for ncurses
-  local_brew_tool ncurses
+  local_brew_tool ncurses -vd
 
   # Need BZIP/Readline for final build.
-  local_brew_tool bzip2
+  local_brew_tool bzip2 -vd
   brew_tool unzip
   local_brew_tool readline
   brew_tool sqlite
@@ -84,7 +87,7 @@ function platform_linux_main() {
   brew_tool bison
 
   # Need libgpg-error for final build.
-  local_brew_tool libgpg-error
+  local_brew_tool libgpg-error -vd
 
   # More LLVM dependencies.
   brew_tool popt
@@ -93,8 +96,8 @@ function platform_linux_main() {
 
   # Curl and Python are needed for LLVM mostly.
   local_brew_tool curl
-  local_brew_tool python
-  core_brew_tool cmake
+  local_brew_tool python -vd
+  local_brew_tool cmake --without-docs -vd
 
   # LLVM/Clang.
   local_brew_tool llvm -v --with-clang --with-clang-extra --with-compiler-rt
@@ -118,11 +121,11 @@ function platform_linux_main() {
   local_brew_dependency yara
   local_brew_dependency glog
   local_brew_dependency util-linux
-  local_brew_dependency libdevmapper
+  local_brew_dependency libdevmapper -vd
   local_brew_dependency libaptpkg
   local_brew_dependency libiptables
   local_brew_dependency libgcrypt
-  local_brew_dependency libcryptsetup
+  local_brew_dependency libcryptsetup -vd
   local_brew_dependency libudev
   local_brew_dependency libaudit
   local_brew_dependency libdpkg
