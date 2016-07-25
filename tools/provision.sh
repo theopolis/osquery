@@ -37,7 +37,7 @@ function platform_linux_main() {
   local_brew_postinstall glibc
 
   # Build a bottle for a legacy glibc.
-  local_brew_tool glibc-legacy -vd
+  local_brew_tool glibc-legacy
   local_brew_postinstall glibc-legacy
 
   # Need LZMA for final builds.
@@ -51,7 +51,7 @@ function platform_linux_main() {
   brew_tool berkeley-db
 
   # GCC 5x.
-  local_brew_tool gcc --with-glibc-legacy --without-fortran -vd
+  local_brew_tool gcc --with-glibc-legacy --without-fortran
   # Discover and set newly installed GCC 5x.
   set_deps_compilers gcc
 

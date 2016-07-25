@@ -27,7 +27,7 @@ function setup_brew() {
   # Checkout new brew in local deps dir
   if [[ ! -d "$DEPS/.git" ]]; then
     log "setting up new brew in $DEPS"
-    git clone $BREW .
+    git clone $BREW "$DEPS"
     log "installing local tap: homebrew-osquery-local"
     mkdir -p "$DEPS/Library/Taps/osquery/"
     ln -sf "$FORMULA_DIR" "$DEPS/Library/Taps/osquery/homebrew-osquery-local" 
@@ -116,7 +116,7 @@ function local_brew_tool() {
   log "brew (build) tool $TOOL"
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    ARGS="$ARGS --build-bottle --ignore-dependencies"
+    ARGS="$ARGS -vd --build-bottle --ignore-dependencies"
     ARGS="$ARGS --env=inherit"
   else
     ARGS="--ignore-dependencies --force-bottle"

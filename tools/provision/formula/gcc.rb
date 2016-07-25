@@ -172,21 +172,14 @@ class Gcc < AbstractOsqueryFormula
 
     args << "--enable-host-shared" if build.with?("jit") || build.with?("all-languages")
 
-    # osquery testing:
-    # args << "--enable-ld=yes"
-
     # Ensure correct install names when linking against libgcc_s;
     # see discussion in https://github.com/Homebrew/homebrew/pull/34303
     inreplace "libgcc/config/t-slibgcc-darwin", "@shlib_slibdir@", "#{HOMEBREW_PREFIX}/lib/gcc/#{version_suffix}"
+    inreplace "libitm/method-serial.cc", "assert (ok);", "(void) ok;"
 
     # osquery: experimentation
     args << "--disable-bootstrap"
     args << "--disable-libgomp"
-
-    #ENV.delete "LD_RUN_PATH"
-    #ENV.delete "CFLAGS"
-    #ENV.delete "CPATH"
-    #ENV.delete "CPPFLAGS"
 
     mkdir "build" do
       if OS.mac? && !MacOS::CLT.installed?
@@ -196,10 +189,7 @@ class Gcc < AbstractOsqueryFormula
         args << "--with-sysroot=#{MacOS.sdk_path}"
       end
 
-      #system "env"
       system "../configure", *args
-      #system "kmake", "bootstrap"
-      #system "make", "bootstrap"
       system "make"
       system "make", "install"
 

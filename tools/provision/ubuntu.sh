@@ -14,7 +14,6 @@ function distro_main() {
   package gawk
   package autotools-dev
   package autopoint
-  package realpath
   package g++
   package ruby
   package curl

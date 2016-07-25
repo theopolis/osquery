@@ -53,13 +53,14 @@ class AbstractOsqueryFormula < Formula
       # Set the dynamic linker and library search path.
       if ["gcc"].include?(self.name)
         puts "This is a GCC install..."
+
         # When building gcc, use the modern linker.
-        prepend "CFLAGS", "-I#{legacy.include}"
-        append "LDFLAGS", "-Wl,--dynamic-linker=#{modern.lib}/ld-linux-x86-64.so.2"
+        # append "LDFLAGS", "-Wl,--dynamic-linker=#{modern.lib}/ld-linux-x86-64.so.2"
       else
-        # Otherwise, when building with gcc, use the legacy linker.
-        prepend "CFLAGS", "-isystem#{HOMEBREW_PREFIX}/include"
-        prepend "CFLAGS", "-isystem#{legacy.include}"
+        #if ENV["CC"].include? "gcc"
+          # Otherwise, when building with gcc, use the legacy linker.
+          prepend "CFLAGS", "-isystem#{HOMEBREW_PREFIX}/include"
+        #end
 
         # clang wants -L in the CFLAGS.
         # These used to belong to !gcc but -lz wants the system libz.
@@ -67,14 +68,26 @@ class AbstractOsqueryFormula < Formula
         prepend "CFLAGS", "-L#{legacy.lib}"
 
 
-        append "LDFLAGS", "-Wl,--dynamic-linker=#{legacy.lib}/ld-linux-x86-64.so.2"
-        append "LDFLAGS", "-Wl,-rpath,#{legacy.lib}"
+        #append "LDFLAGS", "-Wl,--dynamic-linker=#{legacy.lib}/ld-linux-x86-64.so.2"
+        #append "LDFLAGS", "-Wl,-rpath,#{legacy.lib}"
 
         # cmake wants this to have -I
         #prepend "CXXFLAGS", "-I/usr/local/osquery/Cellar/gcc/6.1.0/include/c++/6.1.0"
         prepend "CXXFLAGS", "-I#{HOMEBREW_PREFIX}/include"
         prepend "CXXFLAGS", "-I#{legacy.include}"
       end
+
+      #if ENV["CC"].include? "gcc"
+        # This used to be in the GCC/not-GCC logic, pulling out to compile GCC
+        # Using the system compilers with legacy runtime.
+        prepend "CFLAGS", "-isystem#{legacy.include}"
+        prepend "CXXFLAGS", "-isystem#{legacy.include}"
+      #else
+      #  ENV.delete "CPPFLAGS"
+      #end
+
+      append "LDFLAGS", "-Wl,--dynamic-linker=#{legacy.lib}/ld-linux-x86-64.so.2"
+      append "LDFLAGS", "-Wl,-rpath,#{legacy.lib}"
 
       # Add a runtime search path for the legacy C implementation.
       append "LDFLAGS", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib"
