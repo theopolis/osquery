@@ -1,4 +1,6 @@
-class Cmake < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Cmake < AbstractOsqueryFormula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
 
@@ -29,6 +31,8 @@ class Cmake < Formula
   # For the GUI application please instead use brew install caskroom/cask/cmake.
 
   def install
+    osquery_setup
+
     # Reduce memory usage below 4 GB for Circle CI.
     ENV.deparallelize if ENV["CIRCLECI"]
 

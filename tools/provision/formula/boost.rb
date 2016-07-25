@@ -1,4 +1,6 @@
-class Boost < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Boost < AbstractOsqueryFormula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
   url "https://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.tar.bz2"
@@ -37,8 +39,9 @@ class Boost < Formula
   depends_on "bzip2" unless OS.mac?
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.universal_binary if build.universal?
 
     # Force boost to compile with the desired compiler

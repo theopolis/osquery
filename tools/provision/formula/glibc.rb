@@ -1,4 +1,6 @@
-class Glibc < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Glibc < AbstractOsqueryFormula
   desc "The GNU C Library"
   homepage "https://www.gnu.org/software/libc/download.html"
   url "http://ftpmirror.gnu.org/glibc/glibc-2.19.tar.bz2"

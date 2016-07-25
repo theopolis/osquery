@@ -1,4 +1,6 @@
-class Libcryptsetup < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libcryptsetup < AbstractOsqueryFormula
   desc "Open source disk encryption libraries"
   homepage "https://gitlab.com/cryptsetup/cryptsetup"
   url "https://osquery-packages.s3.amazonaws.com/deps/cryptsetup-1.6.7.tar.gz"
@@ -10,7 +12,7 @@ class Libcryptsetup < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     args = [
       "--disable-selinux",

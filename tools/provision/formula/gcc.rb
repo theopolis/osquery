@@ -1,4 +1,6 @@
-class Gcc < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Gcc < AbstractOsqueryFormula
   def arch
     if Hardware::CPU.type == :intel
       if MacOS.prefer_64_bit?
@@ -79,6 +81,8 @@ class Gcc < Formula
   patch :DATA if OS.mac?
 
   def install
+    osquery_setup
+
     # GCC will suffer build errors if forced to use a particular linker.
     ENV.delete "LD"
 

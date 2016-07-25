@@ -1,4 +1,6 @@
-class Libaptpkg < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libaptpkg < AbstractOsqueryFormula
   desc "The low-level bindings for apt-pkg"
   homepage "https://apt.alioth.debian.org/python-apt-doc/library/apt_pkg.html"
   url "https://osquery-packages.s3.amazonaws.com/deps/apt-1.2.6.tar.gz"
@@ -10,10 +12,12 @@ class Libaptpkg < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     args = []
     args << "STATICLIBS=1"
+
+    inreplace "configure", "dpkg-architecture -qDEB_HOST_ARCH", "echo 'amd64'"
 
     system "make", "clean"
     system "./configure", "--prefix=#{prefix}"

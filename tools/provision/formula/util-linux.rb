@@ -1,4 +1,6 @@
-class UtilLinux < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class UtilLinux < AbstractOsqueryFormula
   desc "Collection of Linux utilities"
   homepage "https://github.com/karelzak/util-linux"
   url "https://www.kernel.org/pub/linux/utils/util-linux/v2.27/util-linux-2.27.1.tar.xz"
@@ -13,7 +15,7 @@ class UtilLinux < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     system "./configure",
       "--disable-debug",

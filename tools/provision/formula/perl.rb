@@ -1,4 +1,6 @@
-class Perl < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Perl < AbstractOsqueryFormula
   desc "Highly capable, feature-rich programming language"
   homepage "https://www.perl.org/"
   url "http://www.cpan.org/src/5.0/perl-5.22.1.tar.xz"
@@ -23,6 +25,8 @@ class Perl < Formula
   depends_on "gdbm" => "with-libgdbm-compat" unless OS.mac?
 
   def install
+    osquery_setup
+
     args = %W[
       -des
       -Dprefix=#{prefix}

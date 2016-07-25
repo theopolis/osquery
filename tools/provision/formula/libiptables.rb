@@ -1,4 +1,6 @@
-class Libiptables < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libiptables < AbstractOsqueryFormula
   desc "Device Mapper development"
   homepage "http://netfilter.samba.org/"
   url "https://osquery-packages.s3.amazonaws.com/deps/iptables-1.4.21.tar.gz"
@@ -13,7 +15,7 @@ class Libiptables < Formula
   patch :DATA
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     args = [
       "--disable-shared",

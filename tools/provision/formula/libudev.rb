@@ -1,4 +1,6 @@
-class Libudev < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libudev < AbstractOsqueryFormula
   desc "API for enumerating and introspecting local devices"
   homepage "https://www.freedesktop.org/software/systemd/man/libudev.html"
   url "http://pkgs.fedoraproject.org/repo/pkgs/udev/udev-173.tar.bz2/91a88a359b60bbd074b024883cc0dbde/udev-173.tar.bz2"
@@ -11,7 +13,7 @@ class Libudev < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     args = [
       "--disable-introspection",

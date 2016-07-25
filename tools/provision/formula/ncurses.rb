@@ -1,4 +1,6 @@
-class Ncurses < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Ncurses < AbstractOsqueryFormula
   desc "Text-based UI library"
   homepage "https://www.gnu.org/s/ncurses/"
   url "http://ftpmirror.gnu.org/ncurses/ncurses-6.0.tar.gz"
@@ -20,7 +22,8 @@ class Ncurses < Formula
   option :universal
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.universal_binary if build.universal?
 
     # Fix the build for GCC 5.1

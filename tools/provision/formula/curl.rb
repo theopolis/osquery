@@ -1,4 +1,6 @@
-class Curl < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Curl < AbstractOsqueryFormula
   desc "Get a file from an HTTP, HTTPS or FTP server"
   homepage "https://curl.haxx.se/"
   url "https://curl.haxx.se/download/curl-7.48.0.tar.bz2"
@@ -54,6 +56,8 @@ class Curl < Formula
   patch :DATA
 
   def install
+    osquery_setup
+
     # Throw an error if someone actually tries to rock both SSL choices.
     # Long-term, make this singular-ssl-option-only a requirement.
     if build.with?("libressl") && build.with?("openssl")

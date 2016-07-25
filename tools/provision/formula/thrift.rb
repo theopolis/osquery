@@ -1,4 +1,6 @@
-class Thrift < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Thrift < AbstractOsqueryFormula
   desc "Framework for scalable cross-language services development"
   homepage "https://thrift.apache.org/"
 
@@ -33,8 +35,9 @@ class Thrift < Formula
   depends_on :python => :optional
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV["PY_PREFIX"] = prefix
 
     exclusions = [

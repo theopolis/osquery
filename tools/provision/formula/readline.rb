@@ -1,4 +1,6 @@
-class Readline < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Readline < AbstractOsqueryFormula
   desc "Library for command-line editing"
   homepage "https://tiswww.case.edu/php/chet/readline/rltop.html"
   url "http://ftpmirror.gnu.org/readline/readline-6.3.tar.gz"
@@ -34,7 +36,8 @@ class Readline < Formula
   option :universal
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.universal_binary if build.universal?
 
     system "./configure", "--prefix=#{prefix}", "--enable-multibyte",

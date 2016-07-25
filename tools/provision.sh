@@ -9,18 +9,18 @@
 
 set -e
 
-CC=clang
-CXX=clang++
-CFLAGS="-fPIE -fPIC -Os -DNDEBUG -march=x86-64 -mno-avx"
-CXXFLAGS="$CFLAGS"
+# Helpful defines for the provisioning process.
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BUILD_DIR="$SCRIPT_DIR/../build"
-
 WORKING_DIR="/tmp/osquery-provisioning" # no longer needed
 FILES_DIR="$SCRIPT_DIR/provision/files" # maybe needed
 FORMULA_DIR="$SCRIPT_DIR/provision/formula"
 DEPS_URL=https://osquery-packages.s3.amazonaws.com/deps # no longer needed
-export PATH="$PATH:/usr/local/bin"
+
+# Set the SHA1 commit hashes for the pinned homebrew Taps.
+# Pinning allows determinism for bottle availability, expect to update often.
+HOMEBREW_CORE="600e1460c79b9cf6945e87cb5374b9202db1f6a9"
+HOMEBREW_DUPES="83cad3d474e6d245cd543521061bba976529e5df"
 
 source "$SCRIPT_DIR/lib.sh"
 source "$SCRIPT_DIR/provision/lib.sh"
@@ -38,6 +38,7 @@ function platform_linux_main() {
 
   # Build a bottle for a legacy glibc.
   local_brew_tool glibc-legacy -vd
+  local_brew_postinstall glibc-legacy
 
   # Need LZMA for final builds.
   local_brew_tool xz
@@ -50,14 +51,9 @@ function platform_linux_main() {
   brew_tool berkeley-db
 
   # GCC 5x.
-  #$BREW link --force glibc-legacy
   local_brew_tool gcc --with-glibc-legacy --without-fortran -vd
-  #$BREW unlink glibc
-  #$BREW link --force glibc-legacy
-
   # Discover and set newly installed GCC 5x.
-  set_cc gcc
-  set_cxx g++
+  set_deps_compilers gcc
 
   # GCC-compiled (C) dependencies.
   brew_tool pkg-config
@@ -87,7 +83,7 @@ function platform_linux_main() {
   brew_tool bison
 
   # Need libgpg-error for final build.
-  local_brew_tool libgpg-error -vd
+  local_brew_tool libgpg-error
 
   # More LLVM dependencies.
   brew_tool popt
@@ -98,15 +94,15 @@ function platform_linux_main() {
   local_brew_tool curl
   local_brew_tool python -vd
   local_brew_postinstall python
-  local_brew_tool cmake --without-docs -vd
+  local_brew_tool cmake --without-docs
 
   # LLVM/Clang.
-  local_brew_tool llvm -v --with-clang --with-clang-extra --with-compiler-rt
+  local_brew_tool llvm --with-clang --with-clang-extra --with-compiler-rt
+  # Discover and set newly installed clang.
+  set_deps_compilers clang
 
   # Install custom formulas, build with LLVM/clang.
   local_brew_dependency boost
-
-  # List of LLVM-compiled dependencies.
   local_brew_dependency asio
   local_brew_dependency cpp-netlib
   local_brew_dependency google-benchmark
@@ -140,6 +136,9 @@ function platform_linux_main() {
   # brew_tool gettext
   # core_brew_tool libarchive
   # local_brew_dependency librpm
+
+  # Restore the compilers to GCC for the remainder of provisioning.
+  set_deps_compilers gcc
 }
 
 function platform_darwin_main() {
@@ -167,10 +166,9 @@ function platform_darwin_main() {
   local_brew_tool python
   local_brew_postinstall python
 
-  local_brew_dependency boost
-
   # List of LLVM-compiled dependencies.
-  local_brew_dependency asio -vd
+  local_brew_dependency boost
+  local_brew_dependency asio
   local_brew_dependency cpp-netlib
   local_brew_dependency google-benchmark
   local_brew_dependency pcre
@@ -196,6 +194,7 @@ function main() {
    exit 0
   fi
 
+  # Setup the local ./build/DISTRO cmake build directory.
   mkdir -p "$WORKING_DIR"
   if [[ ! -z "$SUDO_USER" ]]; then
     echo "chown -h $SUDO_USER $BUILD_DIR/*"
@@ -206,12 +205,18 @@ function main() {
     chown $SUDO_USER:$SUDO_GID "$WORKING_DIR" > /dev/null 2>&1 || true
   fi
 
+  # Provisioning uses either Linux or Home (OS X) brew.
   if [[ $OS = "darwin" ]]; then
     BREW_TYPE="darwin"
   else
     BREW_TYPE="linux"
   fi
 
+  # Each OS/Distro may have specific provisioning needs.
+  # These scripts are optional and should installed the needed packages for:
+  # 1. A basic ruby interpreter to run brew
+  # 2. A GCC compiler to compile a modern glibc/GCC and legacy glibc.
+  # 3. Curl, git, autotools, autopoint, and gawk.
   OS_SCRIPT="$SCRIPT_DIR/provision/$OS.sh"
   if [[ -f "$OS_SCRIPT" ]]; then
     log "found $OS provision script: $OS_SCRIPT"
@@ -223,7 +228,7 @@ function main() {
     log "your $OS does not use a provision script"
   fi
 
-  # Setup the osquery dependency directory
+  # Setup the osquery dependency directory.
   # One can use a non-build location using OSQUERY_DEPS=/path/to/deps
   if [[ -e "$OSQUERY_DEPS" ]]; then
     DEPS_DIR="$OSQUERY_DEPS"
@@ -231,6 +236,8 @@ function main() {
     DEPS_DIR="/usr/local/osquery"
   fi
 
+  # The dependency directory (DEPS_DIR) will contain our legacy runtime glibc
+  # and various compilers/library dependencies.
   if [[ ! -d "$DEPS_DIR" ]]; then
     log "creating build dir: $DEPS_DIR"
     do_sudo mkdir -p "$DEPS_DIR"
@@ -238,6 +245,8 @@ function main() {
   fi
   cd "$DEPS_DIR"
 
+  # Finally run the setup of *brew, and checkout the needed Taps.
+  # This will install a local tap using a symbol to the formula subdir here.
   export PATH="$DEPS_DIR/bin:$PATH"
   setup_brew "$DEPS_DIR" "$BREW_TYPE"
 
@@ -252,6 +261,9 @@ function main() {
     platform_darwin_main
   else
     platform_linux_main
+
+    # Additional compilations may occur for Python and Ruby
+    export LIBRARY_PATH="$DEPS_DIR/lib:$DEPS_DIR/legacy/lib:$LIBRARY_PATH"
   fi
   cd "$SCRIPT_DIR/../"
 

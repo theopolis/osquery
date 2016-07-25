@@ -1,4 +1,6 @@
-class Python < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Python < AbstractOsqueryFormula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org"
   url "https://www.python.org/ftp/python/2.7.12/Python-2.7.12.tar.xz"
@@ -92,6 +94,8 @@ class Python < Formula
   end
 
   def install
+    osquery_setup
+
     if build.with? "poll"
       opoo "The given option --with-poll enables a somewhat broken poll() on OS X (https://bugs.python.org/issue5154)."
     end

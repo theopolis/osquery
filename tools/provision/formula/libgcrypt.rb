@@ -1,4 +1,6 @@
-class Libgcrypt < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libgcrypt < AbstractOsqueryFormula
   desc "Cryptographic library based on the code from GnuPG"
   homepage "https://directory.fsf.org/wiki/Libgcrypt"
   url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.6.5.tar.bz2"
@@ -22,7 +24,8 @@ class Libgcrypt < Formula
   option :universal
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.universal_binary if build.universal?
 
     args = [

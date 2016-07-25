@@ -1,4 +1,6 @@
-class Lz4 < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Lz4 < AbstractOsqueryFormula
   desc "Lossless compression algorithm"
   homepage "http://www.lz4.info/"
   url "https://github.com/Cyan4973/lz4/archive/r131.tar.gz"
@@ -14,7 +16,7 @@ class Lz4 < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     system "make", "install", "PREFIX=#{prefix}"
   end

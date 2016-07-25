@@ -1,4 +1,6 @@
-class Bzip2 < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Bzip2 < AbstractOsqueryFormula
   desc "Freely available high-quality data compressor"
   homepage "http://www.bzip.org/"
   url "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
@@ -14,8 +16,7 @@ class Bzip2 < Formula
   keg_only :provided_by_osx
 
   def install
-    #Formula["glibc"].include.unlink
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     inreplace "Makefile", "$(PREFIX)/man", "$(PREFIX)/share/man"
     # Expect -fPIC for static library.

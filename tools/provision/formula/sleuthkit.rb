@@ -1,4 +1,6 @@
-class Sleuthkit < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Sleuthkit < AbstractOsqueryFormula
   desc "Forensic toolkit"
   homepage "http://www.sleuthkit.org/"
   url "https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.2.0.tar.gz"
@@ -32,7 +34,8 @@ class Sleuthkit < Formula
     :because => "both install a 'ffind' executable."
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.java_cache if build.with? "jni"
 
     system "./bootstrap"

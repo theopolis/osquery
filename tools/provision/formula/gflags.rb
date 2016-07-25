@@ -1,4 +1,6 @@
-class Gflags < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Gflags < AbstractOsqueryFormula
   desc "Library for processing command-line flags"
   homepage "https://gflags.github.io/gflags/"
   url "https://github.com/gflags/gflags/archive/v2.1.2.tar.gz"
@@ -14,8 +16,9 @@ class Gflags < Formula
   depends_on "cmake" => :build
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = std_cmake_args
     args << "-DBUILD_SHARED_LIBS=OFF"

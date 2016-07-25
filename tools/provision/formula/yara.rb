@@ -1,4 +1,6 @@
-class Yara < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Yara < AbstractOsqueryFormula
   desc "Malware identification and classification tool"
   homepage "https://github.com/plusvic/yara/"
   head "https://github.com/plusvic/yara.git"
@@ -29,8 +31,9 @@ class Yara < Formula
   depends_on "openssl"
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     # Use of "inline" requires gnu89 semantics
     ENV.append "CFLAGS", "-std=gnu89" if ENV.compiler == :clang

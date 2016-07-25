@@ -1,4 +1,6 @@
-class GlibcLegacy < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class GlibcLegacy < AbstractOsqueryFormula
   desc "The GNU C Library"
   homepage "https://www.gnu.org/software/libc/download.html"
   url "http://ftpmirror.gnu.org/glibc/glibc-2.13.tar.bz2"
@@ -26,6 +28,8 @@ class GlibcLegacy < Formula
   keg_only "osquery runtime"
 
   def install
+    osquery_setup
+
     ENV["CFLAGS"] = "-U_FORTIFY_SOURCE -fno-stack-protector -O2"
 
     # osquery: Remove several environment variables
@@ -59,26 +63,8 @@ class GlibcLegacy < Formula
     # Fix permissions
     chmod 0755, [lib/"ld-#{version}.so", lib/"libc-#{version}.so"]
 
-    # Compile locale definition files
-    mkdir_p lib/"locale"
-    locales = ENV.map { |k, v| v if k[/^LANG$|^LC_/] && v != "C" }.compact
-    locales << "en_US.UTF-8" # Required by gawk make check
-    locales.uniq.each do |locale|
-      lang, charmap = locale.split(".", 2)
-      if !charmap.nil?
-        system bin/"localedef", "-i", lang, "-f", charmap, locale
-      else
-        system bin/"localedef", "-i", lang, locale
-      end
-    end
-
-    # Set the local time zone
-    sys_localtime = Pathname.new "/etc/localtime"
-    brew_localtime = Pathname.new prefix/"etc/localtime"
-    (prefix/"etc").install_symlink sys_localtime if sys_localtime.exist? && !brew_localtime.exist?
-
     # Install ld.so symlink.
-    ln_sf lib/"ld-linux-x86-64.so.2", HOMEBREW_PREFIX/"lib/ld.so"
+    ln_sf prefix, HOMEBREW_PREFIX/"legacy"
   end
 
   test do

@@ -1,4 +1,6 @@
-class Asio < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Asio < AbstractOsqueryFormula
   desc "Cross-platform C++ Library for asynchronous programming"
   homepage "https://think-async.com/Asio"
   url "https://downloads.sourceforge.net/project/asio/asio/1.10.6%20%28Stable%29/asio-1.10.6.tar.bz2"
@@ -20,8 +22,9 @@ class Asio < Formula
   depends_on "openssl"
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     if build.head?
       cd "asio"

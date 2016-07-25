@@ -1,6 +1,8 @@
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
 # Upstream project has requested we use a mirror as the main URL
 # https://github.com/Homebrew/homebrew/pull/21419
-class Xz < Formula
+class Xz < AbstractOsqueryFormula
   desc "General-purpose data compression with high compression ratio"
   homepage "http://tukaani.org/xz/"
   url "https://fossies.org/linux/misc/xz-5.2.2.tar.gz"
@@ -17,7 +19,8 @@ class Xz < Formula
   option :universal
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.universal_binary if build.universal?
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",

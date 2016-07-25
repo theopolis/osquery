@@ -82,8 +82,7 @@ macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
   )
   set(LINK_PATHS_SYSTEM
     ${LINK_PATHS}
-    "${BUILD_DEPS}/Cellar/glibc-legacy/2.13/lib"
-    "${BUILD_DEPS}/lib"
+    "${BUILD_DEPS}/legacy/lib"
     "/lib"
     "/lib64"
     "/usr/lib"

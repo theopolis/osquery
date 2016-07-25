@@ -1,3 +1,5 @@
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
 class CodesignRequirement < Requirement
   include FileUtils
   fatal true
@@ -17,7 +19,7 @@ class CodesignRequirement < Requirement
   end
 end
 
-class Llvm < Formula
+class Llvm < AbstractOsqueryFormula
   desc "Next-gen compiler infrastructure"
   homepage "http://llvm.org/"
 
@@ -140,6 +142,8 @@ class Llvm < Formula
   fails_with :llvm
 
   def install
+    osquery_setup
+
     # Apple's libstdc++ is too old to build LLVM
     ENV.libcxx if ENV.compiler == :clang
 

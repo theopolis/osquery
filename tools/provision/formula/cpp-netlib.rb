@@ -1,4 +1,6 @@
-class CppNetlib < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class CppNetlib < AbstractOsqueryFormula
   desc "C++ libraries for high level network programming"
   homepage "http://cpp-netlib.org"
   url "https://github.com/cpp-netlib/cpp-netlib/archive/cpp-netlib-0.12.0-final.tar.gz"
@@ -18,8 +20,9 @@ class CppNetlib < Formula
   needs :cxx11
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = [
       "-DCPP-NETLIB_BUILD_TESTS=OFF",

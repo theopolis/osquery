@@ -1,4 +1,6 @@
-class Librpm < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Librpm < AbstractOsqueryFormula
   desc "The RPM Package Manager (RPM) development libraries"
   homepage "http://rpm.org/"
   url "http://rpm.org/releases/testing/rpm-4.13.0-rc1.tar.bz2"
@@ -12,7 +14,8 @@ class Librpm < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.append_to_cflags "-I#{Formula["nss"].include}"
     ENV.append_to_cflags "-I#{Formula["nspr"].include}"
 

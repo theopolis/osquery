@@ -1,4 +1,6 @@
-class Libaudit < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libaudit < AbstractOsqueryFormula
   desc "Linux auditing framework"
   url "https://github.com/Distrotech/libaudit/archive/audit-2.4.2.tar.gz"
 
@@ -9,7 +11,7 @@ class Libaudit < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     system "./autogen.sh"
     system "./configure", "--prefix=#{prefix}"

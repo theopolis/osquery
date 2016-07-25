@@ -1,4 +1,6 @@
-class Libmagic < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libmagic < AbstractOsqueryFormula
   desc "Implementation of the file(1) command"
   homepage "https://www.darwinsys.com/file/"
   url "ftp://ftp.astron.com/pub/file/file-5.25.tar.gz"
@@ -18,7 +20,8 @@ class Libmagic < Formula
   option :universal
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.universal_binary if build.universal?
 
     # Clean up "src/magic.h" as per http://bugs.gw.com/view.php?id=330

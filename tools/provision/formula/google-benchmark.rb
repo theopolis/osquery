@@ -1,4 +1,6 @@
-class GoogleBenchmark < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class GoogleBenchmark < AbstractOsqueryFormula
   desc "C++ microbenchmark support library"
   homepage "https://github.com/google/benchmark"
   url "https://github.com/google/benchmark/archive/v1.0.0.tar.gz"
@@ -17,8 +19,9 @@ class GoogleBenchmark < Formula
   needs :cxx11
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
     ENV.append_to_cflags "-Wno-zero-length-array"
 
     system "cmake", *std_cmake_args

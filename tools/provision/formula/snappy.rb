@@ -1,4 +1,6 @@
-class Snappy < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Snappy < AbstractOsqueryFormula
   desc "Compression/decompression library aiming for high speed"
   homepage "https://code.google.com/p/snappy/"
   url "https://github.com/google/snappy/releases/download/1.1.3/snappy-1.1.3.tar.gz"
@@ -23,7 +25,8 @@ class Snappy < Formula
   depends_on "pkg-config" => :build
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.universal_binary if build.universal?
     ENV.j1 if build.stable?
 

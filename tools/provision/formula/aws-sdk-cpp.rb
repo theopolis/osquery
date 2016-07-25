@@ -1,4 +1,6 @@
-class AwsSdkCpp < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class AwsSdkCpp < AbstractOsqueryFormula
   desc "AWS SDK for C++"
   homepage "https://github.com/aws/aws-sdk-cpp"
   url "https://osquery-packages.s3.amazonaws.com/deps/aws-sdk-cpp-0.12.4.tar.gz"
@@ -13,8 +15,9 @@ class AwsSdkCpp < Formula
   depends_on "cmake" => :build
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     args = std_cmake_args
     args << "-DSTATIC_LINKING=1"

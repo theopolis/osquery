@@ -1,4 +1,6 @@
-class Pcre < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Pcre < AbstractOsqueryFormula
   desc "Perl compatible regular expressions library"
   homepage "http://www.pcre.org/"
   url "https://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.bz2"
@@ -32,7 +34,8 @@ class Pcre < Formula
   depends_on "zlib" unless OS.mac?
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
+
     ENV.universal_binary if build.universal?
 
     system "./autogen.sh" if build.head?

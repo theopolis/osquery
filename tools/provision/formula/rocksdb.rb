@@ -1,4 +1,6 @@
-class Rocksdb < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Rocksdb < AbstractOsqueryFormula
   desc "Persistent key-value store for fast storage environments"
   homepage "http://rocksdb.org"
   url "https://github.com/facebook/rocksdb/archive/v4.6.1.tar.gz"
@@ -19,8 +21,9 @@ class Rocksdb < Formula
   fails_with :gcc
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     ENV["PORTABLE"] = "1"
     ENV["LIBNAME"] = "librocksdb_lite"

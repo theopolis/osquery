@@ -1,4 +1,6 @@
-class Openssl < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Openssl < AbstractOsqueryFormula
   desc "SSL/TLS cryptography library"
   homepage "https://openssl.org/"
   url "https://www.openssl.org/source/openssl-1.0.2h.tar.gz"
@@ -53,7 +55,7 @@ class Openssl < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     # Load zlib from an explicit path instead of relying on dyld's fallback
     # path, which is empty in a SIP context. This patch will be unnecessary

@@ -1,4 +1,6 @@
-class Glog < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Glog < AbstractOsqueryFormula
   desc "Application-level logging library"
   homepage "https://github.com/google/glog"
   url "https://github.com/google/glog/archive/v0.3.4.tar.gz"
@@ -14,8 +16,9 @@ class Glog < Formula
   depends_on "gflags"
 
   def install
+    osquery_setup
+
     ENV.cxx11
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"

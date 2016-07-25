@@ -1,4 +1,6 @@
-class Libdpkg < Formula
+require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
+
+class Libdpkg < AbstractOsqueryFormula
   desc "Debian package management system"
   homepage "https://wiki.debian.org/Teams/Dpkg"
   url "http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_1.18.9.tar.xz"
@@ -12,7 +14,7 @@ class Libdpkg < Formula
   end
 
   def install
-    ENV.append_to_cflags "-fPIC -DNDEBUG"
+    osquery_setup
 
     args = [
       "--disable-dependency-tracking",

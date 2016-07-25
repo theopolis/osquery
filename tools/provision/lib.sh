@@ -39,8 +39,17 @@ function setup_brew() {
   export HOMEBREW_MAKE_JOBS=$THREADS
   export HOMEBREW_NO_EMOJI=1
   export BREW="$DEPS/bin/brew"
+  TAPS="$DEPS/Library/Taps/"
+
+  # Grab full clone to perform a pin
+  log "installing homebre core"
+  $BREW tap homebrew/core --full
+  (cd $TAPS/homebrew/homebrew-core && git reset --hard $HOMEBREW_CORE)
+
+  # Need dupes for upzip.
   log "installing homebrew dupes"
-  $BREW tap homebrew/dupes
+  $BREW tap homebrew/dupes --full
+  (cd $TAPS/homebrew/homebrew-dupes && git reset --hard $HOMEBREW_DUPES)
 }
 
 # json_element JSON STRUCT
@@ -50,6 +59,16 @@ function json_element() {
   CMD="import json,sys;obj=json.load(sys.stdin);print ${2}"
   RESULT=`(echo "${1}" | python -c "${CMD}") 2>&1 || echo 'NAN'`
   echo $RESULT
+}
+
+function set_deps_compilers() {
+  if [[ "$1" = "gcc" ]]; then
+    export CC="$DEPS/bin/gcc"
+    export CXX="$DEPS/bin/g++"
+  else
+    export CC="$DEPS/bin/clang"
+    export CXX="$DEPS/bin/clang++"
+  fi
 }
 
 # brew_tool NAME
@@ -98,7 +117,7 @@ function local_brew_tool() {
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     ARGS="$ARGS --build-bottle --ignore-dependencies"
-    ARGS="$ARGS --env=legacy"
+    ARGS="$ARGS --env=inherit"
   else
     ARGS="--ignore-dependencies --force-bottle"
   fi
@@ -121,7 +140,7 @@ function local_brew_dependency() {
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
     ARGS="$ARGS -vd --build-bottle --cc=clang --ignore-dependencies"
-    ARGS="$ARGS --env=std"
+    ARGS="$ARGS --env=inherit"
   else
     ARGS="--ignore-dependencies --force-bottle"
   fi

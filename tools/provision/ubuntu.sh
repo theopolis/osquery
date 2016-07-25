@@ -16,4 +16,6 @@ function distro_main() {
   package autopoint
   package realpath
   package g++
+  package ruby
+  package curl
 }
