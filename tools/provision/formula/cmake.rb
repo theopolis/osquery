@@ -31,8 +31,6 @@ class Cmake < AbstractOsqueryFormula
   # For the GUI application please instead use brew install caskroom/cask/cmake.
 
   def install
-    osquery_setup
-
     # Reduce memory usage below 4 GB for Circle CI.
     ENV.deparallelize if ENV["CIRCLECI"]
 

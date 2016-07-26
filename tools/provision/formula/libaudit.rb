@@ -11,8 +11,6 @@ class Libaudit < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     system "./autogen.sh"
     system "./configure", "--prefix=#{prefix}"
     cd "lib" do

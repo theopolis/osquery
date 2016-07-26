@@ -22,8 +22,6 @@ class Asio < AbstractOsqueryFormula
   depends_on "openssl"
 
   def install
-    osquery_setup
-
     ENV.cxx11
 
     if build.head?

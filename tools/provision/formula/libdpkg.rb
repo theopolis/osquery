@@ -14,8 +14,6 @@ class Libdpkg < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     args = [
       "--disable-dependency-tracking",
       "--disable-silent-rules",

@@ -15,8 +15,6 @@ class UtilLinux < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     system "./configure",
       "--disable-debug",
       "--disable-dependency-tracking",

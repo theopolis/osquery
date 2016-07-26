@@ -19,8 +19,10 @@ DEPS_URL=https://osquery-packages.s3.amazonaws.com/deps # no longer needed
 
 # Set the SHA1 commit hashes for the pinned homebrew Taps.
 # Pinning allows determinism for bottle availability, expect to update often.
-HOMEBREW_CORE="600e1460c79b9cf6945e87cb5374b9202db1f6a9"
-HOMEBREW_DUPES="83cad3d474e6d245cd543521061bba976529e5df"
+HOMEBREW_CORE="14eaa685169edf4283e1dadd5818646f67d09f30"
+LINUXBREW_CORE="600e1460c79b9cf6945e87cb5374b9202db1f6a9"
+HOMEBREW_DUPES="36b6b7cd76a482319611eeb71e51f3134018a21c"
+LINUXBREW_DUPES="83cad3d474e6d245cd543521061bba976529e5df"
 
 source "$SCRIPT_DIR/lib.sh"
 source "$SCRIPT_DIR/provision/lib.sh"
@@ -52,17 +54,16 @@ function platform_linux_main() {
 
   # GCC 5x.
   local_brew_tool gcc --with-glibc-legacy --without-fortran
-  # Discover and set newly installed GCC 5x.
   set_deps_compilers gcc
 
   # GCC-compiled (C) dependencies.
   brew_tool pkg-config
 
   # Build a bottle for ncurses
-  local_brew_tool ncurses -vd
+  local_brew_tool ncurses
 
   # Need BZIP/Readline for final build.
-  local_brew_tool bzip2 -vd
+  local_brew_tool bzip2
   brew_tool unzip
   local_brew_tool readline
   brew_tool sqlite
@@ -92,13 +93,12 @@ function platform_linux_main() {
 
   # Curl and Python are needed for LLVM mostly.
   local_brew_tool curl
-  local_brew_tool python -vd
+  local_brew_tool python
   local_brew_postinstall python
   local_brew_tool cmake --without-docs
 
   # LLVM/Clang.
-  local_brew_tool llvm --with-clang --with-clang-extra --with-compiler-rt
-  # Discover and set newly installed clang.
+  local_brew_tool llvm --with-clang --with-clang-extra --with-rtti
   set_deps_compilers clang
 
   # Install custom formulas, build with LLVM/clang.
@@ -117,6 +117,8 @@ function platform_linux_main() {
   local_brew_dependency aws-sdk-cpp
   local_brew_dependency yara
   local_brew_dependency glog
+
+  # Linux specific custom formulas.
   local_brew_dependency util-linux
   local_brew_dependency libdevmapper -vd
   local_brew_dependency libaptpkg
@@ -143,19 +145,14 @@ function platform_linux_main() {
 
 function platform_darwin_main() {
   brew_tool xz
-  # brew_tool perl --without-test # Needs -lgdbm
-  brew_tool sphinx-doc
-  brew_tool readline # local on Linux
+  brew_tool readline
   brew_tool sqlite
   core_brew_tool makedepend
 
-  # brew_dependency zlib this is not available on Darwin
-  # brew_dependency bzip2 this is also not available on Darwin
   local_brew_dependency openssl --without-test
   $BREW link --force openssl
 
   brew_tool pkg-config
-  core_brew_tool cmake
   brew_tool autoconf
   brew_tool automake
   brew_tool libtool
@@ -165,6 +162,7 @@ function platform_darwin_main() {
 
   local_brew_tool python
   local_brew_postinstall python
+  local_brew_tool cmake --without-docs
 
   # List of LLVM-compiled dependencies.
   local_brew_dependency boost

@@ -81,8 +81,6 @@ class Gcc < AbstractOsqueryFormula
   patch :DATA if OS.mac?
 
   def install
-    osquery_setup
-
     # GCC will suffer build errors if forced to use a particular linker.
     ENV.delete "LD"
 

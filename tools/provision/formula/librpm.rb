@@ -14,8 +14,6 @@ class Librpm < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     ENV.append_to_cflags "-I#{Formula["nss"].include}"
     ENV.append_to_cflags "-I#{Formula["nspr"].include}"
 

@@ -12,8 +12,6 @@ class Libaptpkg < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     args = []
     args << "STATICLIBS=1"
 

@@ -12,8 +12,6 @@ class Libcryptsetup < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     args = [
       "--disable-selinux",
       "--disable-udev",

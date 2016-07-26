@@ -16,8 +16,6 @@ class Glog < AbstractOsqueryFormula
   depends_on "gflags"
 
   def install
-    osquery_setup
-
     ENV.cxx11
 
     system "./configure", "--disable-dependency-tracking",

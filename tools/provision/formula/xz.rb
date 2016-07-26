@@ -19,8 +19,6 @@ class Xz < AbstractOsqueryFormula
   option :universal
 
   def install
-    osquery_setup
-
     ENV.universal_binary if build.universal?
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",

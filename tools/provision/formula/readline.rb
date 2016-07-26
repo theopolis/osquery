@@ -36,8 +36,6 @@ class Readline < AbstractOsqueryFormula
   option :universal
 
   def install
-    osquery_setup
-
     ENV.universal_binary if build.universal?
 
     system "./configure", "--prefix=#{prefix}", "--enable-multibyte",

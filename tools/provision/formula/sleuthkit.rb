@@ -34,8 +34,6 @@ class Sleuthkit < AbstractOsqueryFormula
     :because => "both install a 'ffind' executable."
 
   def install
-    osquery_setup
-
     ENV.java_cache if build.with? "jni"
 
     system "./bootstrap"

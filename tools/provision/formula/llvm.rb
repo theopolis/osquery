@@ -142,8 +142,6 @@ class Llvm < AbstractOsqueryFormula
   fails_with :llvm
 
   def install
-    osquery_setup
-
     # Apple's libstdc++ is too old to build LLVM
     ENV.libcxx if ENV.compiler == :clang
 

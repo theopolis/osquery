@@ -94,8 +94,6 @@ class Python < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     if build.with? "poll"
       opoo "The given option --with-poll enables a somewhat broken poll() on OS X (https://bugs.python.org/issue5154)."
     end

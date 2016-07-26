@@ -24,8 +24,6 @@ class Libgcrypt < AbstractOsqueryFormula
   option :universal
 
   def install
-    osquery_setup
-
     ENV.universal_binary if build.universal?
 
     args = [

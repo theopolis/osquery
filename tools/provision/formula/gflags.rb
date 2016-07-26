@@ -16,8 +16,6 @@ class Gflags < AbstractOsqueryFormula
   depends_on "cmake" => :build
 
   def install
-    osquery_setup
-
     ENV.cxx11
 
     args = std_cmake_args

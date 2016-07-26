@@ -19,8 +19,6 @@ class GoogleBenchmark < AbstractOsqueryFormula
   needs :cxx11
 
   def install
-    osquery_setup
-
     ENV.cxx11
     ENV.append_to_cflags "-Wno-zero-length-array"
 

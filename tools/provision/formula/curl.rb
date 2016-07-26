@@ -56,8 +56,6 @@ class Curl < AbstractOsqueryFormula
   patch :DATA
 
   def install
-    osquery_setup
-
     # Throw an error if someone actually tries to rock both SSL choices.
     # Long-term, make this singular-ssl-option-only a requirement.
     if build.with?("libressl") && build.with?("openssl")

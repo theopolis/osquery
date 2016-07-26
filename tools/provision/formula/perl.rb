@@ -25,8 +25,6 @@ class Perl < AbstractOsqueryFormula
   depends_on "gdbm" => "with-libgdbm-compat" unless OS.mac?
 
   def install
-    osquery_setup
-
     args = %W[
       -des
       -Dprefix=#{prefix}

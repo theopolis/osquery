@@ -13,8 +13,6 @@ class Libudev < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     args = [
       "--disable-introspection",
       "--disable-gudev",

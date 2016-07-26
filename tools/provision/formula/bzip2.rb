@@ -16,8 +16,6 @@ class Bzip2 < AbstractOsqueryFormula
   keg_only :provided_by_osx
 
   def install
-    osquery_setup
-
     inreplace "Makefile", "$(PREFIX)/man", "$(PREFIX)/share/man"
     # Expect -fPIC for static library.
     inreplace "Makefile", "CFLAGS=", "CFLAGS=#{ENV.cflags} "

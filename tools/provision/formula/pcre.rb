@@ -34,8 +34,6 @@ class Pcre < AbstractOsqueryFormula
   depends_on "zlib" unless OS.mac?
 
   def install
-    osquery_setup
-
     ENV.universal_binary if build.universal?
 
     system "./autogen.sh" if build.head?

@@ -24,12 +24,31 @@ class AbstractOsqueryFormula < Formula
     ENV[name] = ENV.has_key?(name) ? value.to_s + ':' + ENV[name] : value.to_s
   end
 
-  def osquery_setup(*)
+  def self.method_added(name)
+    return unless /install/.match(name.to_s)
+    return if /inject/.match(name.to_s)
+    return if /hook/.match(name.to_s) or method_defined?("#{name}_hook_target")
+
+    hook = "def #{name}_hook\n setup_inject\n #{name}_hook_target\nend"
+    self.class_eval(hook)
+    target = "alias #{name}_hook_target #{name}"
+    self.class_eval(target)
+    inject_hook = "alias #{name} #{name}_hook"
+    self.class_eval(inject_hook)
+  end
+
+  def legacy
+    return Formula["glibc-legacy"]
+  end
+
+  def modern
+    return Formula["glibc"]
+  end
+
+  def setup_inject
     return if setup
 
     puts "Hello from setup osquery: #{name}"
-    legacy = Formula["glibc-legacy"]
-    modern = Formula["glibc"]
 
     # Reset compile flags for safety, we want to control them explicitly.
     reset "CFLAGS"
@@ -44,47 +63,28 @@ class AbstractOsqueryFormula < Formula
     reset "LIBRARY_PATH"
 
     if OS.linux? && !["glibc", "glibc-legacy"].include?(self.name)
-      puts "This is NOT a GLIBC install..."
       # The modern runtime is not brew-linked.
 
       prepend_path "LD_LIBRARY_PATH", lib
       prepend_path "LD_LIBRARY_PATH", prefix
 
       # Set the dynamic linker and library search path.
-      if ["gcc"].include?(self.name)
-        puts "This is a GCC install..."
+      prepend "CFLAGS", "-isystem#{HOMEBREW_PREFIX}/include"
 
-        # When building gcc, use the modern linker.
-        # append "LDFLAGS", "-Wl,--dynamic-linker=#{modern.lib}/ld-linux-x86-64.so.2"
-      else
-        #if ENV["CC"].include? "gcc"
-          # Otherwise, when building with gcc, use the legacy linker.
-          prepend "CFLAGS", "-isystem#{HOMEBREW_PREFIX}/include"
-        #end
+      # clang wants -L in the CFLAGS.
+      # Several projects do not want this: pcre, RocksDB
+      # These used to belong to !gcc but -lz wants the system libz.
+      prepend "CFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
+      prepend "CFLAGS", "-L#{legacy.lib}"
 
-        # clang wants -L in the CFLAGS.
-        # These used to belong to !gcc but -lz wants the system libz.
-        prepend "CFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
-        prepend "CFLAGS", "-L#{legacy.lib}"
+      # cmake wants this to have -I
+      prepend "CXXFLAGS", "-I#{HOMEBREW_PREFIX}/include"
+      prepend "CXXFLAGS", "-I#{legacy.include}"
 
-
-        #append "LDFLAGS", "-Wl,--dynamic-linker=#{legacy.lib}/ld-linux-x86-64.so.2"
-        #append "LDFLAGS", "-Wl,-rpath,#{legacy.lib}"
-
-        # cmake wants this to have -I
-        #prepend "CXXFLAGS", "-I/usr/local/osquery/Cellar/gcc/6.1.0/include/c++/6.1.0"
-        prepend "CXXFLAGS", "-I#{HOMEBREW_PREFIX}/include"
-        prepend "CXXFLAGS", "-I#{legacy.include}"
-      end
-
-      #if ENV["CC"].include? "gcc"
-        # This used to be in the GCC/not-GCC logic, pulling out to compile GCC
-        # Using the system compilers with legacy runtime.
-        prepend "CFLAGS", "-isystem#{legacy.include}"
-        prepend "CXXFLAGS", "-isystem#{legacy.include}"
-      #else
-      #  ENV.delete "CPPFLAGS"
-      #end
+      # This used to be in the GCC/not-GCC logic, pulling out to compile GCC
+      # Using the system compilers with legacy runtime.
+      prepend "CFLAGS", "-isystem#{legacy.include}"
+      prepend "CXXFLAGS", "-isystem#{legacy.include}"
 
       append "LDFLAGS", "-Wl,--dynamic-linker=#{legacy.lib}/ld-linux-x86-64.so.2"
       append "LDFLAGS", "-Wl,-rpath,#{legacy.lib}"
@@ -96,11 +96,6 @@ class AbstractOsqueryFormula < Formula
       # We want the legacy path to be the last thing prepended.
       prepend "LDFLAGS", "-L#{legacy.lib}"
 
-      # llvm does NOT want these with -isystem
-      # Regardless, always prefer the legacy system includes.
-      #prepend "CPPFLAGS", "-isystem#{HOMEBREW_PREFIX}/include"
-      #prepend "CPPFLAGS", "-isystem#{legacy.include}"
-
       prepend_path "LIBRARY_PATH", HOMEBREW_PREFIX/"lib"
       prepend_path "LIBRARY_PATH", legacy.lib
 
@@ -109,6 +104,10 @@ class AbstractOsqueryFormula < Formula
 
       # Set the search path for header files.
       prepend_path "CPATH", HOMEBREW_PREFIX/"include"
+    end
+
+    if !OS.linux?
+      prepend_path "PATH", HOMEBREW_PREFIX/"bin"
     end
 
     # Everyone receives:

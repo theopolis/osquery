@@ -22,8 +22,6 @@ class Ncurses < AbstractOsqueryFormula
   option :universal
 
   def install
-    osquery_setup
-
     ENV.universal_binary if build.universal?
 
     # Fix the build for GCC 5.1

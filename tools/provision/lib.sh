@@ -11,9 +11,13 @@
 # 2: Linux or Darwin
 function setup_brew() {
   if [[ "$2" == "linux" ]]; then
-    BREW=https://github.com/Linuxbrew/brew
+    BREW_REPO=https://github.com/Linuxbrew/brew
+    CORE_COMMIT=$LINUXBREW_CORE
+    DUPES_COMMIT=$LINUXBREW_DUPES
   else
-    BREW=https://github.com/Homebrew/brew
+    BREW_REPO=https://github.com/Homebrew/brew
+    CORE_COMMIT=$HOMEBREW_CORE
+    DUPES_COMMIT=$HOMEBREW_DUPES
   fi
 
   # Check if DEPS directory exists.
@@ -27,7 +31,7 @@ function setup_brew() {
   # Checkout new brew in local deps dir
   if [[ ! -d "$DEPS/.git" ]]; then
     log "setting up new brew in $DEPS"
-    git clone $BREW "$DEPS"
+    git clone $BREW_REPO "$DEPS"
     log "installing local tap: homebrew-osquery-local"
     mkdir -p "$DEPS/Library/Taps/osquery/"
     ln -sf "$FORMULA_DIR" "$DEPS/Library/Taps/osquery/homebrew-osquery-local" 
@@ -42,14 +46,14 @@ function setup_brew() {
   TAPS="$DEPS/Library/Taps/"
 
   # Grab full clone to perform a pin
-  log "installing homebre core"
+  log "installing homebrew core"
   $BREW tap homebrew/core --full
-  (cd $TAPS/homebrew/homebrew-core && git reset --hard $HOMEBREW_CORE)
+  (cd $TAPS/homebrew/homebrew-core && git reset --hard $CORE_COMMIT)
 
   # Need dupes for upzip.
   log "installing homebrew dupes"
   $BREW tap homebrew/dupes --full
-  (cd $TAPS/homebrew/homebrew-dupes && git reset --hard $HOMEBREW_DUPES)
+  (cd $TAPS/homebrew/homebrew-dupes && git reset --hard $DUPES_COMMIT)
 }
 
 # json_element JSON STRUCT
@@ -116,8 +120,11 @@ function local_brew_tool() {
   log "brew (build) tool $TOOL"
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    ARGS="$ARGS -vd --build-bottle --ignore-dependencies"
+    ARGS="$ARGS -v --build-bottle --ignore-dependencies"
     ARGS="$ARGS --env=inherit"
+    if [[ ! -z "$DEBUG" ]]; then
+      ARGS="$ARGS -d"
+    fi
   else
     ARGS="--ignore-dependencies --force-bottle"
   fi
@@ -139,8 +146,11 @@ function local_brew_dependency() {
   FROM_BOTTLE=false
   ARGS="$@"
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    ARGS="$ARGS -vd --build-bottle --cc=clang --ignore-dependencies"
+    ARGS="$ARGS -v --build-bottle --cc=clang --ignore-dependencies"
     ARGS="$ARGS --env=inherit"
+    if [[ ! -z "$DEBUG" ]]; then
+      ARGS="$ARGS -d"
+    fi
   else
     ARGS="--ignore-dependencies --force-bottle"
   fi

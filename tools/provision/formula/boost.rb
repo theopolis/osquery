@@ -39,8 +39,6 @@ class Boost < AbstractOsqueryFormula
   depends_on "bzip2" unless OS.mac?
 
   def install
-    osquery_setup
-
     ENV.cxx11
     ENV.universal_binary if build.universal?
 

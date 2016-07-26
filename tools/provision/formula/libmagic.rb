@@ -20,8 +20,6 @@ class Libmagic < AbstractOsqueryFormula
   option :universal
 
   def install
-    osquery_setup
-
     ENV.universal_binary if build.universal?
 
     # Clean up "src/magic.h" as per http://bugs.gw.com/view.php?id=330

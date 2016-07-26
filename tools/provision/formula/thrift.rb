@@ -35,8 +35,6 @@ class Thrift < AbstractOsqueryFormula
   depends_on :python => :optional
 
   def install
-    osquery_setup
-
     ENV.cxx11
     ENV["PY_PREFIX"] = prefix
 

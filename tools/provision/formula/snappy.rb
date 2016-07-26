@@ -25,8 +25,6 @@ class Snappy < AbstractOsqueryFormula
   depends_on "pkg-config" => :build
 
   def install
-    osquery_setup
-
     ENV.universal_binary if build.universal?
     ENV.j1 if build.stable?
 

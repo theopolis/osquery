@@ -31,8 +31,6 @@ class Yara < AbstractOsqueryFormula
   depends_on "openssl"
 
   def install
-    osquery_setup
-
     ENV.cxx11
 
     # Use of "inline" requires gnu89 semantics

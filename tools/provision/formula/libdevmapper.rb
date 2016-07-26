@@ -13,8 +13,6 @@ class Libdevmapper < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     # When building with LLVM/clang do not expect symbol versioning information.
     inreplace "lib/misc/lib.h", "defined(__GNUC__)", "defined(__GNUC__) && !defined(__clang__)"
 

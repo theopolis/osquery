@@ -16,8 +16,6 @@ class Lz4 < AbstractOsqueryFormula
   end
 
   def install
-    osquery_setup
-
     system "make", "install", "PREFIX=#{prefix}"
   end
 

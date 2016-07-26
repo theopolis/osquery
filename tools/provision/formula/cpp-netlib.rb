@@ -20,8 +20,6 @@ class CppNetlib < AbstractOsqueryFormula
   needs :cxx11
 
   def install
-    osquery_setup
-
     ENV.cxx11
 
     args = [

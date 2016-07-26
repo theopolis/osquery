@@ -28,8 +28,6 @@ class GlibcLegacy < AbstractOsqueryFormula
   keg_only "osquery runtime"
 
   def install
-    osquery_setup
-
     ENV["CFLAGS"] = "-U_FORTIFY_SOURCE -fno-stack-protector -O2"
 
     # osquery: Remove several environment variables

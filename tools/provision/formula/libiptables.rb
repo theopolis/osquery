@@ -15,8 +15,6 @@ class Libiptables < AbstractOsqueryFormula
   patch :DATA
 
   def install
-    osquery_setup
-
     args = [
       "--disable-shared",
     ]

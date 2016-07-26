@@ -21,8 +21,6 @@ class Rocksdb < AbstractOsqueryFormula
   fails_with :gcc
 
   def install
-    osquery_setup
-
     ENV.cxx11
 
     ENV["PORTABLE"] = "1"
