@@ -158,7 +158,6 @@ function platform_linux_main() {
   brew_tool mpfr
   brew_tool libmpc
   brew_tool isl
-  brew_tool berkeley-db
 
   # GCC 5x.
   local_brew_tool gcc --with-glibc-legacy --without-fortran
@@ -238,6 +237,9 @@ function platform_linux_main() {
   local_brew_dependency libudev
   local_brew_dependency libaudit
   local_brew_dependency libdpkg
+
+  #brew_tool berkeley-db
+  local_brew_dependency librpm -vd
 
   ## The following section is a work in progress for librpm.
   # This will need NSS and NSPR
