@@ -30,9 +30,11 @@ Include line-delimited switches to be interpreted and used as CLI-flags:
 --config_plugin=custom_plugin
 --logger_plugin=custom_plugin
 --distributed_plugin=custom_plugin
---watchlog_level=2
 ```
 
+On Linux the flagfile path: `/etc/osquery/osquery.flags` is set within the service/systemd configuration.
+
+On OS X the flagfile path: `/var/osquery/osquery.flags` is set within the LaunchDaemon config.
 
 ### Configuration control flags
 
@@ -72,8 +74,7 @@ Disable userland watchdog process. **osqueryd** uses a watchdog process to monit
 
 `--watchdog_level=1`
 
-Performance limit level (0=loose, 1=normal, 2=restrictive, 3=debug). The default watchdog process uses a "level" to configure performance limits.
-The higher the level the more strict the limits become. The "debug" level disables the performance limits completely.
+Performance limit level (0=normal, 1=restrictive, -1=off). The default watchdog process uses a "level" to configure performance limits. The higher the level the more strict the limits become. The "debug" level disables the performance limits completely.
 
 `--utc=false`
 
