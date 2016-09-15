@@ -3,8 +3,9 @@ require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
 class Libdevmapper < AbstractOsqueryFormula
   desc "Device Mapper development"
   homepage "https://www.sourceware.org/dm/"
-  url "https://osquery-packages.s3.amazonaws.com/deps/LVM2.2.02.145.tar.gz"
+  url "ftp://sources.redhat.com/pub/lvm2/releases/LVM2.2.02.165.tgz"
   sha256 "98b7c4c07c485a462c6a86e1a5265757133ceea36289ead8a419af29ef39560b"
+  version "2.02.165"
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

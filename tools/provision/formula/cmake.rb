@@ -50,7 +50,7 @@ class Cmake < AbstractOsqueryFormula
       args << "--sphinx-man" << "--sphinx-build=#{Formula["sphinx-doc"].opt_bin}/sphinx-build"
     end
 
-    ENV.append "CXXFLAGS", "-L#{legacy.lib}"
+    ENV.append "CXXFLAGS", "-L#{legacy_prefix}/lib"
 
     system "./bootstrap", *args
     system "make"

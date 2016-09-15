@@ -1,9 +1,9 @@
 require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
 
 class Libiptables < AbstractOsqueryFormula
-  desc "Device Mapper development"
+  desc "Netfilter/iptables development"
   homepage "http://netfilter.samba.org/"
-  url "https://osquery-packages.s3.amazonaws.com/deps/iptables-1.4.21.tar.gz"
+  url "http://ftp.netfilter.org/pub/iptables/iptables-1.6.0.tar.bz2"
   sha256 "ce1335c91764dc87a26978bd3725c510c2564853184c6e470e0a0f785f420f89"
 
   bottle do

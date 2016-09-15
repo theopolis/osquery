@@ -33,6 +33,16 @@ function setup_brew() {
   # Create a local cache directory
   mkdir -p "$DEPS/.cache"
 
+  # Create a 'legacy' mirror.
+  if [[ -L "$DEPS/legacy" ]]; then
+    # Backwards compatibility for legacy environment.
+    rm -f "$DEPS/legacy"
+    mkdir -p "$DEPS/legacy"
+    local_brew_link glibc-legacy
+  elif [[ ! -d "$DEPS/legacy" ]]; then
+    mkdir -p "$DEPS/legacy"
+  fi
+
   # Always update the location of the local tap link.
   log "refreshing local tap: homebrew-osquery-local"
   mkdir -p "$DEPS/Library/Taps/osquery/"

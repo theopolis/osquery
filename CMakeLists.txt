@@ -66,6 +66,10 @@ if(NOT WIN32)
     -Wformat-security
     -Werror=format-security
     -Wabi-tag
+    -Wwrite-strings
+    -Wcast-qual
+    -Wno-long-long
+    -Wdelete-non-virtual-dtor
     -fpermissive
     -fstack-protector-all
     -pipe
