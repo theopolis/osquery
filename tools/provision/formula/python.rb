@@ -6,6 +6,7 @@ class Python < AbstractOsqueryFormula
   url "https://www.python.org/ftp/python/2.7.12/Python-2.7.12.tar.xz"
   sha256 "d7837121dd5652a05fef807c361909d255d173280c4e1a4ded94d73d80a1f978"
   head "https://hg.python.org/cpython", :using => :hg, :branch => "2.7"
+  revision 1
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -146,7 +147,7 @@ class Python < AbstractOsqueryFormula
     inreplace "setup.py" do |s|
       s.gsub! "do_readline = self.compiler.find_library_file(lib_dirs, 'readline')",
               "do_readline = '#{Formula["readline"].opt_lib}/libhistory.dylib'"
-      s.gsub! "/usr/local/ssl", Formula["libressl"].opt_prefix
+      s.gsub! "/usr/local/ssl", HOMEBREW_PREFIX
       s.gsub! "/usr/include/db4", Formula["berkeley-db4"].opt_include
     end
 
@@ -182,6 +183,10 @@ class Python < AbstractOsqueryFormula
     args << "LDFLAGS=#{ldflags.join(" ")}" unless ldflags.empty?
     args << "CPPFLAGS=#{cppflags.join(" ")}" unless cppflags.empty?
 
+    # Remove the site-packages that Python created in its Cellar.
+    rm_rf Dir[site_packages]
+    rm_rf Dir[site_packages_cellar]
+
     system "./configure", *args
 
     # HAVE_POLL is "broken" on OS X. See:
@@ -211,9 +216,6 @@ class Python < AbstractOsqueryFormula
         "-u _PyMac_Error $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)"
     end if OS.mac?
 
-    # Remove the site-packages that Python created in its Cellar.
-    site_packages_cellar.rmtree
-
     (libexec/"setuptools").install resource("setuptools")
     (libexec/"pip").install resource("pip")
     (libexec/"wheel").install resource("wheel")
@@ -227,8 +229,8 @@ class Python < AbstractOsqueryFormula
     site_packages.mkpath
 
     # Symlink the prefix site-packages into the cellar.
-    site_packages_cellar.unlink if site_packages_cellar.exist?
-    site_packages_cellar.parent.install_symlink site_packages
+    # site_packages_cellar.unlink if site_packages_cellar.exist?
+    # site_packages_cellar.parent.install_symlink site_packages
 
     # Write our sitecustomize.py
     rm_rf Dir["#{site_packages}/sitecustomize.py[co]"]
@@ -260,8 +262,8 @@ class Python < AbstractOsqueryFormula
     end
 
     # Help distutils find brewed stuff when building extensions
-    include_dirs = [HOMEBREW_PREFIX/"include", Formula["libressl"].opt_include]
-    library_dirs = [HOMEBREW_PREFIX/"lib", Formula["libressl"].opt_lib]
+    include_dirs = [HOMEBREW_PREFIX/"include"]
+    library_dirs = [HOMEBREW_PREFIX/"lib"]
 
     if build.with? "sqlite"
       include_dirs << Formula["sqlite"].opt_include
@@ -312,7 +314,7 @@ class Python < AbstractOsqueryFormula
           sys.path = [p for p in sys.path if not p.startswith(library_site) and
                                              not p.startswith('/System')]
           # .pth files have already been processed so don't use addsitedir
-          sys.path.extend(library_packages)
+          # sys.path.extend(library_packages)
 
           # the Cellar site-packages is a symlink to the HOMEBREW_PREFIX
           # site_packages; prefer the shorter paths
@@ -330,7 +332,7 @@ class Python < AbstractOsqueryFormula
               pass  # remember: don't print here. Better to fail silently.
 
           # Set the sys.executable to use the opt_prefix
-          sys.executable = '#{opt_bin}/python2.7'
+          # sys.executable = '#{HOMEBREW_PREFIX}/bin/python2.7'
     EOF
   end
 

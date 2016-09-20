@@ -129,7 +129,7 @@ function brew_internal() {
   ARGS="$@"
 
   if [[ "$TYPE" = "uninstall" ]]; then
-    if [[ ! "$INFO" = "" ]]; then
+    if [[ ! "$INSTALLED" = "NAN" ]]; then
       log "brew package $TOOL uninstalling version: ${STABLE}"
       $BREW uninstall --force "${FORMULA}"
     fi

@@ -126,6 +126,7 @@ function main() {
   export LIBRARY_PATH="$DEPS_DIR/legacy/lib:$DEPS_DIR/lib:$LIBRARY_PATH"
 
   # Pip may have just been installed.
+  export PYTHONPATH="$DEPS_DIR/lib/python2.7/site-packages"
   log "upgrading pip and installing python dependencies"
   PIP=`which pip`
   $PIP install --upgrade pip

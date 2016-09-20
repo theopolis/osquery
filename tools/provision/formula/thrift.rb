@@ -25,7 +25,7 @@ class Thrift < AbstractOsqueryFormula
   def install
     ENV.cxx11
     ENV["PY_PREFIX"] = prefix
-    ENV.append "CXXFLAGS", "-DOPENSSL_NO_SSL3"
+    ENV.append "CPPFLAGS", "-DOPENSSL_NO_SSL3"
 
     exclusions = [
       "--without-ruby",

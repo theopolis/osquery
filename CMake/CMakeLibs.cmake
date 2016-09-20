@@ -97,8 +97,6 @@ macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
   set(LINK_PATHS_SYSTEM
     ${LINK_PATHS}
     "${BUILD_DEPS}/legacy/lib"
-    # Allow the build to search the default deps include for libz.
-    "${BUILD_DEPS}/lib"
     ${OS_LIB_DIRS}
   )
 
