@@ -20,7 +20,7 @@ class Curl < AbstractOsqueryFormula
   option "with-c-ares", "Build with C-Ares async DNS support"
   option "with-gssapi", "Build with GSSAPI/Kerberos authentication support."
   option "with-libmetalink", "Build with libmetalink support."
-  option "with-libressl", "Build with LibreSSL instead of Secure Transport or OpenSSL"
+  option "without-libressl", "Build with LibreSSL instead of Secure Transport or OpenSSL"
   option "with-nghttp2", "Build with HTTP/2 support (requires OpenSSL or LibreSSL)"
 
   deprecated_option "with-idn" => "with-libidn"

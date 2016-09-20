@@ -184,11 +184,8 @@ function platform_linux_main() {
   brew_tool makedepend
   brew_tool libidn
 
-  # Build a bottle for perl and openssl.
-  # OpenSSL is needed for the final build.
-  # local_brew_tool perl -vd --without-test
-  local_brew_tool openssl
-  local_brew_link openssl
+  # Curl and Python need an OpenSSL implementation.
+  local_brew_tool libressl
 
   # LLVM dependencies.
   brew_tool libxml2
@@ -259,8 +256,8 @@ function platform_darwin_main() {
   brew_tool makedepend
   brew_tool clang-format
 
-  local_brew_dependency openssl --without-test
-  local_brew_link openssl
+  local_brew_uninstall openssl
+  local_brew_tool libressl
 
   brew_tool pkg-config
   brew_tool autoconf

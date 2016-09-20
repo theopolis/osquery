@@ -15,7 +15,7 @@ class CppNetlib < AbstractOsqueryFormula
   end
 
   depends_on "cmake" => :build
-  depends_on "openssl"
+  depends_on "libressl"
 
   needs :cxx11
 

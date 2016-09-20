@@ -19,7 +19,7 @@ class Asio < AbstractOsqueryFormula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
 
-  depends_on "openssl"
+  depends_on "libressl"
 
   def install
     ENV.cxx11
