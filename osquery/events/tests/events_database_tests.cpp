@@ -20,13 +20,17 @@
 #include <osquery/system.h>
 #include <osquery/tables.h>
 
+#include <osquery/logger.h>
+
 namespace osquery {
 
 DECLARE_uint64(events_expiry);
 DECLARE_uint64(events_max);
 
 class EventsDatabaseTests : public ::testing::Test {
-  void SetUp() override { Registry::registry("config_parser")->setUp(); }
+  void SetUp() override {
+    Registry::registry("config_parser")->setUp();
+  }
 };
 
 class DBFakeEventPublisher
@@ -36,7 +40,9 @@ class DBFakeEventPublisher
 
 class DBFakeEventSubscriber : public EventSubscriber<DBFakeEventPublisher> {
  public:
-  DBFakeEventSubscriber() { setName("DBFakeSubscriber"); }
+  DBFakeEventSubscriber() {
+    setName("DBFakeSubscriber");
+  }
   /// Add a fake event at time t
   Status testAdd(int t) {
     Row r;
@@ -109,6 +115,7 @@ TEST_F(EventsDatabaseTests, test_record_indexing) {
 
 TEST_F(EventsDatabaseTests, test_record_range) {
   auto sub = std::make_shared<DBFakeEventSubscriber>();
+  sub->testAdd(60);
 
   // Search within a specific record range.
   auto indexes = sub->getIndexes(0, 10);
@@ -116,10 +123,22 @@ TEST_F(EventsDatabaseTests, test_record_range) {
   EXPECT_EQ(records.size(), 2U); // 1, 2
 
   // Search within a large bound.
-  indexes = sub->getIndexes(3, 3601);
+  indexes = sub->getIndexes(3, -1);
   // This will include the 0-10 bucket meaning 1, 2 will show up.
   records = sub->getRecords(indexes);
   EXPECT_EQ(records.size(), 5U); // 1, 2, 11, 61, 3601
+
+  for (size_t j = 0; j < 30; j++) {
+    sub->testAdd(110 + j);
+  }
+
+  // Search within a large bound.
+  indexes = sub->getIndexes(110, -1);
+  // This will include the 0-10 bucket meaning 1, 2 will show up.
+  records = sub->getRecords(indexes);
+  for (const auto& record : records) {
+    LOG(INFO) << record.second;
+  }
 
   // Get all of the records.
   indexes = sub->getIndexes(0, 3 * 3600);
@@ -208,8 +227,8 @@ TEST_F(EventsDatabaseTests, test_gentable) {
   // The optimize time should have been written to the database.
   // It should be the same as the current (relative) optimize time.
   std::string content;
-  getDatabaseValue("events", "optimize.DBFakePublisher.DBFakeSubscriber",
-                   content);
+  getDatabaseValue(
+      "events", "optimize.DBFakePublisher.DBFakeSubscriber", content);
   EXPECT_EQ(std::to_string(sub->optimize_time_), content);
 
   keys.clear();

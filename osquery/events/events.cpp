@@ -97,7 +97,6 @@ QueryData EventSubscriberPlugin::genTable(QueryContext& context) {
     auto index_key = "optimize." + dbNamespace();
     setDatabaseValue(kEvents, index_key, std::to_string(optimize_time_));
   }
-
   return get(start, stop);
 }
 
@@ -164,7 +163,11 @@ std::set<std::string> EventSubscriberPlugin::getIndexes(EventTime start,
         start = (start / size) * size;
         start_max = ((start / size) + 1) * size;
         if (start_max < stop) {
-          start_max = start + kEventTimeLists[types - 2];
+          start_max = local_start; //= start + kEventTimeLists[types - 2];
+          printf("k start_max(%d) = start(%d) + kETL(%d)\n",
+                 start_max,
+                 start,
+                 kEventTimeLists[types - 2]);
         }
       }
 
@@ -173,6 +176,7 @@ std::set<std::string> EventSubscriberPlugin::getIndexes(EventTime start,
         stop_min = (stop / size) * size;
         if (stop_min > start) {
           stop_min = stop_min - kEventTimeLists[types - 1];
+          printf("l\n");
         }
       }
     } else if (list_key > 0 || types == 1) {
@@ -180,6 +184,8 @@ std::set<std::string> EventSubscriberPlugin::getIndexes(EventTime start,
       start = (start / size) * size;
       start_max = ((start_max / size) + 1) * size;
     }
+
+    // printf("")
 
     // (1) The first iteration will have 1 range (start to start_max=stop).
     // (2) Intermediate iterations will have 2 (start-start_max, stop-stop_min).
@@ -204,9 +210,16 @@ std::set<std::string> EventSubscriberPlugin::getIndexes(EventTime start,
         }
       }
 
+      printf("start_bin=%d start=%d stop_bin=%d start_max=%d\n",
+             bin_start,
+             start,
+             bin_stop,
+             start_max);
       if (bin_start >= start && bin_stop <= start_max) {
+        printf("a %s\n", bin.c_str());
         bins.push_back(bin);
       } else if ((bin_start >= stop_min && bin_stop <= stop) || stop == 0) {
+        printf("b %s\n", bin.c_str());
         bins.push_back(bin);
       }
     }
@@ -222,6 +235,11 @@ std::set<std::string> EventSubscriberPlugin::getIndexes(EventTime start,
       start_max = (local_start < start_max) ? local_start : start_max;
       local_stop = (timeFromRecord(bins.back()) + 1) * size;
       stop_min = (local_stop < stop_min) ? local_stop : stop_min;
+      printf("local_start=%d start_max=%d local_stop=%d stop_min=%d\n",
+             local_start,
+             start_max,
+             local_stop,
+             stop_min);
     }
 
     for (const auto& bin : bins) {
@@ -352,6 +370,7 @@ std::vector<EventRecord> EventSubscriberPlugin::getRecords(
 
   std::vector<EventRecord> records;
   for (const auto& index : indexes) {
+    printf("i %s\n", index.c_str());
     std::vector<std::string> bin_records;
     {
       std::string record_value;
@@ -369,8 +388,15 @@ std::vector<EventRecord> EventSubscriberPlugin::getRecords(
     // Iterate over every 2 items: EID:TIME.
     for (; bin_it != bin_records.end(); bin_it++) {
       const auto& eid = *bin_it;
-      EventTime time = timeFromRecord(*(++bin_it));
-      records.push_back(std::make_pair(eid, time));
+      EventTime et = timeFromRecord(*(++bin_it));
+      if (FLAGS_events_optimize && et <= optimize_time_ + 1) {
+        // There is an optimization collision, check for colliding IDs.
+        auto eidr = timeFromRecord(eid);
+        if (eidr <= optimize_eid_) {
+          continue;
+        }
+      }
+      records.push_back(std::make_pair(eid, et));
     }
   }
 
@@ -480,6 +506,18 @@ QueryData EventSubscriberPlugin::get(EventTime start, EventTime stop) {
     if (record.second >= start && (record.second <= stop || stop == 0)) {
       mapped_records.push_back(events_key + "." + record.first);
     }
+    printf("%s %d %s\n",
+           record.first.c_str(),
+           record.second,
+           (record.second % 60 == 0) ? "ping" : "");
+  }
+
+  if (FLAGS_events_optimize && !records.empty()) {
+    // If records were returned save the ordered-last as the optimization EID.
+    unsigned long int eidr = 0;
+    if (safeStrtoul(records.back().first, 10, eidr)) {
+      optimize_eid_ = static_cast<size_t>(eidr);
+    }
   }
 
   // Select mapped_records using event_ids as keys.
@@ -503,6 +541,7 @@ QueryData EventSubscriberPlugin::get(EventTime start, EventTime stop) {
     // Index retrieval will apply the constraints checking and auto-expire.
     expire_time_ = getUnixTime() - getEventsExpiry();
   }
+
   return results;
 }
 
@@ -510,7 +549,11 @@ Status EventSubscriberPlugin::add(Row& r, EventTime event_time) {
   // Get and increment the EID for this module.
   EventID eid = getEventID();
   // Without encouraging a missing event time, do not support a 0-time.
-  r["time"] = std::to_string((event_time == 0) ? getUnixTime() : event_time);
+  if (event_time == 0) {
+    event_time = getUnixTime();
+  }
+
+  r["time"] = std::to_string(event_time);
   // Serialize and store the row data, for query-time retrieval.
   std::string data;
   auto status = serializeRowJSON(r, data);
@@ -756,6 +799,13 @@ Status EventFactory::registerEventSubscriber(const PluginRef& sub) {
       long long optimize_time = 0;
       safeStrtoll(content, 10, optimize_time);
       specialized_sub->optimize_time_ = static_cast<EventTime>(optimize_time);
+    }
+
+    index_key = "optimize_id." + specialized_sub->dbNamespace();
+    if (getDatabaseValue(kEvents, index_key, content)) {
+      long long optimize_id = 0;
+      safeStrtoll(content, 10, optimize_id);
+      specialized_sub->optimize_eid_ = static_cast<size_t>(optimize_id);
     }
   }
 

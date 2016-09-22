@@ -46,7 +46,8 @@ TEST_F(SyslogTests, test_populate_event_context) {
 
   // Too few fields
 
-  std::string bad_line = R"("2016-03-22T21:17:01.701882+00:00","vagrant-ubuntu-trusty-64","6","cron",)";
+  std::string bad_line =
+      R"("2016-03-22T21:17:01.701882+00:00","vagrant-ubuntu-trusty-64","6","cron",)";
   ec = pub.createEventContext();
   status = pub.populateEventContext(bad_line, ec);
   ASSERT_FALSE(status.ok());
@@ -58,15 +59,6 @@ TEST_F(SyslogTests, test_populate_event_context) {
   status = pub.populateEventContext(bad_line, ec);
   ASSERT_FALSE(status.ok());
   ASSERT_NE(std::string::npos, status.getMessage().find("more"));
-}
-
-TEST_F(SyslogTests, test_parse_time_string) {
-  ASSERT_EQ((time_t)0,
-            SyslogEventPublisher::parseTimeString("1970-01-01T00:00:00.000000+00:00"));
-  ASSERT_EQ((time_t)1458927568,
-            SyslogEventPublisher::parseTimeString("2016-03-25T17:39:28.717070+00:00"));
-  ASSERT_EQ((time_t)1483228799,
-            SyslogEventPublisher::parseTimeString("2016-12-31T23:59:59.999000+00:00"));
 }
 
 TEST_F(SyslogTests, test_csv_separator) {
