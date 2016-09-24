@@ -280,6 +280,9 @@ function platform_darwin_main() {
   local_brew_tool cppcheck
   local_brew_tool ccache
 
+  # Secondary dependencies
+  local_brew_dependency libxml2
+
   # List of LLVM-compiled dependencies.
   local_brew_dependency boost
   local_brew_dependency asio

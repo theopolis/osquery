@@ -84,6 +84,9 @@ if(APPLE OR LINUX)
   file(GLOB OSQUERY_CROSS_EVENTS_TABLES "events/*.cpp")
 
   ADD_OSQUERY_LINK_ADDITIONAL("augeas fa xml2")
+  if(APPLE)
+    ADD_OSQUERY_LINK_ADDITIONAL("libiconv")
+  endif()
 else()
   # TODO: When we have Windows events, fill this in
   set(OSQUERY_CROSS_EVENTS_TABLES "")

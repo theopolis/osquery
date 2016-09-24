@@ -21,11 +21,13 @@ class Libxml2 < AbstractOsqueryFormula
       system "./autogen.sh"
     end
 
+    args = []
+    args << "--with-zlib=#{legacy_prefix}" if OS.linux?
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--without-python",
                           "--without-lzma",
-                          "--with-zlib=#{legacy_prefix}"
+                          *args
     system "make"
     ENV.deparallelize
     system "make", "install"
