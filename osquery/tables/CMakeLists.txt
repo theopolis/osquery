@@ -107,6 +107,9 @@ if(NOT WINDOWS)
     ${OSQUERY_CROSS_FORENSIC_TABLES}
     ${OSQUERY_POSIX_SYSTEM_TABLES}
   )
+
+  file(GLOB OSQUERY_POSIX_TABLES_TESTS "*/posix/tests/*.cpp")
+  ADD_OSQUERY_TABLE_TEST(${OSQUERY_POSIX_TABLES_TESTS})
 endif()
 
 # No cross-platform application tables yet.
