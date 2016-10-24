@@ -34,7 +34,7 @@ cp -R include/osquery "$SYNC_DIR"
 for file in $BUILD_DIR/generated/*.cpp; do
   cp "$file" "$SYNC_DIR/osquery/generated/";
 done
-cp osquery.thrift "$SYNC_DIR/osquery/extensions"
+cp osquery.thrift "$SYNC_DIR/extensions.thrift"
 rm -rf "$SYNC_DIR/osquery/examples"
 
 # delete all of the old CMake files

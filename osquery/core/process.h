@@ -214,7 +214,7 @@ int platformGetUid();
 /// Causes the current thread to sleep for a specified time in milliseconds.
 void sleepFor(size_t msec);
 
-/// Set the enviroment variable name with value value.
+/// Set the environment variable name with value value.
 bool setEnvVar(const std::string& name, const std::string& value);
 
 /// Unsets the environment variable specified by name.
