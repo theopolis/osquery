@@ -187,15 +187,19 @@ function platform_linux_main() {
   # Build a bottle for perl and openssl.
   # OpenSSL is needed for the final build.
   # local_brew_tool perl -vd --without-test
+  brew_clean curl
   local_brew_tool openssl
+  local_brew_postinstall openssl
   local_brew_link openssl
 
   # LLVM dependencies.
-  brew_tool libxml2
   brew_tool libedit
   brew_tool libtool
   brew_tool m4
   brew_tool bison
+
+  # LLVM dependencies and osquery dependencies.
+  local_brew_tool libxml2
 
   # More LLVM dependencies.
   brew_tool autoconf
@@ -206,9 +210,6 @@ function platform_linux_main() {
   local_brew_tool python
   local_brew_postinstall python
   local_brew_tool cmake --without-docs
-  local_brew_tool zzuf
-  local_brew_tool cppcheck
-  local_brew_tool ccache
 
   # Linux library secondary dependencies.
   local_brew_tool berkeley-db
@@ -222,22 +223,11 @@ function platform_linux_main() {
   # General Linux dependencies.
   local_brew_dependency util-linux
 
-  # Install custom formulas, build with LLVM/clang.
-  local_brew_dependency boost
-  local_brew_dependency asio
-  local_brew_dependency cpp-netlib
-  local_brew_dependency google-benchmark
-  local_brew_dependency pcre
-  local_brew_dependency lz4
-  local_brew_dependency snappy
-  local_brew_dependency sleuthkit
-  local_brew_dependency libmagic
-  local_brew_dependency thrift
-  local_brew_dependency rocksdb
-  local_brew_dependency gflags
-  local_brew_dependency aws-sdk-cpp
-  local_brew_dependency yara
-  local_brew_dependency glog
+  platform_posix_main
+
+  local_brew_tool zzuf
+  local_brew_tool cppcheck
+  local_brew_tool ccache
 
   # Linux specific custom formulas.
   local_brew_dependency libgpg-error
@@ -262,28 +252,33 @@ function platform_darwin_main() {
   brew_tool makedepend
   brew_tool clang-format
 
-  local_brew_dependency openssl --without-test
+  local_brew_dependency openssl
+  local_brew_postinstall openssl
   local_brew_link openssl
+
+  local_brew_dependency libxml2
 
   brew_tool pkg-config
   brew_tool autoconf
   brew_tool automake
   brew_tool libtool
-  brew_tool m4
   brew_tool bison
   brew_link bison
 
   local_brew_tool python
   local_brew_postinstall python
   local_brew_tool cmake --without-docs
+
+  platform_posix_main
+
   local_brew_tool zzuf
   local_brew_tool cppcheck
   local_brew_tool ccache
+}
 
-  # Secondary dependencies
-  local_brew_dependency libxml2
-
+function platform_posix_main() {
   # List of LLVM-compiled dependencies.
+  local_brew_dependency linenoise-ng
   local_brew_dependency boost
   local_brew_dependency asio
   local_brew_dependency cpp-netlib
@@ -299,6 +294,7 @@ function platform_darwin_main() {
   local_brew_dependency aws-sdk-cpp
   local_brew_dependency yara
   local_brew_dependency glog
+  local_brew_dependency augeas
 }
 
 check $1 "$2"
