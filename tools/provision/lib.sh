@@ -113,11 +113,7 @@ function brew_internal() {
   shift
   shift
 
-  if [[ "$TYPE" = "upstream" || "$TYPE" = "upstream-link" || "$TYPE" = "uninstall" ]]; then
-    FORMULA="$TOOL"
-  else
-    FORMULA="osquery/homebrew-osquery-local/${TOOL}"
-  fi
+  FORMULA="$TOOL"
   INFO=`$BREW info --json=v1 "${FORMULA}"`
   INSTALLED=$(json_element "${INFO}" 'obj[0]["installed"][0]["version"]')
   STABLE=$(json_element "${INFO}" 'obj[0]["versions"]["stable"]')
@@ -140,7 +136,7 @@ function brew_internal() {
 
   # Configure additional arguments if installing from a local formula.
   ARGS="$ARGS --ignore-dependencies --env=inherit"
-  if [[ ! "$TYPE" = "upstream" ]]; then
+  if [[ "$FORMUA" == "osquery-local"* ]]; then
     if [[ -z "$OSQUERY_BUILD_DEPS" ]]; then
       ARGS="$ARGS --force-bottle"
     else
@@ -157,7 +153,7 @@ function brew_internal() {
   fi
 
   # If linking, only link if not linked and return immediately.
-  if [[ "$TYPE" = "link" || "$TYPE" = "upstream-link" ]]; then
+  if [[ "$TYPE" = "link" ]]; then
     if [[ ! "$LINKED" = "$STABLE" ]]; then
       $BREW link --force "${FORMULA}"
     fi
@@ -172,7 +168,7 @@ function brew_internal() {
   fi
 
   export HOMEBREW_OPTIMIZATION_LEVEL=-Os
-  if [[ ! -z "$OSQUERY_BUILD_BOTTLES" && ! "$TYPE" = "upstream" ]]; then
+  if [[ ! -z "$OSQUERY_BUILD_BOTTLES" && "$FORMULA" == "osquery-local"* ]]; then
     $BREW bottle --skip-relocation "${FORMULA}"
   elif [[ "$TYPE" = "clean" ]]; then
     if [[ ! "${INSTALLED}" = "${STABLE}" ]]; then
@@ -191,24 +187,24 @@ function brew_internal() {
   fi
 }
 
-function local_brew_tool() {
+function brew_tool() {
   brew_internal "tool" $@
 }
 
-function local_brew_dependency() {
+function brew_dependency() {
   # Essentially uses clang instead of GCC.
   brew_internal "dependency" $@
 }
 
-function local_brew_link() {
+function brew_link() {
   brew_internal "link" $@
 }
 
-function local_brew_unlink() {
+function brew_unlink() {
   brew_internal "unlink" $@
 }
 
-function local_brew_uninstall() {
+function brew_uninstall() {
   brew_internal "uninstall" $@
 }
 
@@ -217,23 +213,15 @@ function brew_clean() {
   brew_internal "clean" $@
 }
 
-function brew_tool() {
-  brew_internal "upstream" $@
-}
-
-function brew_link() {
-  brew_internal "upstream-link" $@
-}
-
 function brew_bottle() {
   TOOL=$1
-  $BREW bottle --skip-relocation "${FORMULA_TAP}/${TOOL}.rb"
+  $BREW bottle --skip-relocation "${TOOL}"
 }
 
-function local_brew_postinstall() {
+function brew_postinstall() {
   TOOL=$1
   if [[ ! -z "$OSQUERY_BUILD_DEPS" ]]; then
-    $BREW postinstall "${FORMULA_TAP}/${TOOL}.rb"
+    $BREW postinstall "${TOOL}"
   fi
 }
 

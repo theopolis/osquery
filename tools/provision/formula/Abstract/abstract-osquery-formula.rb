@@ -145,6 +145,9 @@ class AbstractOsqueryFormula < Formula
 
     prepend_path "PKG_CONFIG_PATH", legacy_prefix/"lib/pkgconfig"
 
+    # For flex/yacc
+    # append "BISON_PKGDATADIR", Formula["bison"].prefix/"share/bison"
+
     self.audit
     reset "DEBUG"
   end

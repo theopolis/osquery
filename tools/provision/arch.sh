@@ -17,5 +17,7 @@ function distro_main() {
   package xz
   package ruby
   package bzip2
+  package bison
+  package flex
 }
 
