@@ -79,6 +79,7 @@ class AbstractOsqueryFormula < Formula
     # Reset compile flags for safety, we want to control them explicitly.
     reset "CFLAGS"
     reset "CXXFLAGS"
+    reset "CPPFLAGS"
 
     # Reset the following since the logic within the 'std' environment does not
     # known about our legacy runtime 'glibc' formula name.
