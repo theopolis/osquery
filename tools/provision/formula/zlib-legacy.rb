@@ -5,6 +5,7 @@ class ZlibLegacy < AbstractOsqueryFormula
   homepage "http://www.zlib.net/"
   url "https://github.com/madler/zlib/archive/v1.2.3.tar.gz"
   sha256 "2134178c123ea8252fd6afc9b794d9a2df480ccd030cc5db720a41883676fc2e"
+  revision 1
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -32,6 +33,25 @@ class ZlibLegacy < AbstractOsqueryFormula
     system "./configure", "--prefix=#{prefix}", "--shared"
     system "make"
     system "make", "install"
+
+    mkdir_p "#{legacy_prefix}/lib/pkgconfig"
+    config = Pathname.new("#{prefix}/lib/pkgconfig/zlib.pc")
+    config.write <<-EOS.undent
+      prefix=#{prefix}
+      exec_prefix=\$\{prefix\}
+      libdir=\$\{exec_prefix\}/lib
+      sharedlibdir=\$\{libdir\}
+      includedir=\$\{prefix\}/include
+
+      Name: zlib
+      Description: zlib compression library
+      Version: #{version}
+
+      Requires:
+      Libs: -L\$\{libdir\} -L\$\{sharedlibdir\} -lz
+      Cflags: -I\$\{includedir\}
+    EOS
+
   end
 
   test do

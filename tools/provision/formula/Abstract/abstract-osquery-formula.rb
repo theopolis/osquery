@@ -143,6 +143,8 @@ class AbstractOsqueryFormula < Formula
     append "CFLAGS", "-fPIC -DNDEBUG -Os -march=core2"
     append "CXXFLAGS", "-fPIC -DNDEBUG -Os -march=core2"
 
+    prepend_path "PKG_CONFIG_PATH", legacy_prefix/"lib/pkgconfig"
+
     self.audit
     reset "DEBUG"
   end
@@ -161,5 +163,6 @@ class AbstractOsqueryFormula < Formula
     puts ":: LD_LIBRARY_PATH : " + ENV["LD_LIBRARY_PATH"].to_s
     puts ":: LIBRARY_PATH    : " + ENV["LIBRARY_PATH"].to_s
     puts ":: LD_RUN_PATH     : " + ENV["LD_RUN_PATH"].to_s
+    puts ":: PKG_CONFIG_PATH : " + ENV["PKG_CONFIG_PATH"].to_s
   end
 end
