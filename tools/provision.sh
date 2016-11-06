@@ -196,9 +196,9 @@ function platform_linux_main() {
   brew_tool libedit
   brew_tool libtool
   brew_tool m4
-  brew_tool bison
 
   # LLVM dependencies and osquery dependencies.
+  local_brew_tool bison
   local_brew_tool libxml2
 
   # More LLVM dependencies.
@@ -262,9 +262,8 @@ function platform_darwin_main() {
   brew_tool autoconf
   brew_tool automake
   brew_tool libtool
-  brew_tool bison
-  brew_link bison
 
+  local_brew_tool bison
   local_brew_tool python
   local_brew_postinstall python
   local_brew_tool cmake --without-docs
