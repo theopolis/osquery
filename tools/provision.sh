@@ -86,7 +86,7 @@ function platform_linux_main() {
   brew_tool libedit
   brew_tool libtool
   brew_tool m4
-  brew_clean bison
+  brew_uninstall bison
   #brew_tool bison
   #brew_tool flex
   #brew_clean bison
