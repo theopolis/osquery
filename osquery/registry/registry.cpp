@@ -42,13 +42,14 @@ InitializerMap& plugin_initializer() {
 
 void registerRegistry(InitializerInterface* const item) {
   if (item != nullptr) {
-    registry_initializer().insert({item->id(), item});
+    printf("%s\n", item->id.c_str());
+    registry_initializer().insert({item->id, nullptr});
   }
 }
 
 void registerPlugin(InitializerInterface* const item) {
   if (item != nullptr) {
-    plugin_initializer().insert({item->id(), item});
+    //plugin_initializer().insert({item->id, item});
   }
 }
 

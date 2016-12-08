@@ -26,7 +26,13 @@ namespace osquery {
 
 /// An opaque interface used within plugin macros.
 struct InitializerInterface {
-  virtual const char* id() const = 0;
+ public:
+  /// A garenteed-initialized name/id for the plugin or registry.
+  std::string id;
+
+  InitializerInterface(std::string _id) : id(std::move(_id)) {}
+
+  /// Will be implemented by Macro.
   virtual void run() const = 0;
   virtual ~InitializerInterface() {}
 };
@@ -62,14 +68,11 @@ void registryAndPluginInit();
 #define CREATE_REGISTRY(type, name)                                            \
   namespace registry {                                                         \
   struct type##Registry : public InitializerInterface {                        \
-    type##Registry(void) {                                                     \
+    type##Registry(void) : InitializerInterface(name) {                        \
       registerRegistry(this);                                                  \
     }                                                                          \
-    const char* id() const override {                                          \
-      return name;                                                             \
-    }                                                                          \
     void run() const override {                                                \
-      Registry::create<type>(name);                                            \
+      Registry::create<type>(id);                                              \
     }                                                                          \
   };                                                                           \
   static type##Registry type##instance_;                                       \
@@ -86,14 +89,11 @@ void registryAndPluginInit();
 #define CREATE_LAZY_REGISTRY(type, name)                                       \
   namespace registry {                                                         \
   struct type##Registry : public InitializerInterface {                        \
-    type##Registry(void) {                                                     \
+    type##Registry(void) : InitializerInterface(name) {                        \
       registerRegistry(this);                                                  \
     }                                                                          \
-    const char* id() const override {                                          \
-      return name;                                                             \
-    }                                                                          \
     void run() const override {                                                \
-      Registry::create<type>(name, true);                                      \
+      Registry::create<type>(id, true);                                        \
     }                                                                          \
   };                                                                           \
   static type##Registry type##instance_;                                       \
@@ -113,14 +113,11 @@ void registryAndPluginInit();
  */
 #define REGISTER(type, registry, name)                                         \
   struct type##RegistryItem : public InitializerInterface {                    \
-    type##RegistryItem(void) {                                                 \
+    type##RegistryItem(void) : InitializerInterface(name) {                    \
       registerPlugin(this);                                                    \
     }                                                                          \
-    const char* id() const override {                                          \
-      return registry "." name;                                                \
-    }                                                                          \
     void run() const override {                                                \
-      Registry::add<type>(registry, name);                                     \
+      Registry::add<type>(registry, id);                                       \
     }                                                                          \
   };                                                                           \
   static type##RegistryItem type##instance_;
@@ -128,14 +125,11 @@ void registryAndPluginInit();
 /// The same as REGISTER but prevents the plugin item from being broadcasted.
 #define REGISTER_INTERNAL(type, registry, name)                                \
   struct type##RegistryItem : public InitializerInterface {                    \
-    type##RegistryItem(void) {                                                 \
+    type##RegistryItem(void) : InitializerInterface(name) {                    \
       registerPlugin(this);                                                    \
     }                                                                          \
-    const char* id() const override {                                          \
-      return registry "." name;                                                \
-    }                                                                          \
     void run() const override {                                                \
-      Registry::add<type>(registry, name, true);                               \
+      Registry::add<type>(registry, id, true);                                 \
     }                                                                          \
   };                                                                           \
   static type##RegistryItem type##instance_;

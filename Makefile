@@ -41,7 +41,8 @@ DEFINES := CTEST_OUTPUT_ON_FAILURE=1 \
 	LSAN_OPTIONS="detect_container_overflow=0 \
 	suppressions=${ANALYSIS}/lsan.supp" \
 	ASAN_OPTIONS="suppressions=${ANALYSIS}/asan.supp" \
-	TSAN_OPTIONS="suppressions=${ANALYSIS}/tsan.supp"
+	TSAN_OPTIONS="suppressions=${ANALYSIS}/tsan.supp" \
+        MSAN_OPTIONS="poison_in_dtor=1"
 
 .PHONY: docs build
 

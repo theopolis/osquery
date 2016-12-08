@@ -173,6 +173,12 @@ elseif(DEFINED ENV{SANITIZE})
   )
   if (DEFINED ENV{SANITIZE_THREAD})
     add_compile_options(-fsanitize=thread)
+  elseif(DEFINED ENV{SANITIZE_MEMORY})
+    add_compile_options(
+      -fsanitize=memory
+      -fsanitize-memory-track-origins=1
+      -fsanitize-memory-use-after-dtor
+    )
   else()
     add_compile_options(-fsanitize=address)
     if(LINUX)
