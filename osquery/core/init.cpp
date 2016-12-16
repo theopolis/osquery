@@ -348,6 +348,7 @@ Initializer::Initializer(int& argc, char**& argv, ToolType tool)
 
   std::signal(SIGABRT, signalHandler);
   std::signal(SIGUSR1, signalHandler);
+  std::signal(SIGCHLD, SIG_IGN);
 
   // If the caller is checking configuration, disable the watchdog/worker.
   if (FLAGS_config_check) {
