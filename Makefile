@@ -3,7 +3,7 @@ BASH_EXISTS := $(shell which bash)
 SHELL := $(shell which bash)
 SOURCE_DIR := $(shell pwd)
 
-ifneq ($(MAKECMDGOALS),deps)
+ifneq ($(MAKECMDGOALS),sysprep)
 GIT_EXISTS := $(shell which git)
 endif
 
