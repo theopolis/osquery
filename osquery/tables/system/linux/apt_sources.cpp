@@ -14,8 +14,9 @@
 #define __DEBUG
 #endif
 
-#include <apt-pkg/init.h>
 #include <apt-pkg/cachefile.h>
+#include <apt-pkg/init.h>
+#include <apt-pkg/metaindex.h>
 
 #ifdef __DEBUG
 #define DEBUG
@@ -41,36 +42,17 @@ void closeConfig() {
   }
 }
 
-bool isFieldOkay(const char* fieldValue) {
-  // Ensure the value is initialized so we don't segfault
-  return (fieldValue != nullptr && fieldValue[0] != 0);
-}
-
-void extractAptSourceInfo(pkgCache::PkgFileIterator src,
-                          const pkgIndexFile* pkgIndex,
-                          QueryData& results) {
+void extractAptSourceInfo(metaIndex const* mi, QueryData& results) {
   Row r;
 
-  r["name"] = pkgIndex->Describe(true);
-
-  // If we don't pass it a path to construct, it will
-  // just return the base URI of the repo
-  r["base_uri"] = pkgIndex->ArchiveURI("");
-
-  if (isFieldOkay(src.FileName()))
-    r["package_cache_file"] = src.FileName();
-  if (isFieldOkay(src.Archive()))
-    r["release"] = src.Archive();
-  if (isFieldOkay(src.Component()))
-    r["component"] = src.Component();
-  if (isFieldOkay(src.Version()))
-    r["version"] = src.Version();
-  if (isFieldOkay(src.Origin()))
-    r["maintainer"] = src.Origin();
-  if (isFieldOkay(src.Label()))
-    r["label"] = src.Label();
-  if (isFieldOkay(src.Site()))
-    r["site"] = src.Site();
+  r["name"] = mi->Describe();
+  r["base_uri"] = mi->GetURI();
+  r["release"] = mi->GetDist();
+  r["type"] = mi->GetType();
+  r["date"] = INTEGER(mi->GetDate());
+  r["trusted"] = (mi->IsTrusted()) ? "1" : "0";
+  r["signed_by"] = mi->GetSignedBy();
+  r["valid_until"] = INTEGER(mi->GetValidUntil());
 
   results.push_back(r);
 }
@@ -103,31 +85,13 @@ QueryData genAptSrcs(QueryContext& context) {
   }
 
   pkgCacheFile cache_file;
-  pkgCache* cache = cache_file.GetPkgCache();
-  if (cache == nullptr) {
-    closeConfig();
-    return results;
-  }
-
   pkgSourceList* src_list = cache_file.GetSourceList();
-  if (src_list == nullptr) {
-    cache_file.Close();
-    closeConfig();
-    return results;
-  }
-
-  // For each apt cache file that contains packages
-  for (auto file = cache->FileBegin(); file && !file.end(); ++file) {
-    // Locate the associated index files to ensure the repository is installed
-    pkgIndexFile* pkgIndex = nullptr;
-    if (!src_list->FindIndex(file, pkgIndex) || pkgIndex == nullptr) {
-      continue;
+  if (src_list != nullptr) {
+    for (auto s = src_list->begin(); s != src_list->end(); s++) {
+      extractAptSourceInfo(*s, results);
     }
-
-    extractAptSourceInfo(file, pkgIndex, results);
   }
 
-  // Cleanup
   cache_file.Close();
   closeConfig();
 
