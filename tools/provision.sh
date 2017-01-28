@@ -83,6 +83,7 @@ function platform_linux_main() {
 
   # LLVM/Clang.
   brew_tool osquery/osquery-local/llvm
+  brew_dependency osquery/osquery-local/llvm2 --with-clang
 
   # Util-Linux provides libuuid.
   brew_dependency osquery/osquery-local/util-linux

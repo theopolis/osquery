@@ -134,7 +134,7 @@ void FilesystemLoggerPlugin::init(const std::string& name,
 
   // The log dir is used for status logging and the filesystem results logs.
   if (isWritable(log_path_.string()).ok()) {
-    FLAGS_log_dir = log_path_.string();
+    Flag::updateValue("log_dir", log_path_.string());
     FLAGS_logtostderr = false;
   } else {
     // If we cannot write logs to the filesystem, fallback to stderr.

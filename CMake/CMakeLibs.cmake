@@ -285,7 +285,7 @@ macro(ADD_OSQUERY_MODULE TARGET)
   endif()
   if(NOT WINDOWS AND CMAKE_CXX_COMPILER MATCHES "clang")
     #enable LTO builds of modules when building with clang on Unix
-    target_link_libraries(${TARGET} "-flto")
+    target_link_libraries(${TARGET} "-flto=thin")
   endif()
   set_target_properties(${TARGET} PROPERTIES COMPILE_FLAGS "${CXX_COMPILE_FLAGS}")
   set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET})

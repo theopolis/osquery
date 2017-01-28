@@ -75,7 +75,7 @@ if(NOT WIN32)
   if (CMAKE_CXX_COMPILER MATCHES "clang")
     # Only enale LTO builds when using clang on Unix, for now
     add_compile_options(
-      -flto
+      -flto=thin
     )
   endif()
 endif()
@@ -152,6 +152,8 @@ if(LINUX AND CMAKE_CXX_COMPILER MATCHES "clang")
   # Use the LLVM versions of ar and ranlib to support LTO builds
   find_program(LLVMRANLIB_EXECUTABLE "llvm-ranlib" ENV PATH)
   find_program(LLVMAR_EXECUTABLE "llvm-ar" ENV PATH)
+  set(LLVM_ENABLE_LTO "Thin")
+  set(LLVM_PARALLEL_LINK_JOBS "1")
   set(CMAKE_AR "${LLVMAR_EXECUTABLE}")
   set(CMAKE_RANLIB "${LLVMRANLIB_EXECUTABLE}")
   set(CMAKE_C_ARCHIVE_CREATE "${LLVMAR_EXECUTABLE} qc <TARGET> <LINK_FLAGS> <OBJECTS>")
@@ -288,7 +290,7 @@ if(WINDOWS)
 else()
   if (CMAKE_CXX_COMPILER MATCHES "clang")
     # Clang on Unix uses LTO; we also need to pass -flto when linking
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto=thin")
   endif()
 
 endif()
@@ -463,6 +465,7 @@ endif()
 
 # Make sure the generated paths exist
 execute_process(COMMAND mkdir ${MKDIR_OPTS} "${CMAKE_BINARY_DIR}/generated")
+execute_process(COMMAND mkdir ${MKDIR_OPTS} "${CMAKE_BINARY_DIR}/linkcache")
 
 # We need to link some packages as dynamic/dependent.
 set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .dylib .so .a)

@@ -144,6 +144,7 @@ class AbstractOsqueryFormula < Formula
 
       if [ENV["CC"]].include?("#{default_prefix}/bin/clang")
         append "LDFLAGS", "-lrt -lpthread -ldl"
+        # append "CFLAGS", "-flto=thin"
       end
     end
 
@@ -154,7 +155,7 @@ class AbstractOsqueryFormula < Formula
 
     # Everyone receives:
     append "CFLAGS", "-fPIC -DNDEBUG -Os -march=core2"
-    append "CXXFLAGS", "-fPIC -DNDEBUG -Os -march=core2"
+    append "CXXFLAGS", "-fPIC -DNDEBUG -Os -march=core2 -std=c++11 -stdlib=libstdc++"
 
     prepend_path "PKG_CONFIG_PATH", legacy_prefix/"lib/pkgconfig"
 

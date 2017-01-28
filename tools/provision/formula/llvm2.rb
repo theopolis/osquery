@@ -19,9 +19,10 @@ class CodesignRequirement < Requirement
   end
 end
 
-class Llvm < AbstractOsqueryFormula
+class Llvm2 < AbstractOsqueryFormula
   desc "Next-gen compiler infrastructure"
   homepage "http://llvm.org/"
+  revision 1
 
   stable do
     url "http://llvm.org/releases/3.9.1/llvm-3.9.1.src.tar.xz"
@@ -93,12 +94,11 @@ class Llvm < AbstractOsqueryFormula
   fails_with :llvm
 
   def install
-    ENV.cxx11
     # Added to gcc's specs, but also needed here.
     ENV.append "LDFLAGS", "-lrt -lpthread"
 
     # Apple's libstdc++ is too old to build LLVM
-    # ENV.libcxx if ENV.compiler == :clang
+    ENV.libcxx if ENV.compiler == :clang
 
     (buildpath/"tools/clang").install resource("clang") if build.with? "clang"
     (buildpath/"tools/clang/tools/extra").install resource("clang-extra-tools")
@@ -118,6 +118,8 @@ class Llvm < AbstractOsqueryFormula
     args = %w[
       -DLLVM_OPTIMIZED_TABLEGEN=On
       -DLLVM_BUILD_LLVM_DYLIB=On
+      -DLLVM_ENABLE_LTO=Thin
+      -DLLVM_PARALLEL_LINK_JOBS=1
     ]
 
     if build.with? "rtti"
@@ -130,9 +132,6 @@ class Llvm < AbstractOsqueryFormula
       binutils = Formula["binutils"].prefix/"include"
       args << "-DLLVM_BINUTILS_INCDIR=#{binutils}"
     end
-    # args << "-DLLVM_ENABLE_LTO=Thin"
-    # args << "-DLLVM_PARALLEL_LINK_JOBS=1"
-
 
     args << "-DLLVM_BUILD_EXTERNAL_COMPILER_RT=ON" if build.with? "compiler-rt"
     args << "-DLLVM_INSTALL_UTILS=On" if build.with? "utils"
@@ -153,8 +152,6 @@ class Llvm < AbstractOsqueryFormula
       system "make"
       system "make", "install"
     end
-
-
 
     (share/"clang/tools").install Dir["tools/clang/tools/scan-{build,view}"]
     inreplace "#{share}/clang/tools/scan-build/bin/scan-build", "$RealBin/bin/clang", "#{bin}/clang"

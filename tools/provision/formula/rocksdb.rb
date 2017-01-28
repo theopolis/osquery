@@ -5,6 +5,7 @@ class Rocksdb < AbstractOsqueryFormula
   homepage "http://rocksdb.org"
   url "https://github.com/facebook/rocksdb/archive/v4.11.2.tar.gz"
   sha256 "9374be06fdfccbbdbc60de90b72b5db7040e1bc4e12532e4c67aaec8181b45be"
+  revision 1
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
