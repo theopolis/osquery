@@ -22,7 +22,7 @@ end
 class Llvm < AbstractOsqueryFormula
   desc "Next-gen compiler infrastructure"
   homepage "http://llvm.org/"
-  revision 2
+  revision 3
 
   stable do
     url "http://llvm.org/releases/3.8.1/llvm-3.8.1.src.tar.xz"
@@ -52,7 +52,7 @@ class Llvm < AbstractOsqueryFormula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
-    sha256 "413eb81e07ea61bc3dc99ecb95fa4fce9cd087080259b342a0b3f7f1fe4808c8" => :x86_64_linux
+    sha256 "51fd50c5788e89ead2f8bd35eb15a67700625e254beaae6a9b985e446b48b66b" => :x86_64_linux
   end
 
   head do
