@@ -207,5 +207,6 @@ test:
 	@cd build/$(BUILD_DIR) && $(DEFINES) $(CTEST)
 
 %::
+	@mkdir -p build/$(BUILD_DIR)
 	@cd build/$(BUILD_DIR) && $(CMAKE) && \
 		$(DEFINES) $(MAKE) --no-print-directory $@
