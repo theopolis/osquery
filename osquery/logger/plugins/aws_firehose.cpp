@@ -32,10 +32,12 @@ FLAG(uint64,
      aws_firehose_period,
      10,
      "Seconds between flushing logs to Firehose (default 10)");
+
 FLAG(string, aws_firehose_stream, "", "Name of Firehose stream for logging")
 
 // This is the max per AWS docs
 const size_t FirehoseLogForwarder::kFirehoseMaxRecords = 500;
+
 // Max size of log + partition key is 1MB. Max size of partition key is 256B.
 const size_t FirehoseLogForwarder::kFirehoseMaxLogBytes = 1000000 - 256;
 
@@ -62,6 +64,7 @@ Status FirehoseLogForwarder::send(std::vector<std::string>& log_data,
     if (log.size() + 1 > kFirehoseMaxLogBytes) {
       LOG(ERROR) << "Firehose log too big, discarding!";
     }
+
     Aws::Firehose::Model::Record record;
     auto buffer =
         Aws::Utils::ByteBuffer((unsigned char*)log.c_str(), log.length() + 1);
@@ -92,7 +95,7 @@ Status FirehoseLogForwarder::send(std::vector<std::string>& log_data,
   }
 
   VLOG(1) << "Successfully sent " << result.GetRequestResponses().size()
-          << " logs to Firehose.";
+          << " logs to Firehose";
   return Status(0);
 }
 
@@ -109,8 +112,7 @@ Status FirehoseLogForwarder::setUp() {
   }
 
   if (FLAGS_aws_firehose_stream.empty()) {
-    return Status(1,
-                  "Stream name must be specified with --aws_firehose_stream");
+    return Status(1, "Stream name not configured");
   }
 
   // Make sure we can connect to designated stream
