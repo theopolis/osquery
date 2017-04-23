@@ -3,8 +3,8 @@ require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
 class Snappy < AbstractOsqueryFormula
   desc "Compression/decompression library aiming for high speed"
   homepage "https://code.google.com/p/snappy/"
-  url "https://github.com/google/snappy/releases/download/1.1.3/snappy-1.1.3.tar.gz"
-  sha256 "2f1e82adf0868c9e26a5a7a3115111b6da7e432ddbac268a7ca2fae2a247eef3"
+  url "https://github.com/google/snappy/releases/download/1.1.4/snappy-1.1.4.tar.gz"
+  sha256 "134bfe122fd25599bb807bb8130e7ba6d9bdb851e0b16efcb83ac4f5d0b70057"
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -26,7 +26,7 @@ class Snappy < AbstractOsqueryFormula
   depends_on "pkg-config" => :build
 
   def install
-    ENV.universal_binary if build.universal?
+    ENV.universal_binary
     ENV.j1 if build.stable?
 
     system "./autogen.sh" if build.head?
