@@ -35,6 +35,9 @@ else()
     -pedantic
     -Wuseless-cast
     -Wno-c99-extensions
+    -Wno-four-char-constants
+    -Wno-vla-extension
+    -Wno-c99-extensions
     -Wno-zero-length-array
     -Wno-unused-parameter
     -Wno-gnu-case-range
