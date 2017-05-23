@@ -117,9 +117,6 @@ class AbstractOsqueryFormula < Formula
 
       # This is already set to the PREFIX
       if !["gcc"].include?(self.name)
-        # Set the dynamic linker and library search path.
-        prepend "CFLAGS", "-isystem#{default_prefix}/include"
-
         # cmake wants this to have -I
         prepend "CXXFLAGS", "-I#{default_prefix}/include"
 
@@ -142,8 +139,12 @@ class AbstractOsqueryFormula < Formula
 
       # This used to be in the GCC/not-GCC logic, pulling out to compile GCC
       # Using the system compilers with legacy runtime.
-      prepend "CFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
-      prepend "CXXFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
+      if ENV["CC"].to_s.include?("clang")
+        # Set the dynamic linker and library search path.
+        prepend "CFLAGS", "-isystem#{default_prefix}/include" if OS.linux?
+        prepend "CFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
+        prepend "CXXFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
+      end
 
       prepend_path "LIBRARY_PATH", legacy_prefix/"lib" if OS.linux?
 

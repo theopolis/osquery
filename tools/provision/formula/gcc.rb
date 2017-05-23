@@ -3,9 +3,9 @@ require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
 class Gcc < AbstractOsqueryFormula
   desc "GNU compiler collection"
   homepage "https://gcc.gnu.org"
-  url "https://ftp.heanet.ie/mirrors/gnu/gcc/gcc-5.3.0/gcc-5.3.0.tar.bz2"
-  mirror "https://ftp.gnu.org/gnu/gcc/gcc-5.3.0/gcc-5.3.0.tar.bz2"
-  sha256 "b84f5592e9218b73dbae612b5253035a7b34a9a1f7688d2e1bfaaf7267d5c4db"
+  url "https://ftp.gnu.org/gnu/gcc/gcc-6.3.0/gcc-6.3.0.tar.bz2"
+  mirror "https://ftpmirror.gnu.org/gcc/gcc-6.3.0/gcc-6.3.0.tar.bz2"
+  sha256 "f06ae7f3f790fbf0f018f6d40e844451e6bc3b7bc96e128e63b09825c1f8b29f"
   revision 101
 
   head "svn://gcc.gnu.org/svn/gcc/trunk"
@@ -23,7 +23,7 @@ class Gcc < AbstractOsqueryFormula
   option "with-fortran", "Build without the gfortran compiler"
   option "with-multilib", "Build with multilib support"
 
-  depends_on "zlib" unless OS.mac?
+  depends_on "zlib"
   depends_on "binutils" if build.with? "glibc"
   depends_on "gmp"
   depends_on "libmpc"
@@ -106,7 +106,6 @@ class Gcc < AbstractOsqueryFormula
     inreplace "libitm/method-serial.cc", "assert (ok);", "(void) ok;"
 
     ENV.delete "LDFLAGS"
-    # ENV.delete "LD_LIBRARY_PATH"
 
     # osquery: speed up the build by skipping the bootstrap.
     args << "--disable-bootstrap"
@@ -187,10 +186,16 @@ class Gcc < AbstractOsqueryFormula
     # This should be the default_prefix since we expect an ABI => C runtime
     # to be available and backward compatible on the system.
     glibc = Formula["glibc-legacy"]
-    libgcc = lib/"gcc/x86_64-unknown-linux-gnu"/version
+    libgcc = lib/"gcc/x86_64-pc-linux-gnu"/version
+
+    # Hack for include path order
+    # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70129
+    gccsystem = prefix/"include/c++"/version
+    libgccinclude = libgcc/"include"
+
     specs.write specs_string + <<-EOS.undent
       *cpp_unique_options:
-      + -isystem #{legacy_prefix}/include
+      + -isystem #{gccsystem} -isystem #{gccsystem}/x86_64-pc-linux-gnu -isystem #{gccsystem}/backward -isystem #{libgccinclude} -isystem #{legacy_prefix}/include
 
       *link_libgcc:
       #{glibc.installed? ? "-nostdlib -L#{libgcc}" : "+"} -L#{legacy_prefix}/lib -L#{default_prefix}/lib -lrt -lpthread
