@@ -6,7 +6,7 @@ class Sleuthkit < AbstractOsqueryFormula
   url "https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.3.0.tar.gz"
   sha256 "64a57a44955e91300e1ae69b34e8702afda0fb5bd72e2116429875c9f5f28980"
   head "https://github.com/sleuthkit/sleuthkit.git"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

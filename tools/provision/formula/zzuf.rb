@@ -6,7 +6,7 @@ class Zzuf < AbstractOsqueryFormula
   url "https://github.com/theopolis/zzuf/archive/v0.15-osx-r2.tar.gz"
   sha256 "9f59bac21aef5408bbdaab0b2732ca5848dbd3e74297b66c34245bdbc04db86e"
   version "0.15-osx-r2"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

@@ -5,7 +5,7 @@ class Cmake < AbstractOsqueryFormula
   homepage "https://www.cmake.org/"
   url "https://cmake.org/files/v3.6/cmake-3.6.1.tar.gz"
   sha256 "28ee98ec40427d41a45673847db7a905b59ce9243bb866eaf59dce0f58aaef11"
-  revision 100
+  revision 101
 
   head "https://cmake.org/cmake.git"
 
@@ -13,7 +13,7 @@ class Cmake < AbstractOsqueryFormula
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
     sha256 "a672cdd3a43a8917ac0311799384f57a6877ad67c9fed8755a011d1688fafbb2" => :sierra
-    sha256 "d8a743cf235812a0f99f0db59af3deeb856b10e14be194fc6001b9c5883e5022" => :x86_64_linux
+    sha256 "9a9f93f60fc699e18c7ec7b7917e16843a81b7305fb1c863d4730c9b9356a42c" => :x86_64_linux
   end
 
   option "without-docs", "Don't build man pages"

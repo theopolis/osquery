@@ -7,7 +7,7 @@ class Lz4 < AbstractOsqueryFormula
   version "r131"
   sha256 "9d4d00614d6b9dec3114b33d1224b6262b99ace24434c53487a0c8fd0b18cfed"
   head "https://github.com/Cyan4973/lz4.git"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -18,6 +18,9 @@ class Lz4 < AbstractOsqueryFormula
 
   def install
     system "make", "install", "PREFIX=#{prefix}"
+
+    # Remove shared library
+    rm_rf lib/"liblz4.so"
   end
 
   test do

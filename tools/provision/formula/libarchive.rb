@@ -5,7 +5,7 @@ class Libarchive < AbstractOsqueryFormula
   homepage "http://www.libarchive.org"
   url "http://www.libarchive.org/downloads/libarchive-3.2.2.tar.gz"
   sha256 "691c194ee132d1f0f7a42541f091db811bc2e56f7107e9121be2bc8c04f1060f"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -25,7 +25,9 @@ class Libarchive < AbstractOsqueryFormula
            "--without-nettle",  # xar hashing option but GPLv3
            "--without-xml2",    # xar hashing option but tricky dependencies
            "--without-openssl", # mtree hashing now possible without OpenSSL
-           "--with-expat"       # best xar hashing option
+           "--with-expat",       # best xar hashing option
+           "--disable-shared",
+           "--enable-static"
 
     system "make", "install"
 

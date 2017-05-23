@@ -6,7 +6,7 @@ class Cppcheck < AbstractOsqueryFormula
   url "https://github.com/danmar/cppcheck/archive/1.75.tar.gz"
   sha256 "d3732dba3fb4dee075009e2422cd9b48bbd095249994ec60550aee43026030e5"
   head "https://github.com/danmar/cppcheck.git"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

@@ -5,7 +5,7 @@ class Thrift < AbstractOsqueryFormula
   homepage "https://thrift.apache.org/"
   url "http://www-us.apache.org/dist/thrift/0.10.0/thrift-0.10.0.tar.gz"
   sha256 "2289d02de6e8db04cbbabb921aeb62bfe3098c4c83f36eec6c31194301efa10b"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

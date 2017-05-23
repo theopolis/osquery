@@ -5,7 +5,7 @@ class Ccache < AbstractOsqueryFormula
   homepage "https://ccache.samba.org/"
   url "https://www.samba.org/ftp/ccache/ccache-3.3.1.tar.xz"
   sha256 "c6d87a49cc6d7639636d289ed9a5f560bc2acf7ab698fe8ee14e9c9f15ba41c6"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

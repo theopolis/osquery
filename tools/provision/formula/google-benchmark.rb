@@ -6,7 +6,7 @@ class GoogleBenchmark < AbstractOsqueryFormula
   url "https://github.com/google/benchmark/archive/v1.0.0.tar.gz"
   sha256 "d2206c263fc1a7803d4b10e164e0c225f6bcf0d5e5f20b87929f137dee247b54"
   head "https://github.com/google/benchmark.git"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

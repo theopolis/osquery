@@ -27,7 +27,7 @@ HOMEBREW_BREW="2be7999878702554f1e1b5f4118978e670e6156c"
 LINUXBREW_BREW="1d16368a177807663e1b3146d71fcd69e2061e27"
 
 # If the world needs to be rebuilt, increase the version
-DEPS_VERSION="3"
+DEPS_VERSION="4"
 
 source "$SCRIPT_DIR/lib.sh"
 source "$SCRIPT_DIR/provision/lib.sh"
@@ -48,7 +48,6 @@ function platform_linux_main() {
   brew_tool osquery/osquery-local/glibc
 
   # Build a bottle for a legacy glibc.
-  brew_clean osquery/osquery-local/curl
   brew_tool osquery/osquery-local/glibc-legacy
   brew_tool osquery/osquery-local/zlib-legacy
 
@@ -72,7 +71,6 @@ function platform_linux_main() {
 
   # OpenSSL is needed for the final build.
   brew_tool osquery/osquery-local/libxml2
-  brew_clean osquery/osquery-local/curl
   brew_tool osquery/osquery-local/openssl
 
   # Curl and Python are needed for LLVM mostly.

@@ -6,7 +6,7 @@ class Pcre < AbstractOsqueryFormula
   url "https://ftp.pcre.org/pub/pcre/pcre-8.40.tar.gz"
   mirror "https://www.mirrorservice.org/sites/downloads.sourceforge.net/p/pc/pcre/pcre/8.40/pcre-8.40.tar.bz2"
   sha256 "1d75ce90ea3f81ee080cdc04e68c9c25a9fb984861a0618be7bbf676b18eda3e"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

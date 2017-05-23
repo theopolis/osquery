@@ -5,7 +5,7 @@ class Libmagic < AbstractOsqueryFormula
   homepage "https://www.darwinsys.com/file/"
   url "https://fossies.org/linux/misc/file-5.29.tar.gz"
   sha256 "ea661277cd39bf8f063d3a83ee875432cc3680494169f952787e002bdd3884c0"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -25,7 +25,8 @@ class Libmagic < AbstractOsqueryFormula
                           "--disable-silent-rules",
                           "--prefix=#{prefix}",
                           "--enable-fsect-man5",
-                          "--enable-static"
+                          "--enable-static",
+                          "--disable-shared"
     system "make", "install"
     (share+"misc/magic").install Dir["magic/Magdir/*"]
 

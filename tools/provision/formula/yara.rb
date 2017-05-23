@@ -4,7 +4,7 @@ class Yara < AbstractOsqueryFormula
   desc "Malware identification and classification tool"
   homepage "https://github.com/VirusTotal/yara/"
   head "https://github.com/VirusTotal/yara.git"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

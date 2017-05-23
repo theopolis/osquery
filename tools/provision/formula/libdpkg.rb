@@ -5,7 +5,7 @@ class Libdpkg < AbstractOsqueryFormula
   homepage "https://wiki.debian.org/Teams/Dpkg"
   url "http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_1.18.23.tar.xz"
   sha256 "cc08802a0cea2ccd0c10716bc71531ff9b9234dd454b83a59f71117a37f36923"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

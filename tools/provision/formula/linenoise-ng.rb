@@ -5,7 +5,7 @@ class LinenoiseNg < AbstractOsqueryFormula
   homepage "https://github.com/arangodb/linenoise-ng"
   url "https://github.com/theopolis/linenoise-ng/archive/v1.0.1.tar.gz"
   sha256 "c317f3ec92dcb4244cb62f6fb3b7a0a5a53729a85842225fcfce0d4a429a0dfa"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

@@ -6,7 +6,7 @@ class Augeas < AbstractOsqueryFormula
   url "https://github.com/hercules-team/augeas.git",
     :revision => "f66a71dc22c0536853bb99585a4bf605018ba6db"
   version "1.8.0"
-  revision 100
+  revision 101
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
