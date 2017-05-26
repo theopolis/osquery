@@ -10,6 +10,7 @@ class Beecrypt < AbstractOsqueryFormula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
+    sha256 "" => :sierra
     sha256 "20f9a37cd35bc4adf05f0e68bd5c430b3c010903cdc05f50bfc89d9216e9a797" => :x86_64_linux
   end
 
@@ -25,12 +26,16 @@ class Beecrypt < AbstractOsqueryFormula
       "--without-java",
       "--without-python",
       "--without-cplusplus",
-      "--with-arch=x86_64",
       "--disable-shared",
       "--enable-static"
     ]
 
-    system "./autogen.sh"
+    if OS.mac?
+      cp Dir["#{Formula["libtool"].opt_share}/libtool/*/config.{guess,sub}"], buildpath
+    else
+      args << "--with-arch=x86_64"
+      system "./autogen.sh"
+    end
     system "./configure", "--prefix=#{prefix}", *args
     system "make"
     system "make", "check"

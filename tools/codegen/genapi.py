@@ -40,7 +40,8 @@ CANONICAL_PLATFORMS = {
     "utility": "Utility",
     "yara": "YARA",
     "lldpd": "LLDPD",
-    "sleuthkit": "The Sleuth Kit"
+    "sleuthkit": "The Sleuth Kit",
+    "macnux": "Darwin & Linux",
 }
 
 TEMPLATE_API_DEFINITION = """

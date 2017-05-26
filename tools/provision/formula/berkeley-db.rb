@@ -10,6 +10,7 @@ class BerkeleyDb < AbstractOsqueryFormula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
+    sha256 "" => :sierra
     sha256 "918bc7f64a50a3f8a397739e0476f801ef1fa8d734e9a1045975f1c75099c2b9" => :x86_64_linux
   end
 

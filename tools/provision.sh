@@ -66,6 +66,7 @@ function platform_linux_main() {
   brew_tool m4
   brew_tool autoconf
   brew_tool automake
+  brew_tool gettext
 
   # OpenSSL is needed for the final build.
   brew_tool osquery/osquery-local/libxml2
@@ -99,7 +100,6 @@ function platform_linux_main() {
   brew_dependency osquery/osquery-local/libudev
   brew_dependency osquery/osquery-local/libaudit
   brew_dependency osquery/osquery-local/libdpkg
-  brew_dependency osquery/osquery-local/librpm
 }
 
 function platform_darwin_main() {
@@ -113,6 +113,12 @@ function platform_darwin_main() {
   brew_tool autoconf
   brew_tool automake
   brew_tool libtool
+  brew_tool gettext
+
+  # Linux library secondary dependencies.
+  brew_tool osquery/osquery-local/berkeley-db
+  brew_tool osquery/osquery-local/popt
+  brew_tool osquery/osquery-local/beecrypt
 
   brew_dependency osquery/osquery-local/libxml2
   brew_dependency osquery/osquery-local/openssl
@@ -145,6 +151,7 @@ function platform_darwin_main() {
   brew_dependency osquery/osquery-local/linenoise-ng
   brew_dependency osquery/osquery-local/augeas
   brew_dependency osquery/osquery-local/lldpd
+  brew_dependency osquery/osquery-local/librpm
 
   # POSIX-shared locally-managed tools.
   brew_dependency osquery/osquery-local/zzuf
