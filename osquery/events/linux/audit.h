@@ -12,13 +12,20 @@
 
 #include <libaudit.h>
 
+#include <atomic>
+#include <future>
 #include <map>
 #include <set>
+#include <thread>
+#include <utility>
 #include <vector>
 
 #include <boost/algorithm/hex.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <osquery/events.h>
+
+#include "osquery/events/linux/auditdnetlink.h"
 
 namespace osquery {
 
@@ -62,9 +69,6 @@ struct AuditRuleInternal {
   int action{0};
 };
 
-/// The audit ID is a smaller integer.
-using AuditId = size_t;
-
 /// Alias the field container so we can replace and improve with refactors.
 using AuditFields = std::map<std::string, std::string>;
 
@@ -105,30 +109,32 @@ class AuditAssembler : private boost::noncopyable {
   void start(size_t capacity, std::vector<size_t> types, AuditUpdate update);
 
   /// Add a message from audit.
-  boost::optional<AuditFields> add(AuditId id,
+  boost::optional<AuditFields> add(const std::string& id,
                                    size_t type,
                                    const AuditFields& fields);
 
   /// Allow the publisher to explicit-set fields.
-  void set(AuditId id, const std::string& key, const std::string& value) {
+  void set(const std::string& id,
+           const std::string& key,
+           const std::string& value) {
     m_[id][key] = value;
   }
 
   /// Remove an audit ID from the queue and clear associated messages/types.
-  void evict(AuditId id);
+  void evict(const std::string& id);
 
   /// Shuffle an audit ID to the front of the queue.
-  void shuffle(AuditId id);
+  void shuffle(const std::string& id);
 
   /// Check if the audit ID has completed each required message types.
-  bool complete(AuditId id);
+  bool complete(const std::string& id);
 
  private:
   /// A map of audit ID to aggregate message fields.
-  std::unordered_map<AuditId, AuditFields> m_;
+  std::unordered_map<std::string, AuditFields> m_;
 
   /// A map of audit ID to current set of types seen.
-  std::unordered_map<AuditId, std::vector<size_t>> mt_;
+  std::unordered_map<std::string, std::vector<size_t>> mt_;
 
   /// A functional callable to sanitize individual messages.
   AuditUpdate update_{nullptr};
@@ -137,7 +143,7 @@ class AuditAssembler : private boost::noncopyable {
   size_t capacity_{0};
 
   /// The in-order (by time) queue of audit IDs.
-  std::vector<AuditId> queue_;
+  std::vector<std::string> queue_;
 
   /// The set of required types.
   std::vector<size_t> types_;
@@ -202,7 +208,7 @@ struct AuditEventContext : public EventContext {
   AuditFields fields;
 
   /// Each message will contain the audit ID.
-  AuditId audit_id{0};
+  std::string audit_id{0};
 
   /// Each message will contain the event time.
   size_t time{0};
@@ -211,10 +217,7 @@ struct AuditEventContext : public EventContext {
 using AuditEventContextRef = std::shared_ptr<AuditEventContext>;
 using AuditSubscriptionContextRef = std::shared_ptr<AuditSubscriptionContext>;
 
-/// This is a dispatched service that handles published audit replies.
-class AuditConsumerRunner;
-
-class AuditEventPublisher
+class AuditEventPublisher final
     : public EventPublisher<AuditSubscriptionContext, AuditEventContext> {
   DECLARE_PUBLISHER("audit");
 
@@ -256,53 +259,12 @@ class AuditEventPublisher
   }
 
  private:
-  /// Maintain a list of audit rule data for displaying or deleting.
-  void handleListRules();
-
   /// Apply normal subscription to event matching logic.
   bool shouldFire(const AuditSubscriptionContextRef& mc,
                   const AuditEventContextRef& ec) const override;
 
  private:
-  /// Audit subsystem (netlink) socket descriptor.
-  int handle_{0};
-
-  /// Audit subsystem is in an immutable state.
-  bool immutable_{false};
-
-  /**
-   * @brief The last (most current) status reply.
-   *
-   * This contains the: pid, enabled, rate_limit, backlog_limit, lost, and
-   * failure booleans and counts.
-   */
-  struct audit_status status_;
-
-  /**
-   * @brief A counter of non-blocking netlink reads that contained no data.
-   *
-   * After several iterations of no data, the audit run loop will request a
-   * status. It is possible another user land daemon requested control of the
-   * audit subsystem. The kernel thread will only emit to a single handle.
-   */
-  size_t count_{0};
-
-  /// Is this process in control of the audit subsystem.
-  bool control_{false};
-
-  /// The last (most recent) audit reply.
-  struct audit_reply reply_;
-
-  /// Track all rule data added by the publisher.
-  std::vector<struct AuditRuleInternal> transient_rules_;
-
- private:
-  friend class AuditConsumerRunner;
+  /// Audit netlink subscription handle
+  NetlinkSubscriptionHandle audit_netlink_subscription_;
 };
-
-/**
- * @brief Populate an event context from a single audit reply.
- */
-bool handleAuditReply(const struct audit_reply& reply,
-                      AuditEventContextRef& ec);
 }
