@@ -148,7 +148,7 @@ test_debug: .setup
 		$(DEFINES) $(MAKE) test --no-print-directory $(MAKEFLAGS)
 
 analyze: .setup
-	@cd $(BUILD_DIR) && ANALYZE=True $(CMAKE) && \
+	@cd $(BUILD_DIR) && DEBUG=True ANALYZE=True $(CMAKE) && \
 		$(DEFINES) $(MAKE) --no-print-directory $(MAKEFLAGS)
 
 tidy: .setup
