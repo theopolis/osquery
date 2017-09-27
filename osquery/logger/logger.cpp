@@ -31,6 +31,7 @@
 #include "osquery/core/json.h"
 
 namespace pt = boost::property_tree;
+namespace rj = rapidjson;
 
 namespace osquery {
 
@@ -256,29 +257,144 @@ class LoggerDisabler : private boost::noncopyable {
   bool enabled_;
 };
 
+#define RJ_ADDSTR(doc, obj, key, value)                                        \
+  obj.AddMember(rapidjson::Value(key, doc.GetAllocator()).Move(),              \
+                rapidjson::Value(value, doc.GetAllocator()).Move(),            \
+                doc.GetAllocator());
+
+#define RJ_PUSH(doc, obj)                                                      \
+  doc.PushBack(rapidjson::Value(obj, doc.GetAllocator()).Move(),               \
+               doc.GetAllocator());
+
+class JSON : private only_movable {
+ private:
+  explicit JSON(decltype(rj::kObjectType) type) {
+    if (type == rj::kObjectType) {
+      doc_.SetObject();
+    } else {
+      doc_.SetArray();
+    }
+  }
+
+ public:
+  JSON(JSON&&) = default;
+  JSON& operator=(JSON&&) = default;
+
+  static JSON newObject() {
+    return JSON(rj::kObjectType);
+  }
+
+  static JSON newArray() {
+    return JSON(rj::kArrayType);
+  }
+
+ public:
+  rj::Document getObject() {
+    rj::Document line;
+    line.SetObject();
+    return line;
+  }
+
+  rj::Document getArray() {
+    rj::Document line;
+    line.SetArray();
+    return line;
+  }
+
+  void push(rj::Document& line) {
+    doc_.PushBack(rj::Value(line, doc_.GetAllocator()).Move(),
+                  doc_.GetAllocator());
+  }
+
+  void add(rj::Document& line,
+           const std::string& key,
+           const std::string& value) {
+    line.AddMember(rj::Value(key.c_str(), doc_.GetAllocator()).Move(),
+                   rj::Value(value.c_str(), doc_.GetAllocator()).Move(),
+                   doc_.GetAllocator());
+  }
+
+  void add(rj::Document& line, const std::string& key, size_t value) {
+    line.AddMember(rj::Value(key.c_str(), doc_.GetAllocator()).Move(),
+                   rj::Value(static_cast<uint64_t>(value)).Move(),
+                   doc_.GetAllocator());
+  }
+
+  void add(rj::Document& line, const std::string& key, int value) {
+    line.AddMember(rj::Value(key.c_str(), doc_.GetAllocator()).Move(),
+                   rj::Value(value).Move(),
+                   doc_.GetAllocator());
+  }
+
+  Status toString(std::string& str) {
+    rj::StringBuffer sb;
+    rj::Writer<rj::StringBuffer> writer(sb);
+    doc_.Accept(writer);
+    str = sb.GetString();
+    return Status();
+  }
+
+  rj::Document doc_;
+};
+
 static void serializeIntermediateLog(const std::vector<StatusLogLine>& log,
                                      PluginRequest& request) {
-  try {
-    pt::ptree tree;
-    for (const auto& log_item : log) {
-      pt::ptree child;
-      child.put("s", log_item.severity);
-      child.put("f", log_item.filename);
-      child.put("i", log_item.line);
-      child.put("m", log_item.message);
-      child.put("h", log_item.identifier);
-      child.put("c", log_item.calendar_time);
-      child.put("u", log_item.time);
-      tree.push_back(std::make_pair("", std::move(child)));
-    }
+  ////try {
+  //  pt::ptree tree;
+  // rj::Document d;
+  // d.SetArray();
+  auto doc = JSON::newArray();
+  for (const auto& i : log) {
+    //  pt::ptree child;
+    // rj::Document line;
+    // line.SetObject();
+    auto line = doc.getObject();
+    /*line.AddMember(rj::Value("s", d.GetAllocator()).Move(),
+                   rj::Value(static_cast<int>(i.severity)).Move(),
+                   d.GetAllocator());*/
+    // RJ_ADD(d, line, "s", static_cast<int>(i.severity));
+    // RJ_ADDSTR(d, line, "f", i.filename.c_str());
+    // RJ_ADD(d, line, "i", static_cast<uint64_t>(i.line));
+    // RJ_ADDSTR(d, line, "m", i.message.c_str());
+    // RJ_ADDSTR(d, line, "h", i.identifier.c_str());
+    // RJ_ADDSTR(d, line, "c", i.calendar_time.c_str());
+    // RJ_ADD(d, line, "u", static_cast<uint64_t>(i.time));
 
-    // Save the log as a request JSON string.
-    std::ostringstream output;
-    pt::write_json(output, tree, false);
-    request["log"] = output.str();
-  } catch (const pt::ptree_error& e) {
-    VLOG(1) << "Error serializing log entries: " << e.what();
+    doc.add(line, "s", static_cast<int>(i.severity));
+    doc.add(line, "f", i.filename);
+    doc.add(line, "i", i.line);
+    doc.add(line, "m", i.message);
+    doc.add(line, "h", i.identifier);
+    doc.add(line, "c", i.calendar_time);
+    doc.add(line, "u", i.time);
+
+    //  child.put("s", i.severity);
+    // child.put("f", i.filename);
+    // child.put("i", i.line);
+    // child.put("m", i.message);
+    // child.put("h", i.identifier);
+    // child.put("c", i.calendar_time);
+    //  child.put("u", i.time);
+    //  tree.push_back(std::make_pair("", std::move(child)));
+    // d.PushBack(rj::Value(line, d.GetAllocator()).Move(), d.GetAllocator());
+    // RJ_PUSH(d, line);
+    doc.push(line);
   }
+
+  // Save the log as a request JSON string.
+  // std::ostringstream output;
+  // pt::write_json(output, tree, false);
+  // rj::StringBuffer sb;
+  // rj::Writer<rj::StringBuffer> writer(sb);
+  // doc.doc().Accept(writer);
+  // request["log"] = output.str();
+  // request["log"] = sb.GetString();
+  doc.toString(request["log"]);
+  // printf("%s\n", request["log"].c_str());
+
+  // } catch (const pt::ptree_error& e) {
+  //  VLOG(1) << "Error serializing log entries: " << e.what();
+  //}
 }
 
 static void deserializeIntermediateLog(const PluginRequest& request,
@@ -297,17 +413,37 @@ static void deserializeIntermediateLog(const PluginRequest& request,
     return;
   }
 
-  for (const auto& item : tree.get_child("")) {
+  rj::Document doc;
+  if (doc.Parse(request.at("log").c_str()).HasParseError()) {
+    return;
+  }
+
+  for (auto& line : doc.GetArray()) {
+    // printf("f: %s\n", line["f"].GetString());
     log.push_back({
-        (StatusLogSeverity)item.second.get<int>("s", O_INFO),
-        item.second.get<std::string>("f", "<unknown>"),
-        item.second.get<size_t>("i", 0),
-        item.second.get<std::string>("m", ""),
-        item.second.get<std::string>("c", ""),
-        item.second.get<size_t>("u", 0),
-        item.second.get<std::string>("h", ""),
+        (StatusLogSeverity)line["s"].GetInt(),
+        line["f"].GetString(),
+        line["i"].GetUint64(),
+        line["m"].GetString(),
+        line["c"].GetString(),
+        line["u"].GetUint64(),
+        line["h"].GetString(),
     });
   }
+
+  /*
+    for (const auto& item : tree.get_child("")) {
+      log.push_back({
+          (StatusLogSeverity)item.second.get<int>("s", O_INFO),
+          item.second.get<std::string>("f", "<unknown>"),
+          item.second.get<size_t>("i", 0),
+          item.second.get<std::string>("m", ""),
+          item.second.get<std::string>("c", ""),
+          item.second.get<size_t>("u", 0),
+          item.second.get<std::string>("h", ""),
+      });
+    }
+  */
 }
 
 void setVerboseLevel() {
@@ -339,8 +475,7 @@ void setVerboseLevel() {
   }
 
   if (!Flag::isDefault("logger_min_status")) {
-    long int i = 0;
-    safeStrtol(Flag::getValue("logger_min_status"), 10, i);
+    auto i = Flag::getInt32Value("logger_min_status");
     FLAGS_minloglevel = static_cast<decltype(FLAGS_minloglevel)>(i);
   }
 
@@ -351,7 +486,7 @@ void setVerboseLevel() {
   }
 }
 
-void initStatusLogger(const std::string& name) {
+void initStatusLogger(const std::string& name, bool init_glog) {
   FLAGS_alsologtostderr = false;
   FLAGS_colorlogtostderr = true;
   FLAGS_logbufsecs = 0; // flush the log buffer immediately
@@ -361,7 +496,9 @@ void initStatusLogger(const std::string& name) {
 
   setVerboseLevel();
   // Start the logging, and announce the daemon is starting.
-  google::InitGoogleLogging(name.c_str());
+  if (init_glog) {
+    google::InitGoogleLogging(name.c_str());
+  }
   BufferedLogSink::get().setUp();
 }
 
@@ -537,7 +674,6 @@ Status logString(const std::string& message,
         !BufferedLogSink::get().isPrimaryLogger(logger)) {
       continue;
     }
-
     if (Registry::get().exists("logger", logger, true)) {
       auto plugin = Registry::get().plugin("logger", logger);
       auto logger_plugin = std::dynamic_pointer_cast<LoggerPlugin>(plugin);
@@ -654,7 +790,7 @@ void relayStatusLogs(bool async) {
 
       serializeIntermediateLog(status_logs, request);
       if (!request["log"].empty()) {
-        request["log"].pop_back();
+        // request["log"].pop_back();
       }
 
       // Flush the buffered status logs.

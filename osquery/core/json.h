@@ -17,6 +17,11 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
+#define RAPIDJSON_NO_SIZETYPEDEFINE
+namespace rapidjson {
+typedef ::std::size_t SizeType;
+}
+
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
@@ -28,3 +33,8 @@
 // We need to reinclude this to re-enable boost's warning suppression
 #include <boost/config/compiler/visualc.hpp>
 #endif
+
+#define RJ_ADD(doc, obj, key, value)                                           \
+  obj.AddMember(rapidjson::Value(key, doc.GetAllocator()).Move(),              \
+                rapidjson::Value(value).Move(),                                \
+                doc.GetAllocator());
