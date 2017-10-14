@@ -631,8 +631,6 @@ Status attachTableInternal(const std::string& name,
     auto format =
         "CREATE VIRTUAL TABLE temp." + name + " USING " + name + statement;
     rc = sqlite3_exec(instance->db(), format.c_str(), nullptr, nullptr, 0);
-  } else {
-    LOG(ERROR) << "Error attaching table: " << name << " (" << rc << ")";
   }
   return Status(rc, getStringForSQLiteReturnCode(rc));
 }

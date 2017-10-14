@@ -1,5 +1,5 @@
 race:TServerSocket
-race:PthreadThread
+# race:PthreadThread
 signal:signalHandler
 
 race:sqlite3Parser

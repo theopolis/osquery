@@ -258,6 +258,7 @@ void WatcherRunner::watchExtensions() {
   for (auto& extension : extension_restarts_) {
     if (extension.second > 3) {
       watcher.removeExtensionPath(extension.first);
+      LOG(WARNING) << "Extension blacklisted after repeat failures: " << extension.first;
       extension.second = 0;
     }
   }

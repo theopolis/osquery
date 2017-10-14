@@ -94,9 +94,22 @@ REGISTER_EXTERNAL(ExampleConfigPlugin, "config", "example");
 REGISTER_EXTERNAL(ExampleTable, "table", "example");
 REGISTER_EXTERNAL(ComplexExampleTable, "table", "complex_example");
 
+#include <future>
+#include <thread>
+
 int main(int argc, char* argv[]) {
   osquery::Initializer runner(argc, argv, ToolType::EXTENSION);
 
+/**
+    std::packaged_task<void()> task([&runner]{
+      std::this_thread::sleep_for(std::chrono::seconds(30));
+      runner.requestShutdown(0);
+    }); // wrap the function
+
+    std::future<void> f1 = task.get_future();  // get a future
+    std::thread t(std::move(task)); // launch on a thread
+     printf("go\n");
+*/
   auto status = startExtension("example", "0.0.1");
   if (!status.ok()) {
     LOG(ERROR) << status.getMessage();
