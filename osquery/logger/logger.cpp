@@ -64,6 +64,9 @@ FLAG(bool,
      false,
      "Only send status logs to secondary logger plugins");
 
+FLAG(int32, logger_min_stderr, 0, "Minimum level for statuses written to stderr");
+FLAG(bool, logger_stderr, true, "Write status logs to stderr");
+
 /**
  * @brief This hidden flag is for testing status logging.
  *
@@ -330,6 +333,12 @@ void setVerboseLevel() {
     }
   }
 
+  if (!Flag::isDefault("logger_min_stderr")) {
+    auto i = Flag::getInt32Value("logger_min_stderr");
+    FLAGS_stderrthreshold = static_cast<decltype(FLAGS_logger_min_stderr)>(i);
+  }
+
+  FLAGS_logtostderr = FLAGS_logger_stderr;
   if (FLAGS_disable_logging) {
     // Do log ERROR to stderr.
     // Do NOT log INFO, WARNING, ERROR to their log files.
@@ -338,6 +347,7 @@ void setVerboseLevel() {
 }
 
 void initStatusLogger(const std::string& name, bool init_glog) {
+  FLAGS_alsologtostderr = false;
   FLAGS_colorlogtostderr = true;
   FLAGS_logbufsecs = 0; // flush the log buffer immediately
   FLAGS_stop_logging_if_full_disk = true;
