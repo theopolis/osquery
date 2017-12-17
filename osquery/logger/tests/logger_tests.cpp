@@ -16,9 +16,11 @@
 #include <osquery/logger.h>
 
 DECLARE_int32(minloglevel);
+DECLARE_int32(stderrthreshold);
 
 namespace osquery {
 
+DECLARE_int32(logger_min_status);
 DECLARE_bool(logger_secondary_status_only);
 DECLARE_bool(logger_status_sync);
 DECLARE_bool(logger_event_type);
@@ -192,16 +194,38 @@ TEST_F(LoggerTests, test_logger_log_status) {
 }
 
 TEST_F(LoggerTests, test_logger_status_level) {
+  auto minloglevel = FLAGS_minloglevel;
   FLAGS_minloglevel = 0;
   // This will be printed to stdout.
   LOG(INFO) << "Logger test is generating an info status";
   EXPECT_EQ(1U, LoggerTests::statuses_logged);
 
   FLAGS_minloglevel = 1;
+  setVerboseLevel();
+
   LOG(INFO) << "Logger test is generating an info status";
   EXPECT_EQ(1U, LoggerTests::statuses_logged);
   LOG(WARNING) << "Logger test is generating a warning status";
   EXPECT_EQ(2U, LoggerTests::statuses_logged);
+  FLAGS_minloglevel = minloglevel;
+
+  auto stderrthreshold = FLAGS_stderrthreshold;
+  FLAGS_stderrthreshold = 2;
+  setVerboseLevel();
+
+  LOG(WARNING) << "Logger test is generating a warning status";
+  EXPECT_EQ(3U, LoggerTests::statuses_logged);
+  FLAGS_stderrthreshold = stderrthreshold;
+
+  auto logger_min_status = FLAGS_logger_min_status;
+  FLAGS_logger_min_status = 1;
+  setVerboseLevel();
+
+  LOG(INFO) << "Logger test is generating an info status";
+  EXPECT_EQ(3U, LoggerTests::statuses_logged);
+  LOG(WARNING) << "Logger test is generating a warning status";
+  EXPECT_EQ(4U, LoggerTests::statuses_logged);
+  FLAGS_logger_min_status = logger_min_status;
 }
 
 TEST_F(LoggerTests, test_feature_request) {
@@ -412,6 +436,7 @@ TEST_F(LoggerTests, test_recursion) {
   EXPECT_TRUE(rf.exists("logger", "recurse"));
   EXPECT_TRUE(rf.setActive("logger", "recurse").ok());
 
+  FLAGS_logtostderr = true;
   initStatusLogger("logger_test");
   initLogger("logger_test");
   LOG(WARNING) << "Log to the recursive logger";
@@ -446,5 +471,7 @@ TEST_F(LoggerTests, test_recursion) {
 
   EXPECT_EQ(0U, queuedStatuses());
   EXPECT_EQ(0U, queuedSenders());
+
+  FLAGS_logtostderr = false;
 }
 }
