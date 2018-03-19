@@ -239,6 +239,13 @@ TEST_F(ExtensionsTest, test_extension_broadcast) {
   // Now "test_alias" exists since it is in the extensions route table.
   EXPECT_TRUE(rf.exists("extension_test", "test_alias"));
 
+  // Test setActive, using one extension plugin and one local.
+  rf.registry("extension_test")
+      ->add("test_item2", std::make_shared<TestExtensionPlugin>());
+  status = rf.setActive("extension_test", "test_alias,test_item2");
+  EXPECT_NE(status.getMessage(),
+            "Unknown registry plugin: test_alias,test_item2");
+
   PluginResponse response;
   // This registry call will fail, since "test_alias" cannot be resolved using
   // a local registry call.
