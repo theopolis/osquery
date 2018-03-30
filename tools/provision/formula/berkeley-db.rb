@@ -4,7 +4,8 @@ class BerkeleyDb < AbstractOsqueryFormula
   desc "High performance key/value database"
   homepage "https://www.oracle.com/technology/products/berkeley-db/index.html"
   license "Sleepycat"
-  url "http://pkgs.fedoraproject.org/repo/pkgs/libdb/db-5.3.28.tar.gz/b99454564d5b4479750567031d66fe24/db-5.3.28.tar.gz"
+  url "ftp://ftp.netbsd.org/pub/pkgsrc/distfiles/db-5.3.28.tar.gz"
+  mirror "ftp://mirror.us.leaseweb.net/gentoo/distfiles/db-5.3.28.tar.gz"
   sha256 "e0a992d740709892e81f9d93f06daf305cf73fb81b545afe72478043172c3628"
   revision 200
 
