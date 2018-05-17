@@ -10,8 +10,8 @@
 
 #include <boost/algorithm/string/trim.hpp>
 
-#include "osquery/tables/system/hash.h"
 #include "osquery/tables/system/smbios_utils.h"
+#include "osquery/core/hashing.h"
 
 namespace osquery {
 namespace tables {
