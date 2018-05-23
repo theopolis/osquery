@@ -4,8 +4,8 @@ class AwsSdkCpp < AbstractOsqueryFormula
   desc "AWS SDK for C++"
   homepage "https://github.com/aws/aws-sdk-cpp"
   license "Apache-2.0"
-  url "https://github.com/aws/aws-sdk-cpp/archive/1.2.7.tar.gz"
-  sha256 "1f65e63dbbceb1e8ffb19851a8e0ee153e05bf63bfa12b0e259d50021ac3ab6e"
+  url "https://github.com/aws/aws-sdk-cpp/archive/1.4.55.tar.gz"
+  sha256 "0a70c2998d29cc4d8a4db08aac58eb196d404073f6586a136d074730317fe408"
   revision 200
 
   bottle do

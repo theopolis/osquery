@@ -33,7 +33,7 @@ class Ncurses < AbstractOsqueryFormula
 
     (lib/"pkgconfig").mkpath
 
-    system "./configure", "--prefix=#{prefix}",
+    system "./configure", *osquery_autoconf_flags,
                           "--enable-pc-files",
                           "--with-pkg-config-libdir=#{lib}/pkgconfig",
                           "--enable-sigwinch",

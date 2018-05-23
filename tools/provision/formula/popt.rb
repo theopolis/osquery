@@ -16,11 +16,7 @@ class Popt < AbstractOsqueryFormula
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--disable-shared",
-                          "--enable-static"
+    system "./configure", *osquery_autoconf_flags
     system "make", "install"
   end
 end

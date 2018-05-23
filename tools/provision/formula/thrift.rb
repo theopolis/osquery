@@ -44,6 +44,10 @@ class Thrift < AbstractOsqueryFormula
     ]
 
     ENV.prepend_path "PATH", Formula["bison"].bin
+
+    # Prevent unknown yylex.
+    ENV["LIBS"] = "/usr/lib/x86_64-linux-gnu/libfl.a"
+
     system "./bootstrap.sh"
     system "./configure", "--disable-debug",
                           "--prefix=#{prefix}",

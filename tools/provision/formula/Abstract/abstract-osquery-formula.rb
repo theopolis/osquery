@@ -19,6 +19,10 @@ def legacy_prefix
   Pathname.new("#{ENV["HOMEBREW_PREFIX"]}/legacy")
 end
 
+def arm_prefix
+  Pathname.new("#{ENV["HOMEBREW_PREFIX"]}/arm")
+end
+
 def default_prefix
   Pathname.new(ENV["HOMEBREW_PREFIX"])
 end
@@ -38,6 +42,13 @@ class AbstractOsqueryFormula < Formula
       )
     end
 
+    def set_arm
+      Object.const_set(
+        "HOMEBREW_PREFIX",
+        arm_prefix
+      )
+    end
+
     def license(name)
       ENV["LICENSE"] = name
     end
@@ -50,6 +61,13 @@ class AbstractOsqueryFormula < Formula
     # At build/compile time the formula will choose the active runtime to link
     # against, this *should* remain during bottle generation and pouring.
     bottle_specification.extend(SkipRelocation)
+
+    if ENV["BUILD_ARM"] == "1"
+      Object.const_set(
+        "HOMEBREW_PREFIX",
+        arm_prefix
+      )
+    end
   end
 
   def setup
@@ -66,6 +84,24 @@ class AbstractOsqueryFormula < Formula
       "-DCMAKE_LIBRARY_PATH=#{ENV["LIBRARY_PATH"]}",
       "-DCMAKE_INCLUDE_PATH=#{includes}",
     ]
+  end
+
+  def osquery_autoconf_flags
+    autoconf_flags = [
+      "--disable-debug",
+      "--disable-dependency-tracking",
+      "--disable-silent-rules",
+      "--prefix=#{prefix}",
+      "--disable-shared",
+      "--enable-static",
+    ]
+    if arm_build
+      autoconf_flags += [
+        "--host=aarch64-linux-gnu",
+        "--build=x86_64-linux-gnu"
+      ]
+    end
+    autoconf_flags
   end
 
   def reset(name)
@@ -117,6 +153,10 @@ class AbstractOsqueryFormula < Formula
     return ["libcpp"].include?(self.name)
   end
 
+  def arm_build
+    return ENV["BUILD_ARM"] == "1"
+  end
+
   def bypass_visibility_build
     if ["librpm", "python", "librdkafka"].include?(self.name)
       return true
@@ -131,12 +171,47 @@ class AbstractOsqueryFormula < Formula
     prepend_path "LD_LIBRARY_PATH", prefix
     prepend_path "LIBRARY_PATH", "#{default_prefix}/lib"
 
+    if arm_build
+      target = "aarch64-linux-gnu"
+      prepend "CXXFLAGS", "-I#{default_prefix}/include"
+      prepend "CXXFLAGS", "-I#{arm_prefix}/include"
+      prepend "CXXFLAGS", "-cxx-isystem#{default_prefix}/include/c++/v1" if OS.linux?
+      prepend "CXXFLAGS", "--sysroot=#{arm_prefix}/gcc-#{target}/#{target}/libc"
+      prepend "CXXFLAGS", "--gcc-toolchain=#{arm_prefix}/gcc-#{target}"
+      prepend "CXXFLAGS", "--target=aarch64-linux-gnu"
+
+      prepend "CFLAGS", "-I#{default_prefix}/include"
+      prepend "CFLAGS", "-I#{arm_prefix}/include"
+      prepend "CFLAGS", "--sysroot=#{arm_prefix}/gcc-#{target}/#{target}/libc"
+      prepend "CFLAGS", "--gcc-toolchain=#{arm_prefix}/gcc-#{target}"
+      prepend "CFLAGS", "--target=aarch64-linux-gnu"
+
+      prepend "CPPFLAGS", "-I#{default_prefix}/include"
+      prepend "CPPFLAGS", "-I#{arm_prefix}/include"
+      prepend "CPPFLAGS", "--sysroot=#{arm_prefix}/gcc-#{target}/#{target}/libc"
+      prepend "CPPFLAGS", "--gcc-toolchain=#{arm_prefix}/gcc-#{target}"
+      prepend "CPPFLAGS", "--target=aarch64-linux-gnu"
+
+      append "CXXFLAGS", "-stdlib=libc++" if OS.linux?
+      append "LDFLAGS", "-rtlib=compiler-rt" if OS.linux?
+      append "LDFLAGS", "-fuse-ld=lld" if OS.linux?
+      append "LDFLAGS", "-L#{arm_prefix}/lib"
+
+      ENV["CXX"] = "#{default_prefix}/bin/clang++"
+      ENV["CC"] = "#{default_prefix}/bin/clang"
+
+      # Ncurses/GCC
+      prepend_path "LIBRARY_PATH", "#{legacy_prefix}/lib" if OS.linux?
+      return
+    end
+
     if stage1_build
       ENV["CC"] = "gcc"
       ENV["CXX"] = "g++"
       prepend "CFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
-      prepend "CXXFLAGS", "-I#{legacy_prefix}/include" if OS.linux?
-      prepend "CXXFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
+      prepend "CXXFLAGS", "-idirafter/usr/include -idirafter/usr/include/x86_64-linux-gnu" if OS.linux?
+      prepend "CXXFLAGS", "-idirafter#{legacy_prefix}/include" if OS.linux?
+      prepend "CXXFLAGS", "-no-canonical-prefixes --sysroot=#{legacy_prefix}" if OS.linux?
       append "CFLAGS", "-Os"
       append "CXXFLAGS", "-Os"
     end
@@ -153,18 +228,28 @@ class AbstractOsqueryFormula < Formula
 
     if runtime_build
       # RapidJSON does not use CPPFlags.
-      prepend "CXXFLAGS", "-isystem#{default_prefix}/lib/clang/#{llvm_version}/include" if OS.linux?
-      prepend "CXXFLAGS", "-isystem#{default_prefix}/include"
-      prepend "CXXFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
-      prepend "CXXFLAGS", "-isystem#{default_prefix}/include/c++/v1" if OS.linux?
+      #prepend "CXXFLAGS", "-cxx-isystem#{legacy_prefix}/include" if OS.linux?
+      #prepend "CXXFLAGS", "-cxx-isystem#{default_prefix}/lib/clang/#{llvm_version}/include" if OS.linux?
 
-      prepend "CFLAGS", "-isystem#{default_prefix}/lib/clang/#{llvm_version}/include" if OS.linux?
+      # Configuration may check clang-cpp
+      # prepend "CPPFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
+      # prepend "CPPFLAGS", "-isystem#{default_prefix}/lib/clang/#{llvm_version}/include" if OS.linux?
+      # prepend "CPPFLAGS", "-isystem#{default_prefix}/include"
+
+      # prepend "CPPFLAGS", "-I#{legacy_prefix}/include" if OS.linux?
+      # prepend "CPPFLAGS", "-I#{default_prefix}/lib/clang/#{llvm_version}/include" if OS.linux?
+      prepend "CPPFLAGS", "-I#{default_prefix}/include"
+
+      #prepend "CFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
+      #prepend "CFLAGS", "-isystem#{default_prefix}/lib/clang/#{llvm_version}/include" if OS.linux?
       prepend "CFLAGS", "-isystem#{default_prefix}/include"
-      prepend "CFLAGS", "-isystem#{legacy_prefix}/include" if OS.linux?
+      #prepend "CFLAGS", ""
 
       if !libcpp_build
         # Clang will place -I before the -isystem from CPPFlags.
-        prepend "CXXFLAGS", "-I#{default_prefix}/include/c++/v1" if OS.linux?
+        prepend "CXXFLAGS", "-cxx-isystem#{default_prefix}/include/c++/v1" if OS.linux?
+
+        ##prepend "CXXFLAGS", "-I#{default_prefix}/include/c++/v1" if OS.linux?
         append "CXXFLAGS", "-stdlib=libc++" if OS.linux?
         append "LDFLAGS", "-rtlib=compiler-rt" if OS.linux?
 
@@ -173,6 +258,9 @@ class AbstractOsqueryFormula < Formula
           append "CXXFLAGS", "-fvisibility=hidden -fvisibility-inlines-hidden"
         end
       end
+
+      # Finally, add the first CXXFLAGS.
+      prepend "CXXFLAGS", "-isystem#{default_prefix}/include"
 
       if !["libgcrypt"].include?(self.name)
         # GCrypt includes a Pragma GCC to disable optimization.
@@ -186,8 +274,9 @@ class AbstractOsqueryFormula < Formula
 
     if !stage1_build
       # Set the search path for header files.
-      prepend_path "CPATH", "#{default_prefix}/include"
       prepend_path "CPATH", "#{legacy_prefix}/include" if OS.linux?
+      prepend_path "CPATH", "#{default_prefix}/lib/clang/#{llvm_version}/include" if OS.linux?
+      prepend_path "CPATH", "#{default_prefix}/include"
       prepend_path "LD_RUN_PATH", "#{default_prefix}/lib"
     end
 
@@ -220,8 +309,10 @@ class AbstractOsqueryFormula < Formula
       self.setup_runtimes
     end
 
-    append "CFLAGS", "-fPIC -DNDEBUG -march=core2"
-    append "CXXFLAGS", "-fPIC -DNDEBUG -march=core2"
+    if !arm_build 
+      append "CFLAGS", "-fPIC -DNDEBUG -march=core2"
+      append "CXXFLAGS", "-fPIC -DNDEBUG -march=core2"
+    end
 
     # macOS compatibility flags.
     if OS.mac?

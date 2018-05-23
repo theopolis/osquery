@@ -1,6 +1,6 @@
 require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
 
-class Libcpp < AbstractOsqueryFormula
+class LibcppArm < AbstractOsqueryFormula
   desc "Next-gen compiler infrastructure"
   homepage "http://llvm.org/"
   license "NCSA"
@@ -49,8 +49,10 @@ class Libcpp < AbstractOsqueryFormula
 
   needs :cxx11
 
-  def clang_lib
-    return "#{Formula["osquery/osquery-local/llvm"].prefix}/lib/clang/#{llvm_version}/lib"
+  set_arm
+
+  def builtins_lib
+    return "#{Formula["osquery/osquery-local/llvm"].prefix}lib/clang/#{llvm_version}/lib/linux"
   end
 
   def install
@@ -60,22 +62,37 @@ class Libcpp < AbstractOsqueryFormula
     (buildpath/"projects/libcxxabi").install resource("libcxxabi")
     (buildpath/"projects/libunwind").install resource("libunwind")
 
+    target = "aarch64-linux-gnu"
+    toolchain = "/usr/local/osquery/arm/gcc-#{target}"
+    sysroot = "#{toolchain}/#{target}/libc"
+    build = "--target=aarch64-linux-gnu --sysroot=#{sysroot} --gcc-toolchain=#{toolchain}"
+
     # Building with Shared libs, could use LIBNAME_ENABLE_SHARED=NO.
     args = %w[
-      -DLLVM_OPTIMIZED_TABLEGEN=ON
-      -DLLVM_INCLUDE_DOCS=OFF
-      -DLLVM_ENABLE_RTTI=ON
-      -DLLVM_ENABLE_EH=ON
-      -DLLVM_TARGETS_TO_BUILD=X86;ARM;AArch64
+      -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON
+      -DCOMPILER_RT_BUILD_BUILTINS=ON
+      -DCOMPILER_RT_BUILD_SANITIZERS=OFF
+      -DCOMPILER_RT_BUILD_XRAY=OFF
+      -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
+      -DCOMPILER_RT_BUILD_PROFILE=OFF
       -DLLVM_INCLUDE_EXAMPLES=OFF
       -DLLVM_INCLUDE_TESTS=OFF
       -DLIBCXX_USE_COMPILER_RT=ON
       -DLIBCXXABI_USE_COMPILER_RT=ON
       -DLIBCXXABI_USE_LLVM_UNWINDER=ON
-      -DLLVM_BUILD_EXTERNAL_COMPILER_RT=ON
       -DCLANG_DEFAULT_CXX_STDLIB=libstdc++
-      -DLIBFUZZER_ENABLE=YES
     ]
+
+    args << "-DCMAKE_C_COMPILER_TARGET=#{target}"
+    args << "-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld -lgcc"
+    args << "-DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=lld -lgcc"
+    args << "-DCMAKE_C_FLAGS=#{build}"
+    args << "-DCMAKE_CXX_FLAGS=#{build}"
+
+    ENV.delete "LDFLAGS"
+    ENV.delete "CPATH"
+    ENV.delete "CXXFLAGS"
+    ENV.delete "CPPFLAGS"
 
     mktemp do
       system "cmake", "-G", "Unix Makefiles", buildpath/"projects/compiler-rt", *(std_cmake_args + args)
@@ -91,6 +108,6 @@ class Libcpp < AbstractOsqueryFormula
       end
     end
 
-    ln_sf prefix/"lib", clang_lib
+    ln_sf prefix/"lib/linux/libclang_rt.builtins-aarch64.a", builtins_lib
   end
 end

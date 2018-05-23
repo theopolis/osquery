@@ -4,8 +4,9 @@ class Libdpkg < AbstractOsqueryFormula
   desc "Debian package management system"
   homepage "https://wiki.debian.org/Teams/Dpkg"
   license "GPL-2.0+"
-  url "http://download.openpkg.org/components/cache/dpkg/dpkg_1.18.23.tar.xz"
-  sha256 "cc08802a0cea2ccd0c10716bc71531ff9b9234dd454b83a59f71117a37f36923"
+  url "https://launchpad.net/debian/+archive/primary/+sourcefiles/dpkg/1.19.0.5/dpkg_1.19.0.5.tar.xz"
+  mirror "http://snapshot.debian.org/archive/debian/20180121T094839Z/pool/main/d/dpkg/dpkg_1.19.0.5.tar.xz"
+  sha256 "818046927a7f77c1bcbbad7d8dbc04cdf0f3e6ec4e1a4f9d313378ecc69d85b5"
   revision 200
 
   bottle do

@@ -4,8 +4,8 @@ class Sleuthkit < AbstractOsqueryFormula
   desc "Forensic toolkit"
   homepage "http://www.sleuthkit.org/"
   license "CPL-1.0 and IPL-1.0 and GPL-2.0+"
-  url "https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.3.0.tar.gz"
-  sha256 "64a57a44955e91300e1ae69b34e8702afda0fb5bd72e2116429875c9f5f28980"
+  url "https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.6.1.tar.gz"
+  sha256 "bb2c936dbc88820fc4a875bc9b610f56c6a4a61b7bc8625f86be2549a948a7a9"
   head "https://github.com/sleuthkit/sleuthkit.git"
   revision 200
 

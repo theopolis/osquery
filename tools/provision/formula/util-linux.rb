@@ -4,8 +4,8 @@ class UtilLinux < AbstractOsqueryFormula
   desc "Collection of Linux utilities"
   homepage "https://github.com/karelzak/util-linux"
   license "GPL-2.0+"
-  url "https://www.kernel.org/pub/linux/utils/util-linux/v2.27/util-linux-2.27.1.tar.xz"
-  sha256 "0a818fcdede99aec43ffe6ca5b5388bff80d162f2f7bd4541dca94fecb87a290"
+  url "http://ftp.iij.ad.jp/pub/linux/kernel/linux/utils/util-linux/v2.27/util-linux-2.27.1.tar.gz"
+  sha256 "133c14f625d40e90e73e9d200faf3f2ce87937b99f923c84e5504ac0badc71d6"
   head "https://github.com/karelzak/util-linux.git"
   revision 200
 
@@ -16,18 +16,12 @@ class UtilLinux < AbstractOsqueryFormula
   end
 
   def install
-    system "./autogen.sh"
-    system "./configure",
-      "--disable-debug",
-      "--disable-dependency-tracking",
-      "--disable-silent-rules",
-      "--prefix=#{prefix}",
+    #system "./autogen.sh"
+    system "./configure", *osquery_autoconf_flags,
       # Fix chgrp: changing group of 'wall': Operation not permitted
       "--disable-use-tty-group",
       # Conflicts with coreutils.
       "--disable-kill",
-      "--disable-shared",
-      "--enable-static",
       "--with-readline=no"
     system "make", "install"
   end

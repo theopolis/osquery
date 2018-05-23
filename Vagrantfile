@@ -33,7 +33,10 @@ targets = {
     "box" => "bento/ubuntu-16.10"
   },
   "ubuntu17.04" => {
-    "box" => "bento/ubuntu17.04"
+    "box" => "bento/ubuntu-17.04"
+  },
+  "ubuntu18.04" => {
+    "box" => "bento/ubuntu-18.04"
   },
   "ubuntu12" => {
     "box" => "ubuntu/precise64"

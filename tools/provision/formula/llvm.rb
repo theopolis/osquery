@@ -4,7 +4,7 @@ class Llvm < AbstractOsqueryFormula
   desc "Next-gen compiler infrastructure"
   homepage "http://llvm.org/"
   license "NCSA"
-  revision 200
+  revision 201
 
   stable do
     url "http://releases.llvm.org/#{llvm_version}/llvm-#{llvm_version}.src.tar.xz"
@@ -77,6 +77,7 @@ class Llvm < AbstractOsqueryFormula
       -DLLVM_BUILD_LLVM_DYLIB=ON
       -DBUILD_SHARED_LIBS=OFF
       -DLLVM_LINK_LLVM_DYLIB=ON
+      -DC_INCLUDE_DIRS=/usr/local/osquery/legacy/include
     ]
 
     # osquery added a link for pthread
