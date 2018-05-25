@@ -87,8 +87,8 @@ function platform_linux_main() {
   brew_dependency osquery/osquery-local/libdevmapper
   brew_dependency osquery/osquery-local/libiptables
   brew_dependency osquery/osquery-local/libgcrypt
-  brew_dependency osquery/osquery-local/libcryptsetup
-  brew_dependency osquery/osquery-local/libudev
+  brew_dependency osquery/osquery-local/libcryptsetup # arm skip
+  brew_dependency osquery/osquery-local/libudev # amr skip
   brew_dependency osquery/osquery-local/libaudit
   brew_dependency osquery/osquery-local/libdpkg
 }
@@ -116,8 +116,8 @@ function platform_darwin_main() {
 
  function platform_posix_main() {
   # Library secondary dependencies.
-  brew_dependency osquery/osquery-local/popt
-  brew_dependency osquery/osquery-local/berkeley-db
+  brew_dependency osquery/osquery-local/popt # arm skip
+  brew_dependency osquery/osquery-local/berkeley-db # arm skip
 
   # libarchive for file carving
   brew_dependency osquery/osquery-local/libarchive
@@ -125,20 +125,20 @@ function platform_darwin_main() {
   brew_dependency osquery/osquery-local/zstd
 
   # List of LLVM-compiled dependencies.
-  brew_dependency osquery/osquery-local/libmagic
+  brew_dependency osquery/osquery-local/libmagic # arm skip
   brew_dependency osquery/osquery-local/pcre
   brew_dependency osquery/osquery-local/boost
-  brew_dependency osquery/osquery-local/google-benchmark
-  brew_dependency osquery/osquery-local/sleuthkit
+  brew_dependency osquery/osquery-local/google-benchmark # arm skip
+  brew_dependency osquery/osquery-local/sleuthkit # arm skip
   brew_dependency osquery/osquery-local/thrift
   brew_dependency osquery/osquery-local/rocksdb
   brew_dependency osquery/osquery-local/gflags
-  brew_dependency osquery/osquery-local/aws-sdk-cpp
-  brew_dependency osquery/osquery-local/yara
+  brew_dependency osquery/osquery-local/aws-sdk-cpp # can skip
+  brew_dependency osquery/osquery-local/yara # can skip
   brew_dependency osquery/osquery-local/glog
-  brew_dependency osquery/osquery-local/augeas
-  brew_dependency osquery/osquery-local/lldpd
-  brew_dependency osquery/osquery-local/librdkafka
+  brew_dependency osquery/osquery-local/augeas 
+  brew_dependency osquery/osquery-local/lldpd # can skip
+  brew_dependency osquery/osquery-local/librdkafka # can skip
   brew_dependency osquery/osquery-local/librpm
 
   # POSIX-shared locally-managed tools.

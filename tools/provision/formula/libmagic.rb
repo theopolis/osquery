@@ -22,12 +22,8 @@ class Libmagic < AbstractOsqueryFormula
   def install
     ENV.universal_binary if build.universal?
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--enable-fsect-man5",
-                          "--enable-static",
-                          "--disable-shared"
+    system "./configure", *osquery_autoconf_flags,
+                          "--enable-fsect-man5"
     system "make", "install"
     (share+"misc/magic").install Dir["magic/Magdir/*"]
 

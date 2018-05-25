@@ -8,7 +8,7 @@ class Openssl < AbstractOsqueryFormula
   mirror "https://dl.bintray.com/homebrew/mirror/openssl-1.0.2m.tar.gz"
   mirror "https://www.mirrorservice.org/sites/ftp.openssl.org/source/openssl-1.0.2m.tar.gz"
   sha256 "8c6ff15ec6b319b50788f42c7abc2890c08ba5a1cdcd3810eb9092deada37b0f"
-  revision 200
+  revision 201
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -28,7 +28,7 @@ class Openssl < AbstractOsqueryFormula
 
   def arch_args
     if OS.linux?
-      %w[linux-x86_64]
+      %w[linux-generic64]
     else
       %w[darwin64-x86_64-cc enable-ec_nistp_64_gcc_128]
     end
@@ -49,8 +49,8 @@ class Openssl < AbstractOsqueryFormula
     if OS.linux?
       args += [
         ENV.cppflags,
-        ENV.ldflags,
       ]
+      args << ENV.ldflags unless arm_build
     end
     args << ENV.cflags
     return args
@@ -69,7 +69,7 @@ class Openssl < AbstractOsqueryFormula
     system "perl", "./Configure", *(configure_args + arch_args)
     system "make", "depend"
     system "make"
-    system "make", "test"
+    system "make", "test" unless arm_build
     system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl"
   end
 

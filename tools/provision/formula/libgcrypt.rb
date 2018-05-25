@@ -4,9 +4,9 @@ class Libgcrypt < AbstractOsqueryFormula
   desc "Cryptographic library based on the code from GnuPG"
   homepage "https://directory.fsf.org/wiki/Libgcrypt"
   license "LGPL-2.1+"
-  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.1.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.8.1.tar.bz2"
-  sha256 "7a2875f8b1ae0301732e878c0cca2c9664ff09ef71408f085c50e332656a78b3"
+  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.1.tar.gz"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.8.1.tar.gz"
+  sha256 "4f1dc2d90f9dd703cf9b214e7e87ed64a456426fccab1f4977df4aec093eaaaf"
   revision 200
 
   bottle do
@@ -29,21 +29,16 @@ class Libgcrypt < AbstractOsqueryFormula
     ENV.universal_binary if build.universal?
 
     args = [
-      "--disable-dependency-tracking",
-      "--disable-silent-rules",
       "--disable-avx-support",
       "--disable-avx2-support",
       "--disable-drng-support",
       "--disable-pclmul-support",
-      "--disable-shared",
-      "--enable-static",
-      "--prefix=#{prefix}",
       "--disable-asm",
       "--with-libgpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}",
       "--with-gpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}",
     ]
 
-    system "./configure", *args
+    system "./configure", *osquery_autoconf_flags, *args
     if build.universal?
       buildpath.install resource("config.h.ed")
       system "ed -s - config.h <config.h.ed"

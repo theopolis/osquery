@@ -1,6 +1,6 @@
 require File.expand_path("../Abstract/abstract-osquery-formula", __FILE__)
 
-class Thrift < AbstractOsqueryFormula
+class ThriftArm < AbstractOsqueryFormula
   desc "Framework for scalable cross-language services development"
   homepage "https://thrift.apache.org/"
   license "Apache-2.0"
@@ -22,8 +22,9 @@ class Thrift < AbstractOsqueryFormula
 
   def install
     ENV.cxx11
-    ENV["PY_PREFIX"] = prefix
     ENV.append "CPPFLAGS", "-DOPENSSL_NO_SSL3"
+    ENV.append "CXXFLAGS", "-DARITHMETIC_RIGHT_SHIFT=1" if arm_build
+    ENV.append "CXXFLAGS", "-DSIGNED_RIGHT_SHIFT_IS=1" if arm_build
 
     exclusions = [
       "--without-ruby",
@@ -39,12 +40,14 @@ class Thrift < AbstractOsqueryFormula
       "--without-qt4",
       "--without-nodejs",
       "--without-rs",
-      "--with-python",
+      "--without-python",
       "--with-cpp",
       "--enable-tutorial=no",
       "--with-openssl=#{Formula["osquery/osquery-local/openssl"].prefix}",
       "--with-boost=#{Formula["osquery/osquery-local/boost"].prefix}"
     ]
+
+    ENV["THRIFT"] = "#{default_prefix}/bin/thrift"
 
     ENV.prepend_path "PATH", Formula["bison"].bin
 
@@ -98,3 +101,25 @@ index 6a7a1a5..8b4ddc2 100755
  AM_CONDITIONAL(WITH_PY3, [test "$have_py3" = "yes"])
  
  AX_THRIFT_LIB(perl, [Perl], yes)
+
+diff --git a/configure.ac b/configure.ac
+index 8b4ddc2..fed3f14 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -679,14 +679,14 @@ AC_CHECK_DECL([AI_ADDRCONFIG], [],
+ 
+ AC_FUNC_ALLOCA
+ AC_FUNC_FORK
+-AC_FUNC_MALLOC
+ AC_FUNC_MEMCMP
+-AC_FUNC_REALLOC
+ AC_FUNC_SELECT_ARGTYPES
+ AC_FUNC_STAT
+ AC_FUNC_STRERROR_R
+ AC_FUNC_STRFTIME
+ AC_FUNC_VPRINTF
++AC_CHECK_FUNCS([malloc])
++AC_CHECK_FUNCS([realloc])
+ AC_CHECK_FUNCS([strtoul])
+ AC_CHECK_FUNCS([bzero])
+ AC_CHECK_FUNCS([ftruncate])

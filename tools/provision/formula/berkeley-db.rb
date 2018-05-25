@@ -21,13 +21,9 @@ class BerkeleyDb < AbstractOsqueryFormula
     # --enable-compat185 is necessary because our build shadows
     # the system berkeley db 1.x
     args = %W[
-      --disable-debug
-      --prefix=#{prefix}
       --mandir=#{man}
       --enable-cxx
       --enable-compat185
-      --disable-shared
-      --enable-static
     ]
 
     inreplace "src/dbinc/atomic.h", "__atomic_compare_exchange", "__atomic_compare_exchange_db"
@@ -41,7 +37,7 @@ class BerkeleyDb < AbstractOsqueryFormula
 
     # BerkeleyDB requires you to build everything from the build_unix subdirectory
     cd "build_unix" do
-      system "../dist/configure", *args
+      system "../dist/configure", *osquery_autoconf_flags, *args
       system "make", "install"
 
       # use the standard docs location

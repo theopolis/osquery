@@ -4,8 +4,8 @@ class Libudev < AbstractOsqueryFormula
   desc "API for enumerating and introspecting local devices"
   homepage "https://www.freedesktop.org/software/systemd/man/libudev.html"
   license "LGPL-2.1+"
-  url "http://pkgs.fedoraproject.org/repo/pkgs/udev/udev-173.tar.bz2/91a88a359b60bbd074b024883cc0dbde/udev-173.tar.bz2"
-  sha256 "70a18315a12f8fc1131f7da5b4dae3606988b69d5c08f96f443b84b8486caaaf"
+  url "https://s3.amazonaws.com/osquery-packages/deps/udev-182.tar.gz"
+  sha256 "7fac46ed4ae4dbe0ea921658c900b9e950541d3eabf9da54f0f5b6163278e202"
   revision 200
 
   bottle do
@@ -21,11 +21,11 @@ class Libudev < AbstractOsqueryFormula
       "--disable-keymap",
       "--disable-mtd-probe",
       "--disable-hwdb",
-      "--enable-static",
-      "--disable-shared",
     ]
 
-    system "./configure", "--prefix=#{prefix}", *args
+    inreplace "build-aux/config.sub", " arm-* ", " aarch* "
+
+    system "./configure", *osquery_autoconf_flags, *args
     system "make"
     system "make", "install"
   end

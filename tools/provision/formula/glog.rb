@@ -20,10 +20,10 @@ class Glog < AbstractOsqueryFormula
   def install
     ENV.cxx11
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--disable-shared",
-                          "--enable-static"
-    system "make", "install"
+    mkdir "build" do
+      system "cmake", "..", *osquery_cmake_args
+      #system "./configure", *osquery_autoconf_flags
+      system "make", "install"
+    end
   end
 end

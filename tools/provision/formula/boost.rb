@@ -4,8 +4,8 @@ class Boost < AbstractOsqueryFormula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
   license "BSL-1.0"
-  url "https://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2"
-  sha256 "5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9"
+  url "https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz"
+  sha256 "bd0df411efd9a585e5a2212275f8762079fed8842264954675a4fddc46cfcf60"
   head "https://github.com/boostorg/boost.git"
   revision 200
 
@@ -20,14 +20,14 @@ class Boost < AbstractOsqueryFormula
 
   def install
     ENV.cxx11
-    ENV.universal_binary if build.universal?
 
     # libdir should be set by --prefix but isn't
     bootstrap_args = [
       "--prefix=#{prefix}",
       "--libdir=#{lib}",
-      "--with-toolset=cc",
     ]
+
+    bootstrap_args << "--with-toolset=cc" unless arm_build
 
     # layout should be synchronized with boost-python
     args = [
@@ -69,7 +69,7 @@ class Boost < AbstractOsqueryFormula
     #  error: duplicate initialization of clang-linux
     if OS.mac?
       inreplace "project-config.jam", "cc ;", "darwin ;"
-    else
+    elsif !arm_build
       inreplace "project-config.jam", "cc ;", "clang ;"
     end
 

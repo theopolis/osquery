@@ -16,9 +16,7 @@ class Libaudit < AbstractOsqueryFormula
 
   def install
     system "./autogen.sh"
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-shared",
-                          "--enable-static"
+    system "./configure", *osquery_autoconf_flags
     cd "lib" do
       system "make"
       system "make", "install"

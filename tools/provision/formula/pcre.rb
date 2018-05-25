@@ -18,8 +18,7 @@ class Pcre < AbstractOsqueryFormula
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
+    system "./configure", *osquery_autoconf_flags,
                           "--enable-utf8",
                           "--enable-pcre8",
                           "--enable-pcre16",
@@ -27,9 +26,7 @@ class Pcre < AbstractOsqueryFormula
                           "--enable-unicode-properties",
                           "--enable-pcregrep-libz",
                           "--enable-pcregrep-libbz2",
-                          "--enable-jit",
-                          "--disable-shared",
-                          "--enable-static"
+                          "--enable-jit"
     system "make"
     ENV.deparallelize
     system "make", "install"

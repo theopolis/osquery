@@ -322,7 +322,7 @@ if(NOT DEFINED ENV{OPTIMIZED})
   if(WINDOWS)
     # It is unclear if AVX must be managed on Windows.
     add_compile_options(/favor:AMD64)
-  else()
+  elseif(NOT DEFINED ENV{BUILD_ARM})
     add_compile_options(-march=x86-64 -mno-avx)
   endif()
 endif()
@@ -613,13 +613,19 @@ if(WINDOWS)
   list(REMOVE_DUPLICATES OS_LIB_DIRS)
   link_directories(${OS_LIB_DIRS})
 else()
+  if(NOT DEFINED ENV{BUILD_ARM})
+    set(OS_LIB_DIRS_ARCH
+      "/usr/lib/x86_64-linux-gnu/"
+    )
+  endif()
+
   set(OS_LIB_DIRS
     "/lib"
     "/lib64"
     "/usr/lib"
     "/usr/lib64"
-    "/usr/lib/x86_64-linux-gnu/"
-    )
+    ${OS_LIB_DIRS_ARCH}
+  )
 endif()
 
 # Make sure the generated paths exist
