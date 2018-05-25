@@ -37,7 +37,7 @@ class GlibcLegacy < AbstractOsqueryFormula
     ENV.delete "LIBRARY_PATH"
     ENV.delete "CPATH"
     ENV.delete "LD_LIBRARY_PATH"
-    ENV["LDFLAGS"] = "-L/usr/local/osquery/lib"
+    ENV["LDFLAGS"] = "-L/usr/local/osquery/lib -no-pie"
 
     mkdir "build" do
       args = [
@@ -77,7 +77,7 @@ diff -Nur glibc-2.12.2/configure glibc-2.12.2-patched/configure
    case $ac_prog_version in
      '') ac_prog_version="v. ?.??, bad"; ac_verc_fail=yes;;
 -    3.4* | 4.[0-9]* )
-+    3.4* | 4.[0-9]* | 5.[0-9]* )
++    3.4* | 4.[0-9]* | 5.[0-9]* | 6.[0-9]* | 7.[0-9]* )
         ac_prog_version="$ac_prog_version, ok"; ac_verc_fail=no;;
      *) ac_prog_version="$ac_prog_version, bad"; ac_verc_fail=yes;;
 
@@ -134,3 +134,17 @@ index d9b6de9..05677a9 100644
  
  #define __GLIBC_PREREQ(maj, min) \
 	((__GLIBC__ << 16) + __GLIBC_MINOR__ >= ((maj) << 16) + (min))
+
+diff --git a/malloc/obstack.c b/malloc/obstack.c
+index 5786da0aa4..c27a422077 100644
+--- a/malloc/obstack.c
++++ b/malloc/obstack.c
+@@ -116,7 +116,7 @@ int obstack_exit_failure = EXIT_FAILURE;
+ /* A looong time ago (before 1994, anyway; we're not sure) this global variable
+    was used by non-GNU-C macros to avoid multiple evaluation.  The GNU C
+    library still exports it because somebody might use it.  */
+-struct obstack *_obstack_compat;
++struct obstack *_obstack_compat = 0;
+ compat_symbol (libc, _obstack_compat, _obstack, GLIBC_2_0);
+ #  endif
+ # endif
