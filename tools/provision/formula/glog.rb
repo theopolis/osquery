@@ -6,7 +6,7 @@ class Glog < AbstractOsqueryFormula
   license "Apache-2.0"
   url "https://github.com/google/glog/archive/v0.3.5.tar.gz"
   sha256 "7580e408a2c0b5a89ca214739978ce6ff480b5e7d8d7698a2aa92fadc484d1e0"
-  revision 200
+  revision 201
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -20,10 +20,9 @@ class Glog < AbstractOsqueryFormula
   def install
     ENV.cxx11
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--disable-shared",
-                          "--enable-static"
-    system "make", "install"
+    mkdir "build" do
+      system "cmake", "..", *osquery_cmake_args
+      system "make", "install"
+    end
   end
 end

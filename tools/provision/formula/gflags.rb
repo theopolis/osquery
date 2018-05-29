@@ -6,7 +6,7 @@ class Gflags < AbstractOsqueryFormula
   license "MIT"
   url "https://github.com/gflags/gflags/archive/v2.2.1.tar.gz"
   sha256 "ae27cdbcd6a2f935baa78e4f21f675649271634c092b1be01469440495609d0e"
-  revision 200
+  revision 201
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"

@@ -17,13 +17,11 @@ class Libdpkg < AbstractOsqueryFormula
 
   def install
     args = [
-      "--disable-dependency-tracking",
-      "--disable-silent-rules",
       "--disable-dselect",
       "--disable-start-stop-daemon"
     ]
 
-    system "./configure", "--prefix=#{prefix}", *args
+    system "./configure", *osquery_autoconf_flags, *args
     cd "lib" do
       system "make"
       system "make", "install"

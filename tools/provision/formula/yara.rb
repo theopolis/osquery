@@ -35,14 +35,10 @@ class Yara < AbstractOsqueryFormula
     ENV.append "CFLAGS", "-std=gnu89"
 
     # find Homebrew's libpcre
-    ENV.append "LDFLAGS", "-L#{Formula["pcre"].opt_lib} -lpcre"
+    ENV.append "LDFLAGS", "-L#{Formula["osquery/osquery-local/pcre"].opt_lib} -lpcre"
 
     system "./bootstrap.sh"
-    system "./configure", "--disable-silent-rules",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--disable-shared",
-                          "--enable-static"
+    system "./configure", *osquery_autoconf_flags
     system "make", "install"
   end
 end

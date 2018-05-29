@@ -16,17 +16,13 @@ class Libarchive < AbstractOsqueryFormula
   end
 
   def install
-    system "./configure",
-           "--prefix=#{prefix}",
+    system "./configure", *osquery_autoconf_flags,
            "--without-lzo2",    # Use lzop binary instead of lzo2 due to GPL
            "--without-nettle",  # xar hashing option but GPLv3
            "--without-xml2",    # xar hashing option but tricky dependencies
            "--without-openssl", # mtree hashing now possible without OpenSSL
-           "--with-expat",       # best xar hashing option
-           "--disable-shared",
-           "--enable-static"
+           "--with-expat"       # best xar hashing option
 
     system "make", "install"
-
   end
 end

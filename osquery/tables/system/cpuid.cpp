@@ -79,11 +79,12 @@ static inline void cpuid(size_t eax, size_t ecx, int regs[4]) {
 #if defined(WIN32)
   __cpuidex(
       static_cast<int*>(regs), static_cast<int>(eax), static_cast<int>(ecx));
-#else
+#elif !defined(__aarch64__)
   asm volatile("cpuid"
                : "=a"(regs[0]), "=b"(regs[1]), "=c"(regs[2]), "=d"(regs[3])
                : "a"(eax), "c"(ecx));
 #endif
+
 }
 
 static inline void registerToString(int reg, std::stringstream& stream) {

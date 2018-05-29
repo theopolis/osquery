@@ -22,10 +22,15 @@ class Librdkafka < AbstractOsqueryFormula
 
   def install
     args = [
-      "--disable-dependency-tracking",
-      "--prefix=#{prefix}",
       "--disable-sasl",
       "--disable-lz4",
+    ] + osquery_autoconf_flags
+
+    args = args - [
+      "--disable-debug",
+      "--disable-shared",
+      "--disable-dependency-tracking",
+      "--disable-silent-rules"
     ]
 
     if OS.linux?

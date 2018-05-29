@@ -22,15 +22,7 @@ class Augeas < AbstractOsqueryFormula
 
   def install
     ENV.append_to_cflags "-I/usr/include/libxml2" if OS.mac?
-    system "./autogen.sh", "--without-selinux", "--prefix=#{prefix}"
-
-    args = [
-      "--without-selinux",
-      "--prefix=#{prefix}",
-      "--disable-dependency-tracking",
-      "--enable-shared=no"
-    ]
-    system "./configure", *args
+    system "./autogen.sh", "--without-selinux", *osquery_autoconf_flags
 
     # Build the local gnulib checkout.
     cd "gnulib/lib" do

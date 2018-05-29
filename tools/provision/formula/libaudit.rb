@@ -4,8 +4,8 @@ class Libaudit < AbstractOsqueryFormula
   desc "Linux auditing framework"
   homepage "https://github.com/Distrotech/libaudit"
   license "LGPL-2.1+"
-  url "https://github.com/Distrotech/libaudit/archive/audit-2.4.2.tar.gz"
-  sha256 "63020c88b0f37a93438894e67e63ccede23d658277ecc6afb9d40e4043147d3f"
+  url "https://github.com/linux-audit/audit-userspace/archive/v2.8.3.tar.gz"
+  sha256 "c239e3813b84bc264aaf2f796c131c1fe02960244f789ec2bd8d88aad4561b29"
   revision 200
 
   bottle do
@@ -16,9 +16,7 @@ class Libaudit < AbstractOsqueryFormula
 
   def install
     system "./autogen.sh"
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-shared",
-                          "--enable-static"
+    system "./configure", *osquery_autoconf_flags
     cd "lib" do
       system "make"
       system "make", "install"

@@ -6,7 +6,7 @@ class Libdevmapper < AbstractOsqueryFormula
   license "LGPL-2.1+"
   url "https://www.mirrorservice.org/sites/sourceware.org/pub/lvm2/old/LVM2.2.02.173.tgz"
   sha256 "ceb9168c7e009ef487f96a1fe969b23cbb07d920ffb71769affdbdf30fea8d64"
-  revision 200
+  revision 202
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -18,6 +18,13 @@ class Libdevmapper < AbstractOsqueryFormula
     # When building with LLVM/clang do not expect symbol versioning information.
     inreplace "lib/misc/lib.h", "defined(__GNUC__)", "defined(__GNUC__) && !defined(__clang__)"
 
+    # Remove rpl_malloc requirement
+    if arm_build
+      inreplace "configure.in", "AC_FUNC_MALLOC", "AC_CHECK_FUNCS(malloc,,hard_bailout)"
+      inreplace "configure.in", "AC_FUNC_REALLOC", "AC_CHECK_FUNCS(realloc,,hard_bailout)"
+      system "autoreconf"
+    end
+
     args = [
       "--with-lvm1=none",
       "--disable-selinux",
@@ -26,7 +33,7 @@ class Libdevmapper < AbstractOsqueryFormula
       "--enable-static_link",
     ]
 
-    system "./configure", "--prefix=#{prefix}", *args
+    system "./configure", *osquery_autoconf_flags, *args
     system "make", "libdm.device-mapper"
 
     cd "libdm" do

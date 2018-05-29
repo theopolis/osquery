@@ -18,13 +18,10 @@ class Libxml2 < AbstractOsqueryFormula
 
   def install
     args = []
-    args << "--with-zlib=#{legacy_prefix}" if OS.linux?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
+    args << "--with-zlib=#{legacy_prefix}" if OS.linux? and not arm_build
+    system "./configure", *osquery_autoconf_flags,
                           "--without-python",
                           "--without-lzma",
-                          "--enable-static",
-                          "--disable-shared",
                           *args
     system "make"
     ENV.deparallelize

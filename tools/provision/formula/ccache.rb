@@ -14,17 +14,10 @@ class Ccache < AbstractOsqueryFormula
     sha256 "6232d274d9cb91b394e91ceb51b63261f5e5ca3ec355afd61a346b34c846300c" => :x86_64_linux
   end
 
-  head do
-    url "https://github.com/ccache/ccache.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
   def install
-    system "./autogen.sh" if build.head?
-    system "./configure", "--prefix=#{prefix}", "--mandir=#{man}", "--with-bundled-zlib"
+    system "./configure", *osquery_autoconf_flags,
+      "--mandir=#{man}",
+      "--with-bundled-zlib"
     system "make"
     system "make", "install"
 

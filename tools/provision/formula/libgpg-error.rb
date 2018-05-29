@@ -16,17 +16,7 @@ class LibgpgError < AbstractOsqueryFormula
   end
 
   def install
-    ENV.universal_binary if build.universal?
-
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--disable-shared",
-                          "--enable-static"
+    system "./configure", *osquery_autoconf_flags
     system "make", "install"
-  end
-
-  test do
-    system "#{bin}/gpg-error-config", "--libs"
   end
 end

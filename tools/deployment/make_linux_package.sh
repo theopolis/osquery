@@ -58,6 +58,7 @@ OSQUERY_ETC_DIR="/etc/osquery"
 
 WORKING_DIR=/tmp/osquery_packaging
 INSTALL_PREFIX=$WORKING_DIR/prefix
+ARM_INSTALL_PREFIX=$WORKING_DIR/arm_prefix
 DEBUG_PREFIX=$WORKING_DIR/debug
 
 function usage() {
@@ -109,16 +110,20 @@ function check_parsed_args() {
 }
 
 function get_pkg_suffix() {
+  ARCH=$1
   if [[ $PACKAGE_TYPE == "deb" ]]; then
     # stay compliant with Debian package naming convention
-    echo "_${PACKAGE_VERSION}_${PACKAGE_ITERATION}.amd64.${PACKAGE_TYPE}"
+    if [[ "$ARCH" = "x86_64" ]]; then
+      ARCH=amd64
+    fi
+    echo "_${PACKAGE_VERSION}_${PACKAGE_ITERATION}.${ARCH}.${PACKAGE_TYPE}"
   elif [[ $PACKAGE_TYPE == "rpm" ]]; then
     V=`echo ${PACKAGE_VERSION}|tr '-' '_'`
-    echo "-${V}-${PACKAGE_ITERATION}.${PACKAGE_ARCH}.${PACKAGE_TYPE}"
+    echo "-${V}-${PACKAGE_ITERATION}.${ARCH}.${PACKAGE_TYPE}"
   elif [[ $PACKAGE_TYPE == "pacman" ]]; then
-    echo "-${PACKAGE_VERSION}-${PACKAGE_ITERATION}-${PACKAGE_ARCH}.pkg.tar.xz"
+    echo "-${PACKAGE_VERSION}-${PACKAGE_ITERATION}-${ARCH}.pkg.tar.xz"
   else
-    echo "-${PACKAGE_VERSION}_${PACKAGE_ITERATION}_${PACKAGE_ARCH}.tar.gz"
+    echo "-${PACKAGE_VERSION}_${PACKAGE_ITERATION}_${ARCH}.tar.gz"
   fi
 }
 
@@ -129,7 +134,7 @@ function main() {
   platform OS
   distro $OS DISTRO
 
-  OUTPUT_PKG_PATH=`readlink --canonicalize "$BUILD_DIR"`/$PACKAGE_NAME$(get_pkg_suffix)
+  OUTPUT_PKG_PATH=`readlink --canonicalize "$BUILD_DIR"`/$PACKAGE_NAME$(get_pkg_suffix $PACKAGE_ARCH)
 
   rm -rf $WORKING_DIR
   rm -f $OUTPUT_PKG_PATH
@@ -282,7 +287,7 @@ function main() {
   fi
 
   PACKAGE_DEBUG_DEPENDENCIES=`echo "$PACKAGE_DEBUG_DEPENDENCIES"|tr '-' '_'`
-  OUTPUT_DEBUG_PKG_PATH=`readlink --canonicalize "$BUILD_DIR"`/$PACKAGE_DEBUG_NAME$(get_pkg_suffix)
+  OUTPUT_DEBUG_PKG_PATH=`readlink --canonicalize "$BUILD_DIR"`/$PACKAGE_DEBUG_NAME$(get_pkg_suffix $PACKAGE_ARCH)
   if [[ "$BUILD_DEBUG_PKG" = "true" ]]; then
     rm -f $OUTPUT_DEBUG_PKG_PATH
     CMD="$FPM -s dir -t $PACKAGE_TYPE            \
@@ -296,6 +301,31 @@ function main() {
     eval "$CMD"
     log "debug created at $OUTPUT_DEBUG_PKG_PATH"
   fi
+
+
+  if [[ -f "$BUILD_DIR/../arm/osquery/osqueryd" ]]; then
+    mkdir -p $ARM_INSTALL_PREFIX
+    cp -R $INSTALL_PREFIX/* $ARM_INSTALL_PREFIX
+    cp "$BUILD_DIR/../arm/osquery/osqueryd" ${ARM_INSTALL_PREFIX}/usr/bin/
+    aarch64-linux-gnu-strip ${ARM_INSTALL_PREFIX}/usr/bin/osqueryd
+    cp "$BUILD_DIR/../arm/osquery/osqueryi" ${ARM_INSTALL_PREFIX}/usr/bin/
+
+    PACKAGE_ARCH=aarch64
+    OUTPUT_ARM_PKG_PATH=`readlink --canonicalize "$BUILD_DIR"`/$PACKAGE_NAME$(get_pkg_suffix $PACKAGE_ARCH)
+    rm -f $OUTPUT_ARM_PKG_PATH
+
+    CMD="$FPM -s dir -t $PACKAGE_TYPE            \
+      -n $PACKAGE_NAME -v $PACKAGE_VERSION       \
+      -a $PACKAGE_ARCH                           \
+      --iteration $PACKAGE_ITERATION             \
+      --log error                                \
+      $PACKAGE_DEPENDENCIES                      \
+      -p $OUTPUT_ARM_PKG_PATH                    \
+      $EPILOG \"$ARM_INSTALL_PREFIX/=/\""
+    eval "$CMD"
+    log "arm created at $OUTPUT_ARM_PKG_PATH"
+  fi
+
 }
 
 main $@

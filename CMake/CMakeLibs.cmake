@@ -102,9 +102,19 @@ macro(ADD_OSQUERY_LINK IS_CORE LINK)
 endmacro(ADD_OSQUERY_LINK)
 
 macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
+  if(NOT DEFINED ENV{BUILD_ARM})
+    set(LINK_PATHS_SYSTEM_ARCH "${BUILD_DEPS}/legacy/lib")
+    set(LINK_PATHS_ARCH "${BUILD_DEPS}/lib")
+  else()
+    set(LINK_PATHS_SYSTEM_ARCH
+      "${BUILD_DEPS}/arm/aarch64-linux-gnu/usr/lib"
+    )
+    set(LINK_PATHS_ARCH "${BUILD_DEPS}/arm/lib")
+  endif()
+
   # The relative linking set is used for static libraries.
   set(LINK_PATHS_RELATIVE
-    "${BUILD_DEPS}/lib"
+    ${LINK_PATHS_ARCH}
     ${LINK_PATHS}
     ${OS_LIB_DIRS}
     "$ENV{HOME}"
@@ -113,8 +123,8 @@ macro(ADD_OSQUERY_LINK_INTERNAL LINK LINK_PATHS LINK_SET)
   # The system linking set is for legacy ABI compatibility links and libraries
   # known to exist on the system.
   set(LINK_PATHS_SYSTEM
+    ${LINK_PATHS_SYSTEM_ARCH}
     ${LINK_PATHS}
-    "${BUILD_DEPS}/legacy/lib"
   )
   if(LINUX)
     # Allow the build to search the 'default' dependency home for libgcc_s.

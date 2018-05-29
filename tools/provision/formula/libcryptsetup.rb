@@ -24,11 +24,11 @@ class Libcryptsetup < AbstractOsqueryFormula
       "--disable-veritysetup",
       "--disable-nls",
       "--disable-kernel_crypto",
-      "--enable-static",
-      "--disable-shared",
     ]
 
-    system "./autogen.sh", "--prefix=#{prefix}", *args
+    ENV["NOCONFIGURE"] = "1"
+    system "./autogen.sh"
+    system "./configure", *osquery_autoconf_flags, *args
     cd "lib" do
       system "make"
       system "make", "install"

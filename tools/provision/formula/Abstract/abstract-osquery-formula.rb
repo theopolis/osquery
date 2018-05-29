@@ -19,6 +19,10 @@ def legacy_prefix
   Pathname.new("#{ENV["HOMEBREW_PREFIX"]}/legacy")
 end
 
+def arm_prefix
+  Pathname.new("#{ENV["HOMEBREW_PREFIX"]}/arm")
+end
+
 def default_prefix
   Pathname.new(ENV["HOMEBREW_PREFIX"])
 end
@@ -38,6 +42,13 @@ class AbstractOsqueryFormula < Formula
       )
     end
 
+    def set_arm
+      Object.const_set(
+        "HOMEBREW_PREFIX",
+        arm_prefix
+      )
+    end
+
     def license(name)
       ENV["LICENSE"] = name
     end
@@ -50,6 +61,13 @@ class AbstractOsqueryFormula < Formula
     # At build/compile time the formula will choose the active runtime to link
     # against, this *should* remain during bottle generation and pouring.
     bottle_specification.extend(SkipRelocation)
+
+    if ENV["BUILD_ARM"] == "1"
+      Object.const_set(
+        "HOMEBREW_PREFIX",
+        arm_prefix
+      )
+    end
   end
 
   def setup
@@ -62,10 +80,17 @@ class AbstractOsqueryFormula < Formula
     includes = "#{default_prefix}/include"
     includes = "#{legacy_prefix}/include:#{includes}" if OS.linux?
 
-    std_cmake_args + [
+    args = std_cmake_args + [
       "-DCMAKE_LIBRARY_PATH=#{ENV["LIBRARY_PATH"]}",
       "-DCMAKE_INCLUDE_PATH=#{includes}",
     ]
+
+    if arm_build
+      args += [
+        "-DCMAKE_SYSTEM_PROCESSOR=aarch64"
+      ]
+    end
+    args
   end
 
   def osquery_autoconf_flags
@@ -77,6 +102,12 @@ class AbstractOsqueryFormula < Formula
       "--disable-shared",
       "--enable-static",
     ]
+    if arm_build
+      autoconf_flags += [
+        "--host=aarch64-linux-gnu",
+        "--build=x86_64-linux-gnu",
+      ]
+    end
     autoconf_flags
   end
 
@@ -129,6 +160,10 @@ class AbstractOsqueryFormula < Formula
     return ["libcpp"].include?(self.name)
   end
 
+  def arm_build
+    return ENV["BUILD_ARM"] == "1"
+  end
+
   def bypass_visibility_build
     if ["librpm", "python", "librdkafka"].include?(self.name)
       return true
@@ -142,6 +177,47 @@ class AbstractOsqueryFormula < Formula
     prepend_path "LD_LIBRARY_PATH", lib
     prepend_path "LD_LIBRARY_PATH", prefix
     prepend_path "LIBRARY_PATH", "#{default_prefix}/lib"
+
+    if arm_build
+      target = "aarch64-linux-gnu"
+      prepend "CXXFLAGS", "-I#{default_prefix}/include"
+      prepend "CXXFLAGS", "-I#{arm_prefix}/include"
+      prepend "CXXFLAGS", "-cxx-isystem#{default_prefix}/include/c++/v1" if OS.linux?
+      prepend "CXXFLAGS", "--sysroot=#{arm_prefix}/gcc-#{target}/#{target}/libc"
+      prepend "CXXFLAGS", "--gcc-toolchain=#{arm_prefix}/gcc-#{target}"
+      prepend "CXXFLAGS", "--target=aarch64-linux-gnu"
+
+      prepend "CFLAGS", "-I#{default_prefix}/include"
+      prepend "CFLAGS", "-I#{arm_prefix}/include"
+      prepend "CFLAGS", "--sysroot=#{arm_prefix}/gcc-#{target}/#{target}/libc"
+      prepend "CFLAGS", "--gcc-toolchain=#{arm_prefix}/gcc-#{target}"
+      prepend "CFLAGS", "--target=aarch64-linux-gnu"
+
+      prepend "CPPFLAGS", "-I#{default_prefix}/include"
+      prepend "CPPFLAGS", "-I#{arm_prefix}/include"
+      prepend "CPPFLAGS", "--sysroot=#{arm_prefix}/gcc-#{target}/#{target}/libc"
+      prepend "CPPFLAGS", "--gcc-toolchain=#{arm_prefix}/gcc-#{target}"
+      prepend "CPPFLAGS", "--target=aarch64-linux-gnu"
+
+      append "CXXFLAGS", "-stdlib=libc++" if OS.linux?
+      append "LDFLAGS", "-rtlib=compiler-rt" if OS.linux?
+      append "LDFLAGS", "-fuse-ld=lld" if OS.linux?
+      append "LDFLAGS", "-L#{arm_prefix}/lib"
+      append "LDFLAGS", "-lrt -lpthread -ldl -lz" if OS.linux?
+
+      ENV["CXX"] = "#{default_prefix}/bin/clang++"
+      ENV["CC"] = "#{default_prefix}/bin/clang"
+      ENV["CC_FOR_BUILD"] = "#{ENV["CC"]} -idirafter#{default_prefix}/include"
+
+      if !["libgcrypt"].include?(self.name)
+        # GCrypt includes a Pragma GCC to disable optimization.
+        append "CFLAGS", "-Oz"
+        append "CXXFLAGS", "-Oz"
+      end
+
+      prepend_path "LIBRARY_PATH", "#{arm_prefix}/lib" if OS.linux?
+      return
+    end
 
     if stage1_build
       ENV["CC"] = "gcc"
@@ -231,8 +307,13 @@ class AbstractOsqueryFormula < Formula
       self.setup_runtimes
     end
 
-    append "CFLAGS", "-fPIC -DNDEBUG -march=x86-64"
-    append "CXXFLAGS", "-fPIC -DNDEBUG -march=x86-64"
+    append "CFLAGS", "-fPIC -DNDEBUG"
+    append "CXXFLAGS", "-fPIC -DNDEBUG"
+
+    unless arm_build
+      append "CFLAGS", "-march=x86-64"
+      append "CXXFLAGS", "-march=x86-64"
+    end
 
     # macOS compatibility flags.
     if OS.mac?
@@ -261,7 +342,9 @@ class AbstractOsqueryFormula < Formula
     prepend_path "PATH", "#{default_prefix}/bin" if OS.mac?
     prepend_path "PYTHONPATH", "#{default_prefix}/lib/python2.7/site-packages" if OS.mac?
     prepend_path "PKG_CONFIG_PATH", "#{default_prefix}/lib/pkgconfig"
-    prepend_path "PKG_CONFIG_PATH", "#{legacy_prefix}/lib/pkgconfig" if OS.linux?
+    if OS.linux? and !arm_build
+      prepend_path "PKG_CONFIG_PATH", "#{legacy_prefix}/lib/pkgconfig"
+    end
     prepend_path "ACLOCAL_PATH", "#{default_prefix}/share/aclocal"
 
     self.audit

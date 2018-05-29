@@ -6,7 +6,7 @@ class Libiptables < AbstractOsqueryFormula
   license "GPL-2.0+"
   url "https://osquery-packages.s3.amazonaws.com/deps/iptables-1.4.21.tar.gz"
   sha256 "ce1335c91764dc87a26978bd3725c510c2564853184c6e470e0a0f785f420f89"
-  revision 200
+  revision 201
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -17,11 +17,7 @@ class Libiptables < AbstractOsqueryFormula
   patch :DATA
 
   def install
-    args = [
-      "--disable-shared",
-    ]
-
-    system "./configure", "--prefix=#{prefix}", *args
+    system "./configure", *osquery_autoconf_flags
     cd "libiptc" do
       system "make", "install"
     end

@@ -16,16 +16,16 @@ class Librpm < AbstractOsqueryFormula
   end
 
   depends_on "berkeley-db"
+  depends_on "libmagic"
   depends_on "popt"
 
   patch :DATA
 
   def install
     ENV.append "LDFLAGS", "-lz -liconv -llzma" if OS.mac?
+    ENV.append "LDFLAGS", "-lz" if arm_build
 
     args = [
-      "--disable-dependency-tracking",
-      "--disable-silent-rules",
       "--with-external-db",
       "--without-selinux",
       "--without-lua",
@@ -34,9 +34,7 @@ class Librpm < AbstractOsqueryFormula
       "--disable-nls",
       "--disable-rpath",
       "--disable-plugins",
-      "--disable-shared",
       "--disable-python",
-      "--enable-static",
       "--enable-zstd=no",
       "--with-crypto=openssl",
     ]
@@ -44,7 +42,7 @@ class Librpm < AbstractOsqueryFormula
     inreplace "Makefile.in", "rpm2cpio.$(OBJEXT)", "rpm2cpio.$(OBJEXT) lib/poptALL.$(OBJEXT) lib/poptQV.$(OBJEXT)" if OS.mac?
     inreplace "Makefile.in", "rpmspec-rpmspec.$(OBJEXT)", "rpmspec-rpmspec.$(OBJEXT) lib/poptQV.$(OBJEXT)" if OS.mac?
 
-    system "./configure", "--prefix=#{prefix}", *args
+    system "./configure", *osquery_autoconf_flags, *args
     system "make"
     system "make", "install"
   end

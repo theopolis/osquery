@@ -21,11 +21,11 @@ class Libudev < AbstractOsqueryFormula
       "--disable-keymap",
       "--disable-mtd-probe",
       "--disable-hwdb",
-      "--enable-static",
-      "--disable-shared",
     ]
 
-    system "./configure", "--prefix=#{prefix}", *args
+    inreplace "build-aux/config.sub", " arm-* ", " aarch* "
+
+    system "./configure", *osquery_autoconf_flags, *args
     system "make"
     system "make", "install"
   end

@@ -31,6 +31,13 @@ else
 	DEPS_DIR = /usr/local/osquery
 endif
 
+ifeq ($(MAKECMDGOALS),arm)
+	BUILD_LINK = -L$(DEPS_DIR)/arm/lib -B$(DEPS_DIR)/arm/lib
+else
+	BUILD_LINK = -L$(DEPS_DIR)/legacy/lib -B$(DEPS_DIR)/legacy/lib
+endif
+
+
 # This is a hack to support Vagrant and VirtualBox shared folder.
 # LLVM/LLD will use mmap with MAP_SHARED, which is not supported.
 ifeq ($(PLATFORM),Linux)
@@ -64,11 +71,11 @@ ifneq ($(VERBOSE_TEST),)
 endif
 
 ifeq ($(PLATFORM),Linux)
-	LINK_FLAGS = -B$(DEPS_DIR)/legacy/lib -rtlib=compiler-rt -fuse-ld=lld
+	LINK_FLAGS = $(BUILD_LINK) -rtlib=compiler-rt -fuse-ld=lld
 endif
 
 PATH_SET := PATH="$(DEPS_DIR)/bin:/usr/local/bin:$(PATH)"
-CMAKE := $(PATH_SET) LDFLAGS="-L$(DEPS_DIR)/legacy/lib -L$(DEPS_DIR)/lib $(LINK_FLAGS)" \
+CMAKE := $(PATH_SET) LDFLAGS="${BUILD_LINK} -L$(DEPS_DIR)/lib $(LINK_FLAGS)" \
         cmake $(CMAKE_EXTRA) $(SOURCE_DIR)/
 
 CTEST := $(PATH_SET) ctest $(SOURCE_DIR)/
@@ -228,6 +235,23 @@ sysprep: .setup
 
 build_deps: .setup
 	@OSQUERY_BUILD_DEPS=1 SKIP_DISTRO_MAIN=1 make deps
+
+arm_deps: .setup
+	@./tools/provision/arm.sh on
+	@BUILD_ARM=1 ./tools/provision.sh arm
+
+arm_depsclean: .setup
+	@./tools/provision/arm.sh off
+	@rm -rf $(DEPS_DIR)/arm
+	@rm -rf $(DEPS_DIR)/ArmCellar
+
+arm_build_deps: .setup
+	@OSQUERY_BUILD_DEPS=1 SKIP_DISTRO_MAIN=1 make arm_deps
+
+arm:
+	@mkdir -p build/arm
+	@cd build/arm && SKIP_LLDPD=1 SKIP_KAFKA=1 BUILD_ARM=True $(CMAKE) && \
+		$(DEFINES) $(MAKE) --no-print-directory $(MAKEFLAGS)
 
 tags:
 ifeq ($(CTAGS_EXISTS),)

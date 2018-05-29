@@ -7,7 +7,7 @@ class Boost < AbstractOsqueryFormula
   url "https://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2"
   sha256 "5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9"
   head "https://github.com/boostorg/boost.git"
-  revision 200
+  revision 201
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -20,14 +20,14 @@ class Boost < AbstractOsqueryFormula
 
   def install
     ENV.cxx11
-    ENV.universal_binary if build.universal?
 
     # libdir should be set by --prefix but isn't
     bootstrap_args = [
       "--prefix=#{prefix}",
       "--libdir=#{lib}",
-      "--with-toolset=cc",
     ]
+
+    bootstrap_args << "--with-toolset=cc"
 
     # layout should be synchronized with boost-python
     args = [
@@ -53,13 +53,23 @@ class Boost < AbstractOsqueryFormula
 
     args << "cxxflags=-std=c++11 #{ENV["CXXFLAGS"]}"
 
+    if arm_build
+      args << "architecture=arm"
+      args << "abi=aapcs"
+      args << "binary-format=elf"
+    end
+
     # Fix error: bzlib.h: No such file or directory
     # and /usr/bin/ld: cannot find -lbz2
     args += [
       "include=#{HOMEBREW_PREFIX}/include",
-      "linkflags=#{ENV["LDFLAGS"]}"
+      "cxxflags=#{ENV["CPPFLAGS"]}",
+      "cflags=#{ENV["CFLAGS"]}",
+      "asmflags=#{ENV["CFLAGS"]}",
+      "linkflags=#{ENV["LDFLAGS"]}",
     ] unless OS.mac?
 
+    ENV["CFLAGS"] = "-idirafter#{default_prefix}/include"
     system "./bootstrap.sh", *bootstrap_args
 
     # The B2 script will not read our user-config.
@@ -72,7 +82,6 @@ class Boost < AbstractOsqueryFormula
     else
       inreplace "project-config.jam", "cc ;", "clang ;"
     end
-
     system "./b2", "install", *args
   end
 end

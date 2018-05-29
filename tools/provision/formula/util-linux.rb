@@ -7,7 +7,7 @@ class UtilLinux < AbstractOsqueryFormula
   url "https://www.kernel.org/pub/linux/utils/util-linux/v2.27/util-linux-2.27.1.tar.xz"
   sha256 "0a818fcdede99aec43ffe6ca5b5388bff80d162f2f7bd4541dca94fecb87a290"
   head "https://github.com/karelzak/util-linux.git"
-  revision 200
+  revision 202
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -16,19 +16,18 @@ class UtilLinux < AbstractOsqueryFormula
   end
 
   def install
-    system "./autogen.sh"
-    system "./configure",
-      "--disable-debug",
-      "--disable-dependency-tracking",
-      "--disable-silent-rules",
-      "--prefix=#{prefix}",
+    #system "./autogen.sh" # A TEST
+    system "./configure", *osquery_autoconf_flags,
       # Fix chgrp: changing group of 'wall': Operation not permitted
       "--disable-use-tty-group",
       # Conflicts with coreutils.
       "--disable-kill",
-      "--disable-shared",
-      "--enable-static",
-      "--with-readline=no"
+      "--with-readline=no",
+      "--without-python",
+      "--disable-nls",
+      "--disable-all-programs",
+      "--enable-libuuid",
+      "--enable-libblkid"
     system "make", "install"
   end
 end

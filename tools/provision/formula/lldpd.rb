@@ -19,10 +19,6 @@ class Lldpd < AbstractOsqueryFormula
 
   def install
     args = [
-      "--prefix=#{prefix}",
-      "--sysconfdir=#{etc}",
-      "--localstatedir=/var",
-      "--enable-shared=no",
       "--with-privsep-chroot=/var/empty",
       "--with-privsep-user=nobody",
       "--with-privsep-group=nogroup",
@@ -33,7 +29,7 @@ class Lldpd < AbstractOsqueryFormula
 
     args << "--with-launchddaemonsdir=no" if OS.mac?
 
-    system "./configure", *args
+    system "./configure", *osquery_autoconf_flags, *args
     system "make"
     system "make", "install"
   end

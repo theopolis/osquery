@@ -6,7 +6,7 @@ class Bzip2 < AbstractOsqueryFormula
   license "bzip2-1.0.6"
   url "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
   sha256 "a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd"
-  revision 200
+  revision 201
 
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
@@ -21,7 +21,12 @@ class Bzip2 < AbstractOsqueryFormula
     # Expect -fPIC for static library.
     inreplace "Makefile", "CFLAGS=", "CFLAGS=#{ENV.cflags} "
     inreplace "Makefile", "CC=gcc", "CC=#{ENV["CC"]} "
+    inreplace "Makefile", "LDFLAGS=", "LDFLAGS=#{ENV["LDFLAGS"]} "
 
-    system "make", "install", "PREFIX=#{prefix}"
+    system "make", "bzip2", "PREFIX=#{prefix}"
+    mkdir_p lib
+    system "cp", "libbz2.a", lib
+    mkdir_p include
+    system "cp", "bzlib.h", include
   end
 end

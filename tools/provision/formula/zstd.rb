@@ -18,8 +18,6 @@ class Zstd < AbstractOsqueryFormula
   depends_on "cmake" => :build
 
   def install
-    ENV.append_to_cflags(" -fPIC -mno-avx")
-
     system "make", "lib-release"
     system "make", "install", "PREFIX=#{prefix}/"
   end

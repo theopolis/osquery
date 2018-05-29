@@ -93,6 +93,75 @@ function platform_linux_main() {
   brew_dependency osquery/osquery-local/libdpkg
 }
 
+function platform_arm_main() {
+  export BUILD_ARM=1
+  mkdir -p "$DEPS_DIR/arm"
+  "$SCRIPT_DIR/provision/arm.sh" on
+
+  brew_dependency osquery/osquery-local/sysroot-arm
+
+  # (xz-hack) Remember the added 'arm' to the DEP/prefix.
+  if [ ! -d "$DEPS_DIR/Cellar/xz" ]; then
+    log "Installing temporary xz..."
+    mkdir -p "$DEPS_DIR/arm/opt/xz/bin"
+    ln -sf `which xz` "$DEPS_DIR/arm/opt/xz/bin"
+  fi
+
+  SYSROOT_USR="$DEPS_DIR/arm/gcc-aarch64-linux-gnu/aarch64-linux-gnu/libc/usr"
+  mkdir -p "$SYSROOT_USR/local"
+  ln -sf "../include" "$SYSROOT_USR/local/include"
+
+  brew_dependency osquery/osquery-local/libcpp-arm
+  brew_dependency osquery/osquery-local/zlib-arm
+
+  # (xz-hack) Remember the added 'arm' to the DEP/prefix.
+  if [ ! -d "$DEPS_DIR/Cellar/xz" ]; then
+    rm -rf "$DEPS_DIR/arm/opt/xz"
+  fi
+
+  brew_dependency osquery/osquery-local/xz
+
+  # (xz-hack) We install xz using arm-.
+  ln -sf `which xz` "$DEPS_DIR/arm/opt/xz/bin"
+
+  brew_dependency osquery/osquery-local/bzip2
+  brew_dependency osquery/osquery-local/util-linux
+
+  brew_dependency osquery/osquery-local/libxml2
+  brew_dependency osquery/osquery-local/openssl
+
+  brew_dependency osquery/osquery-local/popt
+  brew_dependency osquery/osquery-local/berkeley-db
+
+  brew_dependency osquery/osquery-local/libarchive
+  brew_dependency osquery/osquery-local/rapidjson
+  brew_dependency osquery/osquery-local/zstd
+
+  brew_dependency osquery/osquery-local/libmagic-arm
+  brew_dependency osquery/osquery-local/pcre
+  brew_dependency osquery/osquery-local/boost
+
+  # Thrift will depend on gcrypt.
+  brew_dependency osquery/osquery-local/libgpg-error
+  brew_dependency osquery/osquery-local/libgcrypt
+  brew_dependency osquery/osquery-local/thrift-arm
+
+  brew_dependency osquery/osquery-local/rocksdb
+  brew_dependency osquery/osquery-local/gflags
+  brew_dependency osquery/osquery-local/glog
+  brew_dependency osquery/osquery-local/libaudit
+  brew_dependency osquery/osquery-local/libdevmapper
+  brew_dependency osquery/osquery-local/libiptables
+  brew_dependency osquery/osquery-local/libdpkg
+  brew_dependency osquery/osquery-local/libudev
+  brew_dependency osquery/osquery-local/librpm
+  brew_dependency osquery/osquery-local/augeas
+  brew_dependency osquery/osquery-local/sleuthkit
+  brew_dependency osquery/osquery-local/yara
+  brew_dependency osquery/osquery-local/aws-sdk-cpp
+  brew_dependency osquery/osquery-local/libcryptsetup
+}
+
 function platform_darwin_main() {
   brew_tool readline
   brew_tool sqlite
@@ -248,6 +317,11 @@ function main() {
   if [[ ! "$BREW_TYPE" = "freebsd" ]]; then
     setup_brew "$DEPS_DIR" "$BREW_TYPE" "$ACTION"
     echo -n $DEPS_VERSION > $DEPS_DIR/DEPS_VERSION
+  fi
+
+  if [[ "$ACTION" = "arm" ]]; then
+    platform_arm_main
+    return
   fi
 
   if [[ "$ACTION" = "bottle" ]]; then

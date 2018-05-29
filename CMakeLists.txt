@@ -31,6 +31,22 @@ if(WIN32)
   list(APPEND CMAKE_PROGRAM_PATH "${WINDOWS_DEP_DIR}/*/tools")
 endif()
 
+# It is possible to cross-compiler for ARM64/AARCH64.
+if(DEFINED ENV{BUILD_ARM})
+  set(BUILD_ARM TRUE)
+else()
+  set(BUILD_ARM FALSE)
+endif()
+
+if(BUILD_ARM)
+  set(ARM_TARGET "aarch64-linux-gnu")
+  message("-- Cross-compiling for ${ARM_TARGET}")
+
+  set(CROSS_CXX_FLAGS "--sysroot=${BUILD_DEPS}/arm/gcc-${ARM_TARGET}/${ARM_TARGET}/libc")
+  set(CROSS_CXX_FLAGS "${CROSS_CXX_FLAGS} --gcc-toolchain=${BUILD_DEPS}/arm/gcc-${ARM_TARGET}")
+  set(CROSS_CXX_FLAGS "${CROSS_CXX_FLAGS} --target=${ARM_TARGET}")
+endif()
+
 # If no explicit compiler override and clang++ exists, prefer clang.
 find_program(CLANGXX_EXECUTABLE "clang++" ENV PATH)
 if(DEFINED ENV{CC})
@@ -161,7 +177,8 @@ if(NOT WIN32)
   if(DEFINED ENV{SKIP_DEPS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${CXX_STD} ${CXX_STDLIB}" CACHE STRING "" FORCE)
   else()
-    set(CMAKE_CXX_FLAGS "-std=${CXX_STD} ${CXX_STDLIB}" CACHE STRING "" FORCE)
+    set(CMAKE_C_FLAGS "${CROSS_CXX_FLAGS}" CACHE STRING "" FORCE)
+    set(CMAKE_CXX_FLAGS "${CROSS_CXX_FLAGS} -std=${CXX_STD} ${CXX_STDLIB}" CACHE STRING "" FORCE)
   endif()
 endif()
 
@@ -318,11 +335,11 @@ endif()
 # Generate a compile_commands.json for static analyzer input.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(NOT DEFINED ENV{OPTIMIZED})
+if(NOT DEFINED ENV{OPTIMIZED} AND NOT BUILD_ARM)
   if(WINDOWS)
     # It is unclear if AVX must be managed on Windows.
     add_compile_options(/favor:AMD64)
-  else()
+  elseif(NOT DEFINED ENV{BUILD_ARM})
     add_compile_options(-march=x86-64 -mno-avx)
   endif()
 endif()
@@ -350,6 +367,10 @@ if(DEFINED ENV{PACKAGE})
   set(OSQUERY_BUILD_RELEASE TRUE)
 else()
   set(OSQUERY_BUILD_RELEASE FALSE)
+endif()
+
+if(BUILD_DEPS)
+  add_definitions(-DBUILD_ARM)
 endif()
 
 # Feature environment variables (flags), their use is highly discouraged.
@@ -560,16 +581,24 @@ elseif(LINUX)
 endif()
 
 if(POSIX AND DEPS)
-  set(CMAKE_REQUIRED_INCLUDES
-    "${BUILD_DEPS}/legacy/include"
-    "${BUILD_DEPS}/include"
-  )
+  set(CMAKE_REQUIRED_INCLUDES "${BUILD_DEPS}/include")
+  if(NOT BUILD_ARM)
+    list(APPEND CMAKE_REQUIRED_INCLUDES "${BUILD_DEPS}/legacy/include")
+  endif()
 
   # The order here matters, please do not reorder.
   if(CLANG)
     include_directories(SYSTEM "${BUILD_DEPS}/include/c++/v1")
   endif()
-  include_directories(SYSTEM "${BUILD_DEPS}/legacy/include")
+
+  # The legacy (compatibility) or cros-compiling runtime.
+  if(BUILD_ARM)
+    include_directories(SYSTEM "${BUILD_DEPS}/arm/include")
+  else()
+    include_directories(SYSTEM "${BUILD_DEPS}/legacy/include")
+  endif()
+
+  # Dependencies includes.
   include_directories(SYSTEM "${BUILD_DEPS}/include")
   if(CLANG)
     include_directories(SYSTEM "${BUILD_DEPS}/lib/clang/4.0.0/include")
@@ -613,13 +642,19 @@ if(WINDOWS)
   list(REMOVE_DUPLICATES OS_LIB_DIRS)
   link_directories(${OS_LIB_DIRS})
 else()
+  if(NOT BUILD_ARM)
+    set(OS_LIB_DIRS_ARCH
+      "/usr/lib/x86_64-linux-gnu/"
+    )
+  endif()
+
   set(OS_LIB_DIRS
     "/lib"
     "/lib64"
     "/usr/lib"
     "/usr/lib64"
-    "/usr/lib/x86_64-linux-gnu/"
-    )
+    ${OS_LIB_DIRS_ARCH}
+  )
 endif()
 
 # Make sure the generated paths exist
