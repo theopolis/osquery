@@ -438,8 +438,8 @@ DropPrivilegesRef DropPrivileges::get() {
   return handle;
 }
 
-bool DropPrivileges::dropToParent(const fs::path& path) {
-  auto parent = path.parent_path().string();
+bool DropPrivileges::dropToParent(const std::string& path) {
+  auto parent = fs::path(path).parent_path().string();
   auto result = SQL::selectAllFrom("file", "path", EQUALS, parent);
   if (result.empty()) {
     return false;

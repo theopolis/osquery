@@ -172,7 +172,7 @@ Status parsePlist(const fs::path& path, pt::ptree& tree) {
   tree.clear();
   // Drop privileges, if needed, before parsing plist data.
   auto dropper = DropPrivileges::get();
-  dropper->dropToParent(path);
+  dropper->dropToParent(path.string());
 
   auto status = readFile(path);
   if (!status.ok()) {

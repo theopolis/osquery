@@ -14,8 +14,6 @@
 #include <memory>
 #include <string>
 
-#include <boost/filesystem/path.hpp>
-
 #include <osquery/core.h>
 
 namespace osquery {
@@ -39,7 +37,7 @@ class DropPrivileges : private boost::noncopyable {
    *
    * @return success if privileges were dropped, otherwise false.
    */
-  bool dropToParent(const boost::filesystem::path& path);
+  bool dropToParent(const std::string& path);
 
   /// See DropPrivileges::dropToParent but explicitiy set the UID and GID.
   bool dropTo(const std::string& uid, const std::string& gid);

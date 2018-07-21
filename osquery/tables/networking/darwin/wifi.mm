@@ -109,7 +109,7 @@ QueryData genKnownWifiNetworks(QueryContext& context) {
 
   // drop privileges if needed
   auto dropper = DropPrivileges::get();
-  dropper->dropToParent(path);
+  dropper->dropToParent(path.string());
 
   if (!readFile(path)) {
     VLOG(1) << "Unable to read file: " << kAirPortPreferencesPath;
