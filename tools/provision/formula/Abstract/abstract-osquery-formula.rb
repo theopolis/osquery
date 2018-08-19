@@ -139,6 +139,19 @@ class AbstractOsqueryFormula < Formula
     return false
   end
 
+  def add_libcpp_defines!
+    # Clang will place -I before the -isystem from CPPFlags.
+    prepend "CXXFLAGS", "-cxx-isystem#{default_prefix}/include/c++/v1" if OS.linux?
+
+    append "CXXFLAGS", "-stdlib=libc++" if OS.linux?
+    append "LDFLAGS", "-rtlib=compiler-rt" if OS.linux?
+
+    if !bypass_visibility_build
+      append "CFLAGS", "-fvisibility=hidden -fvisibility-inlines-hidden"
+      append "CXXFLAGS", "-fvisibility=hidden -fvisibility-inlines-hidden"
+    end
+  end
+
   def setup_runtimes
     prepend_path "LD_LIBRARY_PATH", lib
     prepend_path "LD_LIBRARY_PATH", prefix
@@ -170,16 +183,7 @@ class AbstractOsqueryFormula < Formula
       prepend "CFLAGS", "-isystem#{default_prefix}/include"
 
       if !libcpp_build
-        # Clang will place -I before the -isystem from CPPFlags.
-        prepend "CXXFLAGS", "-cxx-isystem#{default_prefix}/include/c++/v1" if OS.linux?
-
-        append "CXXFLAGS", "-stdlib=libc++" if OS.linux?
-        append "LDFLAGS", "-rtlib=compiler-rt" if OS.linux?
-
-        if !bypass_visibility_build
-          append "CFLAGS", "-fvisibility=hidden -fvisibility-inlines-hidden"
-          append "CXXFLAGS", "-fvisibility=hidden -fvisibility-inlines-hidden"
-        end
+        add_libcpp_defines!
       end
 
       # Finally, add the first CXXFLAGS.

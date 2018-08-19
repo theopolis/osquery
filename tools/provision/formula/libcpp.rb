@@ -4,7 +4,7 @@ class Libcpp < AbstractOsqueryFormula
   desc "Next-gen compiler infrastructure"
   homepage "http://llvm.org/"
   license "NCSA"
-  revision 201
+  revision 202
 
   stable do
     url "http://releases.llvm.org/#{llvm_version}/llvm-#{llvm_version}.src.tar.xz"
@@ -41,7 +41,7 @@ class Libcpp < AbstractOsqueryFormula
   bottle do
     root_url "https://osquery-packages.s3.amazonaws.com/bottles"
     cellar :any_skip_relocation
-    sha256 "a33a4c4b63e2e6f8d0beda67fcd3470161034c2a488e96f300280e831a43264e" => :x86_64_linux
+    sha256 "3b4d2ed910ba7ecc47ca246b37e012c98b79490e0d3577cd71e2cbe3b2b60e80" => :x86_64_linux
   end
 
   depends_on "binutils"
@@ -73,16 +73,18 @@ class Libcpp < AbstractOsqueryFormula
       -DLIBCXXABI_USE_COMPILER_RT=ON
       -DLIBCXXABI_USE_LLVM_UNWINDER=ON
       -DLLVM_BUILD_EXTERNAL_COMPILER_RT=ON
-      -DCLANG_DEFAULT_CXX_STDLIB=libstdc++
       -DLIBFUZZER_ENABLE=YES
     ]
 
+    # Bootstrap the Clang compiler runtimes.
     mktemp do
-      system "cmake", "-G", "Unix Makefiles", buildpath/"projects/compiler-rt", *(std_cmake_args + args)
+      system "cmake", "-G", "Unix Makefiles", buildpath/"projects/compiler-rt",
+        *(std_cmake_args + args), "-DCLANG_DEFAULT_CXX_STDLIB=libstdc++"
       system "make"
       system "make", "install"
     end
 
+    # Bootstrap and install LibCpp.
     mktemp do
       system "cmake", "-G", "Unix Makefiles", buildpath, *(std_cmake_args + args)
       cd "projects" do
@@ -91,6 +93,23 @@ class Libcpp < AbstractOsqueryFormula
       end
     end
 
+    # LibCpp is installed.
     ln_sf prefix/"lib", clang_lib
+
+    # Now rebuild sanitizers, which need a C++ runtime.
+    add_libcpp_defines!
+
+    # LibCpp is not in the default or legacy prefix yet.
+    prepend "LDFLAGS", "-L#{prefix}/lib"
+    prepend "CXXFLAGS", "-cxx-isystem#{prefix}/include/c++/v1"
+
+    mktemp do
+      args1 = args
+      args1 << "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
+      system "cmake", "-G", "Unix Makefiles", buildpath/"projects/compiler-rt",
+        *(std_cmake_args + args), "-DCLANG_DEFAULT_CXX_STDLIB=libc++"
+      system "make"
+      system "make", "install"
+    end
   end
 end
