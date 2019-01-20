@@ -29,7 +29,7 @@ osquery_tp_prebuilt_cxx_library(
         ],
     },
     linker_flags = [
-
+	"-lrt",
     ],
     deps = [
         osquery_tp_target("berkeley-db", "db"),

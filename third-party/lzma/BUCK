@@ -15,7 +15,7 @@ osquery_cxx_library(
         (
             LINUX,
             [
-                "-llzma",
+                "-l:liblzma.a",
             ],
         ),
     ],

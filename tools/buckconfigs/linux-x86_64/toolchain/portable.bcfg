@@ -1,0 +1,35 @@
+[cxx]
+  cpp = /usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot/usr/bin/clang
+  cc = /usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot/usr/bin/clang
+  cxxpp = /usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot/usr/bin/clang++
+  cxx = /usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot/usr/bin/clang++
+  as = /usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot/usr/bin/as
+  ld = /usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot/usr/bin/clang++
+  ar = /usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot/usr/bin/ar
+
+[cxx_toolchain]
+  cppflags =
+
+  cflags = \
+    --gcc-toolchain=/usr/local/osquery/x86_64-anywhere-linux-gnu \
+    --sysroot=/usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot \
+    -march=x86-64
+
+  cxxppflags =
+
+  cxxflags = \
+    --gcc-toolchain=/usr/local/osquery/x86_64-anywhere-linux-gnu \
+    --sysroot=/usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot \
+    -march=x86-64
+
+  ldflags = \
+    --gcc-toolchain=/usr/local/osquery/x86_64-anywhere-linux-gnu \
+    --sysroot=/usr/local/osquery/x86_64-anywhere-linux-gnu/x86_64-anywhere-linux-gnu/sysroot \
+    -static-libstdc++ \
+    -fuse-ld=lld \
+    -rtlib=compiler-rt \
+    -l:libc++.a \
+    -l:libc++abi.a \
+    -l:libunwind.a \
+    -lpthread \
+    -ldl

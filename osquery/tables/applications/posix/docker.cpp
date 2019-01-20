@@ -18,6 +18,11 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+// https://www.boost.org/doc/libs/1_67_0/boost/asio/detail/config.hpp
+// Standard library support for std::string_view.
+#define BOOST_ASIO_HAS_STD_STRING_VIEW 1
+#define BOOST_ASIO_DISABLE_STD_STRING_VIEW 1
+
 #include <boost/asio.hpp>
 #include <boost/foreach.hpp>
 
