@@ -9,7 +9,7 @@ function(poptMain)
   set(version "1.16")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "3a328038dc908d8912983100b675333207780f6239a10433a78e365f80e8d3bf")
+    set(hash "36b3d4ed73ce9aef07916b91bf0f82cb019858e101cb11c1f08fef583ccbff85")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "09ef8458657814af24d60968af57800af7f2896175a235c9b2776772be9171e9")
   else()

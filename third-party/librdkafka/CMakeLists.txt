@@ -9,7 +9,7 @@ function(librdkafkaMain)
   set(version "0.11.3")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "a8cece2c04522243ee53fd85130c4c6e2874ba27261bef554e74afed7425641b")
+    set(hash "a4c18be8a3e5a7ee9afa2061af254498c6f20ec54ec3f6571b5e09683fb41a64")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "61790b76923d0005734db6209d99cd2c262cf2227500261244c208918e8b79b7")
   else()

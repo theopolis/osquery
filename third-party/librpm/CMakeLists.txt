@@ -11,7 +11,7 @@ function(librpmMain)
 
   set(name "librpm")
   set(version "4.14.1")
-  set(hash "5aca71879ab793c1029684dfa59baec462584ba3f4e3f6444c374b160b5afde8")
+  set(hash "2461ef466cc70642f5da69fb89ffb181f5313c171a92907b172aa8536a155f68")
   set(anchor_file "lib/librpm.a")
 
   set(additional_libraries
@@ -25,9 +25,9 @@ function(librpmMain)
   target_link_libraries("thirdparty_${name}" INTERFACE
     thirdparty_berkeley-db
     thirdparty_bzip2
-    thirdparty_lzma
     thirdparty_openssl
     thirdparty_popt
+    thirdparty_xz
     thirdparty_zlib
   )
 

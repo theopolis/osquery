@@ -11,7 +11,7 @@ function(zstdMain)
   set(anchor_file "lib/libzstd.a")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "f9397aeea5816a7cabd0e7040be86e569d2ffd84832a2e3c4e4bda224d6e42a5")
+    set(hash "067cb5d0648c5f32b6ca1303e0ebcaa67263cfaf76347d943ff73e9ee488f4db")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "4cd66f8c05f735ccf6c1457116ddb4cb2b1b0260458bb3c1476475721c9d70d9")
   elseif(DEFINED PLATFORM_WINDOWS)

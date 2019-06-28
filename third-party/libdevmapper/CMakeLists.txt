@@ -11,7 +11,7 @@ function(libdevmapperMain)
 
   set(name "libdevmapper")
   set(version "2.2.02.173")
-  set(hash "54fc7a991f42e3693fa3aa9cafe39f0b65a6fe29620f3146fd05f1a1f1bf1eae")
+  set(hash "5cfe6dfd2d7ca764433a55f9a7ac3da52c0769ec6c6f1b9ec9be4bb2b9154e42")
   set(anchor_file "lib/liblvm2app.a")
 
   set(additional_libraries

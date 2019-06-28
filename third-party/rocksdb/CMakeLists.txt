@@ -11,7 +11,7 @@ function(rocksdbMain)
   set(anchor_file "lib/librocksdb_lite.a")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "12c8abadd96ae8ac38327e8b30c195c18f30001025f400efcac82053057d9834")
+    set(hash "30ae051e185f13e988658f966f247f0bb5aded88b734098eac817726cd1e6ef1")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "95b161e7d3def2d4f9241c57061ea1cab4f64e51f0015db490ef99eff890354d")
   elseif(DEFINED PLATFORM_WINDOWS)

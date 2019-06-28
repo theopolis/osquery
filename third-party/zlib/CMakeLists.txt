@@ -11,7 +11,7 @@ function(zlibMain)
   set(anchor_file "lib/libz.a")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "c6dfd85ce6c440fbaead6d4a3246d7771ed2b9b9f9e8c43257f57e0881d390e9")
+    set(hash "5c302234058b8e86f2ef8e766d035f8acbe90c9bfc5b51b9dab2d2d17f4eeb2b")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "7f9b44ca67eadb2c6dcf6b86688cb759b77b772858dae2a2380c032c7c1d9edd")
   elseif(DEFINED PLATFORM_WINDOWS)

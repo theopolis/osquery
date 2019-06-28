@@ -11,7 +11,7 @@ function(libcryptsetupMain)
 
   set(name "libcryptsetup")
   set(version "1.7.5")
-  set(hash "ebb53650592212d67ea8c0e49b48891eec64ef370743678881985490c09adeac")
+  set(hash "1a56b3325cb2a7779e8bcc1a386d07f4a100e7e4f5dc75cb50d7844bcb1bf4ed")
   set(anchor_file "lib/libcryptsetup.a")
 
   importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}")

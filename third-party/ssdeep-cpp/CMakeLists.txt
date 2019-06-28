@@ -9,7 +9,7 @@ function(ssdeepCppMain)
   set(version "2.14.1")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "d8248655050987524dc383d55d7b148803b18331cdbcb8bfd2a8198ca210298b")
+    set(hash "9c5565c4ff9de05bd1cdb8e00ab899bdf57dad221a57a9ff57001a7814af7233")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "93f11f81eab1cc06bf11fd28bc42d7b9d02972e3705f864a9f8ef0f5ca90abcc")
   else()

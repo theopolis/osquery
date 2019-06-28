@@ -20,7 +20,7 @@ function(boostMain)
   )
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "3a24d65730beb3a718ee443eaedac40033d349582eeb83664ea2529080c812ba")
+    set(hash "a03a4078708c711862f8485c2bfe4e095def6dda28bba094d064245c74f026bd")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "69c884d27838a11f9a45b78e03eb12a425d554dac4ad8c6ef19f91e63e945286")
   elseif(DEFINED PLATFORM_WINDOWS)

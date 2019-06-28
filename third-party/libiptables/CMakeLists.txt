@@ -10,8 +10,8 @@ function(libiptablesMain)
   endif()
 
   set(name "libiptables")
-  set(version "1.8.0")
-  set(hash "f32841cca13b8273f767d859b6c98f6fe7fea05cfc835ff192c794a5d417ba26")
+  set(version "1.4.21")
+  set(hash "6a80091cc47bb690581d1b1627d8ef2e4110d683f0cf598546e93ee0f5e7afab")
   set(anchor_file "lib/libip4tc.a")
 
   set(additional_libraries

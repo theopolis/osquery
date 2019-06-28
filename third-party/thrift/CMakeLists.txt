@@ -15,7 +15,7 @@ function(thrifMain)
   )
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "32d0a6c2220114272fe6819a30b5ddfe000d9bed03f0d1fc3b6b68d438b5cc1e")
+    set(hash "c1f3dd85c057038bcc0cf66ffc39bb97c551296ce8e15944dfae6426ef537542")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "11a4f8565728e73a54808bf55517014cc69597ef965c3b2b7ebeb52f6dd43c26")
   elseif(DEFINED PLATFORM_WINDOWS)

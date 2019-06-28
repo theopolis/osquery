@@ -9,7 +9,7 @@ function(libxml2Main)
   set(version "2.9.7")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "40f341caf6442347a130e614f7d1be3193656b7c5ad86a644a87f3b15282f7bf")
+    set(hash "e8515d9245197f4b26f45100e89bc5ca124660828d2809e5291638db0b53bff5")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "15c240f914a430036847d19f18be54b86d0c78d54eff601f9b036b63481b420e")
   else()

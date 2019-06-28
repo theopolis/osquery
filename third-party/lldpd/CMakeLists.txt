@@ -9,7 +9,7 @@ function(lldpdMain)
   set(version "0.9.6")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "27c0b6e6faf1863db025b95e8217e715cffc51b960b1d09e8fe9235b5ef203d8")
+    set(hash "b4ffbd0a96ddb3f151cfedfb30538f58ec06453c61ca5ea748e59056f94c1d03")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "f9d5d5c0c2514e7d51914ffc747a068b8a82602ca62e44b65f02857f015e0d3f")
   else()

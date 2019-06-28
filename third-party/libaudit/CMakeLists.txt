@@ -11,7 +11,7 @@ function(libauditMain)
 
   set(name "libaudit")
   set(version "2.4.2")
-  set(hash "4e87a234f68eb8686ab3fa9096ffd664a899efc8e7839c767abd60ac956f6688")
+  set(hash "e457273959f2da3be6c6252860949d76f7e133651f5d7e57a69eea76387d0fc6")
   set(anchor_file "lib/libaudit.a")
 
   importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}")

@@ -15,7 +15,7 @@ function(gflagsMain)
   )
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "5e0813ea29d5ba739c089ae21dccf5b7d4ec6f7a7d9550da0834476fade2b60c")
+    set(hash "e8183a770f80c1d31bacd74bfcb016fe025eae9b78268cab3b5b833f3f809606")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "217fd2573443981bc8e521fcf4d8201ba4d3c29cace1b9a537f94be08df7ebb6")
   elseif(DEFINED PLATFORM_WINDOWS)

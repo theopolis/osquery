@@ -9,7 +9,7 @@ function(rapidjsonMain)
   set(version "1.1.0")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "f9a3d4e71cb72f00372696fb6c2c14094cec30519a692982de5b893a3562f244")
+    set(hash "d38b3727e5acc3283cb34385cca841fca13555e3eb5139c846027a0c51b77298")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "ab8c220677cc03424d0683e36542a9dcd4eac1ff99ceae70007ce6e2462da9fa")
   elseif(DEFINED PLATFORM_WINDOWS)

@@ -9,7 +9,7 @@ function(libmagicMain)
   set(version "5.32")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "e6c7144360b29d672db7a98cdfe55dc80812c2100b4a111d65f98e78404835aa")
+    set(hash "0589182832e5e9cbebfe993cabacccfd0e6129c3a25c20a5d0b35be1e3eeca3f")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "66efdaf945b8d04751aa337ef0529ded53fcd7e3b85fb8dfd9e4c40a562ffa6d")
   else()

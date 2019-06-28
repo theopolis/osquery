@@ -11,7 +11,7 @@ function(archiveMain)
   set(anchor_file "lib/libarchive.a")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "6818c2d6c8067918365cb81992f7853b100ef3244b8767bf2d182a1974f225a3")
+    set(hash "5380f8a79ca768344b362f3de2a6df9da8cdfb170089d5feabef1788ff5321be")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "a3ec7af1618116fca2008838ef18d2028148b34e215c748da3f25e4053bfe6e8")
   elseif(DEFINED PLATFORM_WINDOWS)

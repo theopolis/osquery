@@ -11,7 +11,7 @@ function(libdpkgMain)
 
   set(name "libdpkg")
   set(version "1.19.0.5")
-  set(hash "9bd06978cf7caaa68bd607ac817c2fd0f436659a9620f6e8bf0281c4f3106799")
+  set(hash "a3775b2cbf9787875f94329066e2950185e80a9a5474db2f84ff7a19186c6bc9")
   set(anchor_file "lib/libdpkg.a")
 
   importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}")

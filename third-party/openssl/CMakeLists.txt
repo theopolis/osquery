@@ -15,7 +15,7 @@ function(opensslMain)
   )
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "73472b9cf2d050b3cdda404144d28244b52d89b538b82de95acaaa98e282a1ea")
+    set(hash "4f11b34065a7efc222603ff4c0df8ebdf6d003c03b9656c7a362390a1915394a")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "39c59c34a497b365af0895de2b3e65e89c03f14c846084902ad3a77f943c3457")
   elseif(DEFINED PLATFORM_WINDOWS)

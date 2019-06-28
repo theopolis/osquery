@@ -33,7 +33,6 @@ function(osqueryThirdpartyMain)
   add_subdirectory("libxml2")
   add_subdirectory("linenoise-ng")
   add_subdirectory("lldpd")
-  add_subdirectory("lzma")
   add_subdirectory("markupsafe")
   add_subdirectory("openssl")
   add_subdirectory("popt")
@@ -45,6 +44,7 @@ function(osqueryThirdpartyMain)
   add_subdirectory("ssdeep-cpp")
   add_subdirectory("thrift")
   add_subdirectory("util-linux")
+  add_subdirectory("xz")
   add_subdirectory("yara")
   add_subdirectory("zlib")
   add_subdirectory("zstd")
@@ -123,6 +123,9 @@ function(importThirdPartyBinaryLibrary name version hash anchor_file_name)
   endif()
 
   set(base_url "${THIRD_PARTY_REPOSITORY_URL}/third-party/pre-built/${platform_name}-x86_64")
+  if("${platform_name}" STREQUAL "linux")
+    set(base_url "${base_url}/next")
+  endif()
   set(file_name "${name}-${version}.tar.gz")
   set(identifier "thirdparty_${name}")
   downloadRemoteFile("${identifier}" "${base_url}" "${file_name}" "${hash}")
@@ -187,6 +190,9 @@ function(importThirdPartyHeaderOnlyLibrary library_type name version hash anchor
     endif()
 
     set(base_url "${THIRD_PARTY_REPOSITORY_URL}/third-party/pre-built/${platform_name}-x86_64")
+    if("${platform_name}" STREQUAL "linux")
+      set(base_url "${base_url}/next")
+    endif()
     set(base_folder "${CMAKE_CURRENT_BINARY_DIR}/${name}/${version}")
   else()
     set(base_folder "${CMAKE_CURRENT_BINARY_DIR}")
@@ -208,7 +214,7 @@ function(importThirdPartyHeaderOnlyLibrary library_type name version hash anchor
 endfunction()
 
 # Initializes the PYTHONPATH folder in the binary directory, used to run the codegen scripts
-function(initializePythonPathFolder)  
+function(initializePythonPathFolder)
   add_custom_command(
     OUTPUT "${PYTHON_PATH}"
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${PYTHON_PATH}"

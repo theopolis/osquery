@@ -17,7 +17,7 @@ function(bzip2Main)
     return()
 
   elseif(DEFINED PLATFORM_LINUX)
-    set(hash "1cc3eaf8fe78f19fcae9f71065b04bd2dedb4862081f1d1c96e0668f3df864c8")
+    set(hash "a4c750a9e47faeb82d0d996386aeb27eddb9d3bcc5915110a1dcd6bdd1b3ed2c")
 
   elseif(DEFINED PLATFORM_WINDOWS)
     set(hash "11001b5e353bc255a755284b9ed8baed01b6d9fe2a63e5e325124e8b998d48c2")

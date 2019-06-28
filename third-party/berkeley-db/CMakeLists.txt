@@ -11,7 +11,7 @@ function(berkeleydbMain)
 
   set(name "berkeley-db")
   set(version "5.3.28")
-  set(hash "793ab1515833c680ef3054f6a16781fa766699395ffbb6810635d36f2e8f6cb0")
+  set(hash "b1b61fbb9d4298c9ca09f835cde68bf3ed40fc466e23ee52691c9a8a481d52c0")
   set(anchor_file "lib/libdb.a")
 
   set(additional_libraries

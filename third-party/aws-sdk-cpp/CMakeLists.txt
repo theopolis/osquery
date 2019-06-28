@@ -19,7 +19,7 @@ function(awsSdkCppMain)
   )
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "38d8ab7feccc25ba89adb49ffbcbe8c9b274191f2eb9172371c94f2ceb5a1159")
+    set(hash "21988572294f5e74e6d977e419c203ab32bc5b4fe078ed5cc59db16b57dbb6ae")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "1d1974a6bb22dbe40ebd98547e775364357e65e81cda52b6fb2485250fdd15ba")
   elseif(DEFINED PLATFORM_WINDOWS)

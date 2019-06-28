@@ -9,7 +9,7 @@ function(augeasMain)
   set(version "1.9.0")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "ff21a672ec7d6ae313eabe32a458d2d4528ad086559a24e9d70638da10983b37")
+    set(hash "ddb836702845d158b7fda71d23b8f06b5368265513b6939afe8ac445f04d4b32")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "7330e0fcfbcea6f58d199916238c47078f3ea2ba85ac4ed2fa74fcb63e034b1c")
   else()

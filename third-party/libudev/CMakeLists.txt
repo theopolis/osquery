@@ -7,7 +7,7 @@
 function(libudevMain)
   set(name "libudev")
   set(version "173")
-  set(hash "fc1483fa27cb92876661e453bceef0c5752e4dbe83074a1653928ce44078aa34")
+  set(hash "0be44e9788121bf192219b8b9a5713f54b545e1b4faabd4e261a25f25cdcc447")
   set(anchor_file "lib/libudev.a")
 
   importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}")

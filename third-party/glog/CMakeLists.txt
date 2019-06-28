@@ -11,7 +11,7 @@ function(glogMain)
   set(anchor_file "lib/libglog.a")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "1291104355f4373f22294d86eeb2e612d03ea1adbf7cbaef2083ca730e9df60c")
+    set(hash "22e79ff3f5fc27f0c22f35013698aea3f4f170cc093142bb99607ff880033e7a")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "91ccd947175a029da61447cc2f871798dc3756bc3adfc178cc782e4714e5a712")
   elseif(DEFINED PLATFORM_WINDOWS)

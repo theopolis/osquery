@@ -11,7 +11,7 @@ function(utillinuxMain)
 
   set(name "util-linux")
   set(version "2.27.1")
-  set(hash "2c2e64f8364afeddc4804716ae835c674d48592c163e59903356de9c3b31da5d")
+  set(hash "dc4386dffc40a16b4345bf32f4311124dfabc74dd889d0789c812d2301be46ba")
   set(anchor_file "lib/libmount.a")
 
   set(additional_libraries

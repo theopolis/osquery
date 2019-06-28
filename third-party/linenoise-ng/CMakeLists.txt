@@ -12,7 +12,7 @@ function(linenoisengMain)
   set(anchor_file "lib/liblinenoise.a")
 
   if(DEFINED PLATFORM_LINUX)
-    set(hash "604e50db04ab61ef592bcb96941bb30b67e976ac5487f904eab6927d96b9f5e9")
+    set(hash "b7c0dc1d8c49cc1fd06945498a47041993d34a877bebd047e916f13a0f8ae617")
   elseif(DEFINED PLATFORM_MACOS)
     set(hash "78030ddb7041e86cfdd8db60bf446a147fb4c82959319597b09dcf0877337cf9")
   elseif(DEFINED PLATFORM_WINDOWS)
