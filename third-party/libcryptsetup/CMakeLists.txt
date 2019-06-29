@@ -10,11 +10,9 @@ function(libcryptsetupMain)
   endif()
 
   set(name "libcryptsetup")
-  set(version "1.7.5")
-  set(hash "ebb53650592212d67ea8c0e49b48891eec64ef370743678881985490c09adeac")
   set(anchor_file "lib/libcryptsetup.a")
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}")
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_libgcrypt)
 

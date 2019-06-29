@@ -5,13 +5,14 @@
 # the LICENSE file found in the root directory of this source tree.
 
 function(libudevMain)
+  if(NOT DEFINED PLATFORM_LINUX)
+    return()
+  endif()
+
   set(name "libudev")
-  set(version "173")
-  set(hash "fc1483fa27cb92876661e453bceef0c5752e4dbe83074a1653928ce44078aa34")
   set(anchor_file "lib/libudev.a")
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}")
-
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 endfunction()
 
 libudevMain()

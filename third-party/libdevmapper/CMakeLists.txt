@@ -10,8 +10,6 @@ function(libdevmapperMain)
   endif()
 
   set(name "libdevmapper")
-  set(version "2.2.02.173")
-  set(hash "54fc7a991f42e3693fa3aa9cafe39f0b65a6fe29620f3146fd05f1a1f1bf1eae")
   set(anchor_file "lib/liblvm2app.a")
 
   set(additional_libraries
@@ -20,7 +18,7 @@ function(libdevmapperMain)
     lib/libdaemonclient.a
   )
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}" ${additional_libraries})
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
 endfunction()
 
 libdevmapperMain()

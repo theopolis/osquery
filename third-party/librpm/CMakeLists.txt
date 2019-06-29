@@ -10,8 +10,6 @@ function(librpmMain)
   endif()
 
   set(name "librpm")
-  set(version "4.14.1")
-  set(hash "5aca71879ab793c1029684dfa59baec462584ba3f4e3f6444c374b160b5afde8")
   set(anchor_file "lib/librpm.a")
 
   set(additional_libraries
@@ -20,7 +18,7 @@ function(librpmMain)
     lib/librpmsign.a
   )
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}" ${additional_libraries})
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
 
   target_link_libraries("thirdparty_${name}" INTERFACE
     thirdparty_berkeley-db
@@ -36,6 +34,8 @@ function(librpmMain)
   )
 
   target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_zlib)
+  target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_bzip2)
+
 endfunction()
 
 librpmMain()

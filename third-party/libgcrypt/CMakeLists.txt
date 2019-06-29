@@ -10,11 +10,9 @@ function(libgcryptMain)
   endif()
 
   set(name "libgcrypt")
-  set(version "1.8.1")
-  set(hash "338bb77bac1565319f69a210db5b50e0410046628b05f9c5ed3521607cbbf711")
   set(anchor_file "lib/libgcrypt.a")
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}")
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_libgpg-error)
 endfunction()

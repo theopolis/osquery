@@ -10,8 +10,6 @@ function(berkeleydbMain)
   endif()
 
   set(name "berkeley-db")
-  set(version "5.3.28")
-  set(hash "793ab1515833c680ef3054f6a16781fa766699395ffbb6810635d36f2e8f6cb0")
   set(anchor_file "lib/libdb.a")
 
   set(additional_libraries
@@ -20,8 +18,7 @@ function(berkeleydbMain)
     lib/libdb_cxx.a
   )
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}" ${additional_libraries})
-
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
 endfunction()
 
 berkeleydbMain()

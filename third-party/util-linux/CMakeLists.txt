@@ -10,18 +10,13 @@ function(utillinuxMain)
   endif()
 
   set(name "util-linux")
-  set(version "2.27.1")
-  set(hash "2c2e64f8364afeddc4804716ae835c674d48592c163e59903356de9c3b31da5d")
-  set(anchor_file "lib/libmount.a")
+  set(anchor_file "lib/libuuid.a")
 
   set(additional_libraries
     lib/libblkid.a
-    lib/libfdisk.a
-    lib/libsmartcols.a
-    lib/libuuid.a
   )
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}" ${additional_libraries})
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
 endfunction()
 
 utillinuxMain()

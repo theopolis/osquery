@@ -5,15 +5,15 @@
 # the LICENSE file found in the root directory of this source tree.
 
 function(lzmaMain)
-  add_osquery_library(thirdparty_lzma INTERFACE)
-
-  if(DEFINED PLATFORM_LINUX)
-    set(library_name "liblzma.a")
-  else()
-    set(library_name "lzma")
+  if(NOT DEFINED PLATFORM_LINUX)
+    return()
   endif()
 
-  target_link_libraries(thirdparty_lzma INTERFACE "${library_name}")
+  set(name "lzma")
+
+  set(anchor_file lib/liblzma.a)
+
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 endfunction()
 
 lzmaMain()

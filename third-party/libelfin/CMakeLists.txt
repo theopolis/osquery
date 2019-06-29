@@ -10,15 +10,13 @@ function(libelfinMain)
   endif()
 
   set(name "libelfin")
-  set(version "0.3")
-  set(hash "d3f6611493558a38796072a5464e0c261e6651b5630b51459d9d98dec7d052c9")
   set(anchor_file "lib/libdwarf++.a")
 
   set(additional_lib
     lib/libelf++.a
   )
 
-  importThirdPartyBinaryLibrary("${name}" "${version}" "${hash}" "${anchor_file}" ${additional_lib})
+  importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_lib})
 endfunction()
 
 libelfinMain()
