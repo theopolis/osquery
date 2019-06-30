@@ -19,7 +19,7 @@ function(libcryptsetupMain)
   set(dependencies util-linux libdevmapper popt libgcrypt)
   definePrebuildProject(${name}
     URL https://gitlab.com/cryptsetup/cryptsetup/repository/v1_7_5/archive.tar.gz
-    SHA256
+    SHA256 6dead2f1420ab1c84a7e82f0ee197861f4a52e4c3284a0bfef824a90c392e077
     DEPENDS ${dependencies}
     CONFIGURE
     ./autogen.sh

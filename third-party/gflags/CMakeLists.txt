@@ -22,7 +22,7 @@ function(gflagsMain)
 
   definePrebuildProject(${name}
     URL https://github.com/gflags/gflags/archive/v2.2.1.tar.gz
-    SHA256
+    SHA256 ae27cdbcd6a2f935baa78e4f21f675649271634c092b1be01469440495609d0e
     CONFIGURE
       cmake
         -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG

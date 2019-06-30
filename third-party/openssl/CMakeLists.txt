@@ -31,7 +31,7 @@ function(opensslMain)
 
   definePrebuildProject(${name}
     URL https://www.openssl.org/source/openssl-1.0.2o.tar.gz
-    SHA256
+    SHA256 ec3f5c9714ba0fd45cb4e087301eb1336c317e0d20b575a125050470e8089e4d
     CONFIGURE
       perl ./Configure --prefix=<INSTALL_DIR>
         --openssldir=<INSTALL_DIR>/etc/openssl

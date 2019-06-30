@@ -44,7 +44,7 @@ function(librpmMain)
   set(dependencies openssl popt berkeley-db libmagic)
   definePrebuildProject(${name}
     URL http://ftp.rpm.org/releases/rpm-4.14.x/rpm-4.14.1.tar.bz2
-    SHA256
+    SHA256 43f40e2ccc3ca65bd3238f8c9f8399d4957be0878c2e83cba2746d2d0d96793b
     DEPENDS ${dependencies}
     PATCHES
       librpm-4.14.1-1.patch

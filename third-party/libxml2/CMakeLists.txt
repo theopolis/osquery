@@ -21,7 +21,7 @@ function(libxml2Main)
   set(dependencies zlib)
   definePrebuildProject(${name}
     URL http://xmlsoft.org/sources/libxml2-2.9.7.tar.gz
-    SHA256
+    SHA256 f63c5e7d30362ed28b38bfa1ac6313f9a80230720b7fb6c80575eeab3ff5900c
     DEPENDS ${dependencies}
     CONFIGURE
       ./configure

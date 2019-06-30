@@ -17,7 +17,7 @@ function(linenoisengMain)
 
   definePrebuildProject(${name}
     URL https://github.com/arangodb/linenoise-ng/archive/master.zip
-    SHA256
+    SHA256 35f8fa471328dd534da111f46c1814fb7efdf0feafb1b71c5a6b4b98d5fd67e8
     CONFIGURE
       cmake
         -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG

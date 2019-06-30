@@ -12,7 +12,7 @@ function(rapidjsonMain)
 
   definePrebuildProject(${name}
     URL https://github.com/miloyip/rapidjson/archive/v1.1.0.tar.gz
-    SHA256
+    SHA256 bf7ced29704a1e696fbccf2a2b4ea068e7774fa37f6d7dd4039d0787f8bed98e
     PATCHES librapidjson-1.1.0-1.patch
     CONFIGURE
       export CXXFLAGS=-Wno-extra-semi-stmt\ -Wno-zero-as-null-pointer-constant\ -Wno-shadow\ $ENV{CXXFLAGS} &&

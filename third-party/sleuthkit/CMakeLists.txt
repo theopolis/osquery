@@ -17,7 +17,7 @@ function(sleuthkitMain)
 
   definePrebuildProject(${name}
     URL https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.6.1.tar.gz
-    SHA256
+    SHA256 bb2c936dbc88820fc4a875bc9b610f56c6a4a61b7bc8625f86be2549a948a7a9
     CONFIGURE
       ./bootstrap &&
       ./configure

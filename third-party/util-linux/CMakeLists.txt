@@ -21,7 +21,7 @@ function(utillinuxMain)
   set(dependencies ncurses)
   definePrebuildProject(${name}
     URL https://www.kernel.org/pub/linux/utils/util-linux/v2.27/util-linux-2.27.1.tar.xz
-    SHA256
+    SHA256 0a818fcdede99aec43ffe6ca5b5388bff80d162f2f7bd4541dca94fecb87a290
     DEPENDS ${dependencies}
     CONFIGURE
       export NCURSES_CFLAGS=-I${THIRD_PARTY_PREFIX}/include/ncurses &&

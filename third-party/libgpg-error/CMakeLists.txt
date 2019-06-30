@@ -16,7 +16,7 @@ function(libgpgerrorMain)
 
   definePrebuildProject(${name}
     URL https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2
-    SHA256
+    SHA256 4f93aac6fecb7da2b92871bb9ee33032be6a87b174f54abf8ddf0911a22d29d2
     CONFIGURE
       ./configure
         --prefix=<INSTALL_DIR>

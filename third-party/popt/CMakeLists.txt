@@ -17,7 +17,7 @@ function(poptMain)
 
   definePrebuildProject(${name}
     URL https://fossies.org/linux/misc/popt-1.16.tar.gz
-    SHA256
+    SHA256 e728ed296fe9f069a0e005003c3d6b2dde3d9cad453422a10d6558616d304cc8
     CONFIGURE
       ./configure
         --prefix=<INSTALL_DIR>

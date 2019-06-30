@@ -28,7 +28,7 @@ function(thrifMain)
   set(dependencies boost openssl)
   definePrebuildProject(${name}
     URL https://github.com/apache/thrift/archive/0.11.0.tar.gz
-    SHA256
+    SHA256 0e324569321a1b626381baabbb98000c8dd3a59697292dbcc71e67135af0fefd
     PATCHES libthrift-0.11.0-1.patch
     DEPENDS ${dependencies}
     CONFIGURE

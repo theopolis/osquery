@@ -19,7 +19,7 @@ function(libdpkgMain)
   set(dependencies zlib bzip2 lzma)
   definePrebuildProject(${name}
     URL https://launchpad.net/debian/+archive/primary/+sourcefiles/dpkg/1.19.0.5/dpkg_1.19.0.5.tar.xz
-    SHA256
+    SHA256 818046927a7f77c1bcbbad7d8dbc04cdf0f3e6ec4e1a4f9d313378ecc69d85b5
     DEPENDS ${dependencies}
     CONFIGURE
       ./configure

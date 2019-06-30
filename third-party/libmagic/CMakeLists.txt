@@ -21,7 +21,7 @@ function(libmagicMain)
   set(dependencies zlib)
   definePrebuildProject(${name}
     URL https://distfiles.macports.org/file/file-5.32.tar.gz
-    SHA256
+    SHA256 8639dc4d1b21e232285cd483604afc4a6ee810710e00e579dbe9591681722b50
     DEPENDS ${dependencies}
     CONFIGURE
       ./configure

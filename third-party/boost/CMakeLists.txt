@@ -41,7 +41,7 @@ function(boostMain)
   set(dependencies zlib bzip2)
   definePrebuildProject(${name}
     URL https://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2
-    SHA256
+    SHA256 5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9
     DEPENDS ${dependencies}
     CONFIGURE
       CC=clang ./bootstrap.sh

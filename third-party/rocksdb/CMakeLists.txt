@@ -20,7 +20,7 @@ function(rocksdbMain)
 
   definePrebuildProject(${name}
     URL https://github.com/facebook/rocksdb/archive/v6.1.2.tar.gz
-    SHA256
+    SHA256 df93f3b66caa1cbe1c2862c99c33e18a5c5b24a64fb51dfe8ef805e3c9fd1cad
     CONFIGURE
       cmake
         -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG

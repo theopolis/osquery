@@ -23,7 +23,7 @@ function(augeasMain)
   set(dependencies libxml2)
   definePrebuildProject(${name}
     URL http://download.augeas.net/augeas-1.12.0.tar.gz
-    SHA256
+    SHA256 321942c9cc32185e2e9cb72d0a70eea106635b50269075aca6714e3ec282cb87
     DEPENDS ${dependencies}
     PATCHES libaugeas-1.12.0-1.patch
     CONFIGURE

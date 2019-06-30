@@ -29,7 +29,7 @@ function(awsSdkCppMain)
   set(dependencies zlib openssl boost)
   definePrebuildProject(${name}
     URL https://github.com/aws/aws-sdk-cpp/archive/1.4.55.tar.gz
-    SHA256
+    SHA256 0a70c2998d29cc4d8a4db08aac58eb196d404073f6586a136d074730317fe408
     DEPENDS ${dependencies}
     CONFIGURE
       cmake

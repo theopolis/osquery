@@ -109,8 +109,8 @@ function(definePrebuildProject name)
   # 'Forward' them to ExternalProject
   ExternalProject_Add(${identifier}
     URL ${url}
+    URL_HASH SHA256=${hash}
     INSTALL_DIR "${install_prefix}"
-    #HASH ${hash}
     DEPENDS ${depends_targets}
     PATCH_COMMAND ${patch_command}
     CONFIGURE_COMMAND ${configure_command}

@@ -17,7 +17,7 @@ function(lzmaMain)
 
   definePrebuildProject(${name}
     URL https://tukaani.org/xz/xz-5.2.4.tar.gz
-    SHA256
+    SHA256 b512f3b726d3b37b6dc4c8570e137b9311e7552e8ccbab4d39d47ce5f4177145
     CONFIGURE
       ./autogen.sh &&
       ./configure --prefix=<INSTALL_DIR>

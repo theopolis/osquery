@@ -19,7 +19,7 @@ function(glogMain)
   set(dependencies gflags)
   definePrebuildProject(${name}
     URL https://github.com/google/glog/archive/v0.3.5.tar.gz
-    SHA256
+    SHA256 7580e408a2c0b5a89ca214739978ce6ff480b5e7d8d7698a2aa92fadc484d1e0
     DEPENDS ${dependencies}
     CONFIGURE
       cmake

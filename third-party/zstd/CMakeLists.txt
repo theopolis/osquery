@@ -16,7 +16,7 @@ function(zstdMain)
 
   definePrebuildProject(${name}
     URL https://github.com/facebook/zstd/archive/v1.2.0.tar.gz
-    SHA256
+    SHA256 4a7e4593a3638276ca7f2a09dc4f38e674d8317bbea51626393ca73fc047cbfb
     CONFIGURE true
     BUILD
       $(MAKE) lib-release

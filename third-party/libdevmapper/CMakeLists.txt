@@ -23,7 +23,7 @@ function(libdevmapperMain)
   set(dependencies util-linux)
   definePrebuildProject(${name}
     URL https://www.mirrorservice.org/sites/sourceware.org/pub/lvm2/old/LVM2.2.02.173.tgz
-    SHA256
+    SHA256 ceb9168c7e009ef487f96a1fe969b23cbb07d920ffb71769affdbdf30fea8d64
     DEPENDS ${dependencies}
     CONFIGURE
       export VALGRIND_CFLAGS=-fPIC\ -I/usr/include/valgrind &&

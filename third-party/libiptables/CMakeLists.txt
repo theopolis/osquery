@@ -21,7 +21,7 @@ function(libiptablesMain)
 
   definePrebuildProject(${name}
     URL https://ftp.osuosl.org/pub/blfs/conglomeration/iptables/iptables-1.8.3.tar.bz2
-    SHA256
+    SHA256 a23cac034181206b4545f4e7e730e76e08b5f3dd78771ba9645a6756de9cdd80
     DEPENDS ${dependencies}
     CONFIGURE
       ./configure

@@ -20,7 +20,7 @@ function(libelfinMain)
 
   definePrebuildProject(${name}
     URL https://github.com/aclements/libelfin/archive/v0.3.tar.gz
-    SHA256
+    SHA256 c338942b967582922b3514b54b93175ca9051a9668db92dd8ef619824d443ac7
     CONFIGURE true
     BUILD
       export CXXFLAGS=-Wno-unused-command-line-argument\ $ENV{CXXFLAGS} &&

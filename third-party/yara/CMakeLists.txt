@@ -19,7 +19,7 @@ function(yaraMain)
   set(dependencies openssl)
   definePrebuildProject(${name}
     URL https://github.com/VirusTotal/yara/archive/v3.7.1.tar.gz
-    SHA256
+    SHA256 df077a29b0fffbf4e7c575f838a440f42d09b215fcb3971e6fb6360318a64892
     DEPENDS ${dependencies}
     CONFIGURE
       ./bootstrap.sh &&

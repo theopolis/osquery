@@ -17,7 +17,7 @@ function(smartmontoolsMain)
 
   definePrebuildProject(${name}
     URL https://github.com/allanliu/smartmontools/archive/v0.3.1.tar.gz
-    SHA256
+    SHA256 a7bde3039f207a88bee72ae7c89bc4442dc65fbe76fc1a9974718d1a128a1c0b
     CONFIGURE
       ${REPLACE_CMD} "1.15 1.14" "1.16 1.15 1.14" "autogen.sh" &&
       ./autogen.sh &&

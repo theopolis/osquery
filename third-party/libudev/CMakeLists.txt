@@ -16,7 +16,7 @@ function(libudevMain)
 
   definePrebuildProject(${name}
     URL http://pkgs.fedoraproject.org/repo/pkgs/udev/udev-173.tar.bz2/91a88a359b60bbd074b024883cc0dbde/udev-173.tar.bz2
-    SHA256
+    SHA256 70a18315a12f8fc1131f7da5b4dae3606988b69d5c08f96f443b84b8486caaaf
     CONFIGURE
       ./configure --prefix=<INSTALL_DIR>
         --disable-logging

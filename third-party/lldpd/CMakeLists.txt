@@ -18,7 +18,7 @@ function(lldpdMain)
   set(dependencies zlib bzip2)
   definePrebuildProject(${name}
     URL https://media.luffy.cx/files/lldpd/lldpd-0.9.6.tar.gz
-    SHA256
+    SHA256 e74e2dd7e2a233ca1ff385c925ddae2a916d302819d1433741407d2f8fb0ddd8
     DEPENDS ${dependencies}
     CONFIGURE
       ./autogen.sh &&

@@ -23,7 +23,7 @@ function(berkeleydbMain)
   set(dependencies libxml2)
   definePrebuildProject(${name}
     URL http://pkgs.fedoraproject.org/repo/pkgs/libdb/db-5.3.28.tar.gz/b99454564d5b4479750567031d66fe24/db-5.3.28.tar.gz
-    SHA256
+    SHA256 e0a992d740709892e81f9d93f06daf305cf73fb81b545afe72478043172c3628
     DEPENDS ${dependencies}
     PATCHES berkeley-db-5.3.28-1.patch
     CONFIGURE

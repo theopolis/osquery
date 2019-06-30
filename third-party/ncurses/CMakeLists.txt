@@ -13,7 +13,7 @@ function(libncursesMain)
 
   definePrebuildProject(${name}
     URL http://ftpmirror.gnu.org/ncurses/ncurses-6.0.tar.gz
-    SHA256
+    SHA256 f551c24b30ce8bfb6e96d9f59b42fbea30fa3a6123384172f9e7284bcf647260
     CONFIGURE
       ./configure
         --prefix=<INSTALL_DIR>
