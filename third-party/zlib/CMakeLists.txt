@@ -13,6 +13,21 @@ function(zlibMain)
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  set(dependencies "")
+
+  definePrebuildProject(${name}
+    URL https://downloads.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./configure --prefix=<INSTALL_DIR>
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 zlibMain()

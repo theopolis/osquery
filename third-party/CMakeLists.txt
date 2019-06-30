@@ -6,6 +6,7 @@
 
 function(osqueryThirdpartyMain)
   initializePythonPathFolder()
+  osqueryThirdpartyBuildMain()
 
   add_subdirectory("augeas")
   add_subdirectory("aws-sdk-cpp")
@@ -48,6 +49,62 @@ function(osqueryThirdpartyMain)
   add_subdirectory("yara")
   add_subdirectory("zlib")
   add_subdirectory("zstd")
+endfunction()
+
+function(osqueryThirdpartyBuildMain)
+  # For our custom ExternalProject wrapper we define argument groups.
+  add_custom_target(thirdparty_prebuilt)
+endfunction()
+
+function(definePrebuildProject name)
+  include(ExternalProject)
+  set(_ep_keywords_definePrebuildProject "^(URL|SHA256|DEPENDS|CONFIGURE|BUILD|INSTALL|BUILD_IN_SOURCE)$")
+
+  set(identifier "thirdparty_build_${name}")
+
+  # Create a target to hold the arguments from the function call.
+  set(props "${identifier}_props")
+  add_custom_target(${props})
+  _ep_parse_arguments(definePrebuildProject ${props} _CEP_ "${ARGN}")
+
+  # Access arguments as propertoes.
+  get_property(depends_list TARGET ${props} PROPERTY _CEP_DEPENDS)
+  foreach(depends ${depends_list})
+    list(APPEND depends_targets "thirdparty_build_${depends}")
+  endforeach()
+
+  get_property(hash TARGET ${props} PROPERTY _CEP_SHA256)
+  get_property(configure TARGET ${props} PROPERTY _CEP_CONFIGURE)
+  get_property(build TARGET ${props} PROPERTY _CEP_BUILD)
+  get_property(install TARGET ${props} PROPERTY _CEP_INSTALL)
+  get_property(build_in_source TARGET ${props} PROPERTY _CEP_BUILD_IN_SOURCE)
+
+  if(DEFINED PLATFORM_LINUX)
+    set(platform_name "linux")
+  elseif(DEFINED PLATFORM_MACOS)
+    set(platform_name "macos")
+  elseif(DEFINED PLATFORM_WINDOWS)
+    set(platform_name "windows")
+  else()
+    message(FATAL_ERROR "Unrecognized system")
+    return()
+  endif()
+
+  set(install_prefix "${THIRD_PARTY_PREBUILT_PATH}/${platform_name}-x86_64")
+
+  # 'Forward' them to ExternalProject
+  ExternalProject_Add(${identifier}
+    URL ${url}
+    INSTALL_DIR "${install_prefix}"
+    #HASH ${hash}
+    DEPENDS ${depends_targets}
+    CONFIGURE_COMMAND ${configure}
+    BUILD_COMMAND ${build}
+    INSTALL_COMMAND ${install}
+    EXCLUDE_FROM_ALL ON
+    BUILD_IN_SOURCE ${build_in_source}
+  )
+  add_dependencies(thirdparty_prebuilt "${identifier}")
 endfunction()
 
 # Generates a target named identifier_downloader that will acquire the remote file while also verifying
