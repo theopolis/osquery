@@ -15,6 +15,24 @@ function(yaraMain)
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_openssl)
+
+  set(dependencies openssl)
+  definePrebuildProject(${name}
+    URL https://github.com/VirusTotal/yara/archive/v3.7.1.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./bootstrap.sh &&
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 yaraMain()

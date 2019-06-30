@@ -15,6 +15,38 @@ function(libgcryptMain)
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_libgpg-error)
+
+  set(dependencies libgpg-error)
+  definePrebuildProject(${name}
+    URL https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.1.tar.bz2
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+        --disable-avx-support
+        --disable-avx2-support
+        --disable-drng-support
+        --disable-pclmul-support
+        --disable-sse41-support
+        --disable-optimization
+        --disable-asm
+        --disable-jent-support
+        --with-libgpg-error-prefix=<INSTALL_DIR>
+        --with-gpg-error-prefix=<INSTALL_DIR> &&
+      ed -s - config.h < ${CMAKE_CURRENT_SOURCE_DIR}/libgcrypt-1.8.1-1-config.h.ed
+    BUILD
+      cd <SOURCE_DIR>/cipher && $(MAKE) &&
+      cd <SOURCE_DIR>/random && $(MAKE) &&
+      cd <SOURCE_DIR>/mpi && $(MAKE) &&
+      cd <SOURCE_DIR>/compat && $(MAKE) &&
+      cd <SOURCE_DIR>/src && $(MAKE)
+    INSTALL
+      cd src && $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libgcryptMain()

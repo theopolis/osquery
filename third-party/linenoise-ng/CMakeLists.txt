@@ -14,6 +14,22 @@ function(linenoisengMain)
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://github.com/arangodb/linenoise-ng/archive/master.zip
+    SHA256
+    CONFIGURE
+      cmake
+        -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_BUILD_TYPE=Release
+        -DBUILD_SHARED_LIBS=OFF
+        <SOURCE_DIR>
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+  )
 endfunction()
 
 linenoisengMain()

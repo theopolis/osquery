@@ -15,6 +15,21 @@ function(ssdeepCppMain)
   set(anchor_file "lib/libfuzzy.a")
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz
+    SHA256
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 ssdeepCppMain()

@@ -14,6 +14,23 @@ function(smartmontoolsMain)
   set(anchor_file "lib/libsmartctl.a")
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://github.com/allanliu/smartmontools/archive/v0.3.1.tar.gz
+    SHA256
+    CONFIGURE
+      ${REPLACE_CMD} "1.15 1.14" "1.16 1.15 1.14" "autogen.sh" &&
+      ./autogen.sh &&
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 smartmontoolsMain()

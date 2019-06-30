@@ -14,6 +14,20 @@ function(libauditMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
+  definePrebuildProject(${name}
+    URL https://github.com/Distrotech/libaudit/archive/audit-2.4.2.tar.gz
+    SHA256
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+    BUILD
+      cd lib && $(MAKE)
+    INSTALL
+      cd lib && $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libauditMain()

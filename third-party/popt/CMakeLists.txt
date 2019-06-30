@@ -14,6 +14,22 @@ function(poptMain)
   set(anchor_file "lib/libpopt.a")
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://fossies.org/linux/misc/popt-1.16.tar.gz
+    SHA256
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-debug
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 poptMain()

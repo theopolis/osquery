@@ -13,6 +13,26 @@ function(archiveMain)
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL http://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./configure --prefix=<INSTALL_DIR>
+        --without-lzo2
+        --without-nettle
+        --without-xml2
+        --without-openssl
+        --with-expat
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 archiveMain()

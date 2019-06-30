@@ -19,6 +19,22 @@ function(gflagsMain)
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_library})
+
+  definePrebuildProject(${name}
+    URL https://github.com/gflags/gflags/archive/v2.2.1.tar.gz
+    SHA256
+    CONFIGURE
+      cmake
+        -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_BUILD_TYPE=Release
+        -DBUILD_SHARED_LIBS=OFF
+        <SOURCE_DIR>
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+  )
 endfunction()
 
 gflagsMain()

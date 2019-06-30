@@ -14,6 +14,23 @@ function(sleuthkitMain)
   set(anchor_file "lib/libtsk.a")
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.6.1.tar.gz
+    SHA256
+    CONFIGURE
+      ./bootstrap
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-java
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 sleuthkitMain()

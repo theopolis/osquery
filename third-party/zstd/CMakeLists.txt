@@ -13,6 +13,17 @@ function(zstdMain)
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://github.com/facebook/zstd/archive/v1.2.0.tar.gz
+    SHA256
+    CONFIGURE true
+    BUILD
+      $(MAKE) lib-release
+    INSTALL
+      $(MAKE) install PREFIX=<INSTALL_DIR>
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 zstdMain()

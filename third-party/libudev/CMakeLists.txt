@@ -13,6 +13,30 @@ function(libudevMain)
   set(anchor_file "lib/libudev.a")
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL http://pkgs.fedoraproject.org/repo/pkgs/udev/udev-173.tar.bz2/91a88a359b60bbd074b024883cc0dbde/udev-173.tar.bz2
+    SHA256
+    CONFIGURE
+      ./configure --prefix=<INSTALL_DIR>
+        --disable-logging
+        --disable-rule_generator
+        --disable-introspection
+        --disable-gudev
+        --disable-keymap
+        --disable-mtd-probe
+        --disable-hwdb
+        --disable-shared
+        --enable-static
+        --enable-gtk-doc-html=no
+        --with-systemdsystemunitdir=<INSTALL_DIR>/share
+    BUILD
+      $(MAKE) libudev/libudev.la
+    INSTALL
+      $(MAKE) install-exec &&
+      $(MAKE) install-includeHEADERS
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libudevMain()

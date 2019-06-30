@@ -24,6 +24,50 @@ function(thrifMain)
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_boost)
+
+  set(dependencies boost openssl)
+  definePrebuildProject(${name}
+    URL https://github.com/apache/thrift/archive/0.11.0.tar.gz
+    SHA256
+    PATCHES libthrift-0.11.0-1.patch
+    DEPENDS ${dependencies}
+    CONFIGURE
+      export CXXFLAGS=-Wno-error\ $ENV{CXXFLAGS} &&
+      export CPPFLAGS=-DOPENSSL_NO_SSL3\ $ENV{CPPFLAGS} &&
+      ./bootstrap.sh &&
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+        --disable-tests
+        --without-ruby
+        --without-php_extension
+        --without-haskell
+        --without-java
+        --without-perl
+        --without-php
+        --without-erlang
+        --without-go
+        --without-qt
+        --without-qt4
+        --without-qt5
+        --without-d
+        --without-lua
+        --without-dart
+        --without-nodejs
+        --without-rs
+        --without-python
+        --with-cpp
+        --with-libevent=no
+        --enable-tutorial=no
+        --with-openssl=<INSTALL_DIR>
+        --with-boost=<INSTALL_DIR>
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 thrifMain()

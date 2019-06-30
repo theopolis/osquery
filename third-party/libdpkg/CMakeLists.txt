@@ -15,6 +15,23 @@ function(libdpkgMain)
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_zlib)
+
+  set(dependencies zlib bzip2 lzma)
+  definePrebuildProject(${name}
+    URL https://launchpad.net/debian/+archive/primary/+sourcefiles/dpkg/1.19.0.5/dpkg_1.19.0.5.tar.xz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-dselect
+        --disable-start-stop-daemon
+    BUILD
+      cd lib && $(MAKE)
+    INSTALL
+      cd lib && $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libdpkgMain()

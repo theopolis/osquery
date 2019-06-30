@@ -31,6 +31,50 @@ function(boostMain)
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
+
+  if(DEFINED PLATFORM_DARWIN)
+    set(platform_toolchain darwin)
+  elseif(DEFINED PLATFORM_LINUX)
+    set(platform_toolchain chang)
+  endif()
+
+  set(dependencies zlib bzip2)
+  definePrebuildProject(${name}
+    URL https://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      CC=clang ./bootstrap.sh
+        --prefix=<INSTALL_DIR>
+        --libdir=<INSTALL_DIR>/lib
+        --with-toolset=cc &&
+      ${REPLACE_CMD} "cc ;" "${platform_toolchain} ;" project-config.jam
+    BUILD true
+    INSTALL
+      ./b2 install
+        --prefix=<INSTALL_DIR>
+        --libdir=<INSTALL_DIR>/lib
+        -d2
+        -j10
+        --layout=tagged
+        --ignore-site-config
+        --disable-icu
+        --with-filesystem
+        --with-regex
+        --with-system
+        --with-thread
+        --with-coroutine
+        --with-context
+        threading=multi
+        link=static
+        optimization=space
+        variant=release
+        toolset=clang
+        "cxxflags=-std=c++11 $ENV{CXXFLAGS}"
+        include=<INSTALL_DIR>/include
+        "linkflags=$ENV{LDFLAGS}"
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 boostMain()

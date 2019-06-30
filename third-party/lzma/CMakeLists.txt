@@ -14,6 +14,21 @@ function(lzmaMain)
   set(anchor_file lib/liblzma.a)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://tukaani.org/xz/xz-5.2.4.tar.gz
+    SHA256
+    CONFIGURE
+      ./autogen.sh &&
+      ./configure --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 lzmaMain()

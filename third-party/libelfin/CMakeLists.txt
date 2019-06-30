@@ -17,6 +17,18 @@ function(libelfinMain)
   )
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_lib})
+
+  definePrebuildProject(${name}
+    URL https://github.com/aclements/libelfin/archive/v0.3.tar.gz
+    SHA256
+    CONFIGURE true
+    BUILD
+      export CXXFLAGS=-Wno-unused-command-line-argument\ $ENV{CXXFLAGS} &&
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libelfinMain()

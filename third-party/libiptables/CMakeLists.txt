@@ -18,6 +18,23 @@ function(libiptablesMain)
   )
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
+
+  definePrebuildProject(${name}
+    URL https://ftp.osuosl.org/pub/blfs/conglomeration/iptables/iptables-1.8.3.tar.bz2
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-nftables
+        --disable-shared
+    BUILD
+      cd libiptc && $(MAKE)
+    INSTALL
+      cd <SOURCE_DIR>/libiptc && $(MAKE) install &&
+      cd <SOURCE_DIR>/include && $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libiptablesMain()

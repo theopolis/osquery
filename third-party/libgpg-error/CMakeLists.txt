@@ -13,6 +13,21 @@ function(libgpgerrorMain)
   set(anchor_file "lib/libgpg-error.a")
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2
+    SHA256
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libgpgerrorMain()

@@ -17,6 +17,33 @@ function(utillinuxMain)
   )
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
+
+  set(dependencies ncurses)
+  definePrebuildProject(${name}
+    URL https://www.kernel.org/pub/linux/utils/util-linux/v2.27/util-linux-2.27.1.tar.xz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      export NCURSES_CFLAGS=-I${THIRD_PARTY_PREFIX}/include/ncurses &&
+      ./autogen.sh &&
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --disable-all-programs
+        --disable-bash-completion
+        --without-ncurses
+        --enable-libuuid
+        --enable-libblkid
+        --disable-use-tty-group
+        --disable-kill
+        --disable-shared
+        --without-readline
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 utillinuxMain()

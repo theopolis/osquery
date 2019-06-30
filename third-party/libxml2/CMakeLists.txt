@@ -17,6 +17,26 @@ function(libxml2Main)
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_zlib)
+
+  set(dependencies zlib)
+  definePrebuildProject(${name}
+    URL http://xmlsoft.org/sources/libxml2-2.9.7.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --without-python
+        --without-lzma
+        --with-zlib=<INSTALL_DIR>
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libxml2Main()

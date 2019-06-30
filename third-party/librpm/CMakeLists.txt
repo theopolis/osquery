@@ -36,6 +36,42 @@ function(librpmMain)
   target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_zlib)
   target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_bzip2)
 
+  if(DEFINED PLATFORM_DARWIN)
+    set(extra_libs "-lz -liconv")
+    set(extra_patches librpm-4.14.1-1-darwin.patch)
+  endif()
+
+  set(dependencies openssl popt berkeley-db libmagic)
+  definePrebuildProject(${name}
+    URL http://ftp.rpm.org/releases/rpm-4.14.x/rpm-4.14.1.tar.bz2
+    SHA256
+    DEPENDS ${dependencies}
+    PATCHES
+      librpm-4.14.1-1.patch
+      ${extra_patches}
+    CONFIGURE
+      export LIBS=${extra_libs} &&
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --with-external-db
+        --without-selinux
+        --without-lua
+        --without-cap
+        --without-archive
+        --disable-nls
+        --disable-rpath
+        --disable-plugins
+        --disable-python
+        --enable-zstd=no
+        --with-crypto=openssl
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 librpmMain()

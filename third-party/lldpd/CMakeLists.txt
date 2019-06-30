@@ -14,6 +14,33 @@ function(lldpdMain)
   set(anchor_file "lib/liblldpctl.a")
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  set(dependencies zlib bzip2)
+  definePrebuildProject(${name}
+    URL https://media.luffy.cx/files/lldpd/lldpd-0.9.6.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./autogen.sh &&
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --with-systemdsystemunitdir=<INSTALL_DIR>/share
+        --with-sysusersdir=<INSTALL_DIR>/share
+        --with-privsep-chroot=/var/empty
+        --with-privsep-user=nobody
+        --with-privsep-group=nogroup
+        --with-launchddaemonsdir=no
+        --with-xml=no
+        --with-json=no
+        --with-readline=no
+        --disable-shared
+        --enable-static
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 lldpdMain()

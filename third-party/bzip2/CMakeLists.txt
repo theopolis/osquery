@@ -17,6 +17,19 @@ function(bzip2Main)
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+
+  definePrebuildProject(${name}
+    URL http://http.debian.net/debian/pool/main/b/bzip2/bzip2_1.0.6.orig.tar.bz2
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ${REPLACE_CMD} "CFLAGS=" "CFLAGS=$ENV{CFLAGS} " Makefile &&
+      ${REPLACE_CMD} "CC=gcc" "CC=$ENV{CC}" Makefile
+    BUILD true
+    INSTALL
+      $(MAKE) install PREFIX=<INSTALL_DIR>
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 bzip2Main()

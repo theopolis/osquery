@@ -17,6 +17,24 @@ function(libmagicMain)
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_zlib)
+
+  set(dependencies zlib)
+  definePrebuildProject(${name}
+    URL https://distfiles.macports.org/file/file-5.32.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --enable-fsect-man5
+        --enable-static
+        --disable-shared
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libmagicMain()

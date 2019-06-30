@@ -19,6 +19,29 @@ function(augeasMain)
   )
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_library})
+
+  set(dependencies libxml2)
+  definePrebuildProject(${name}
+    URL http://download.augeas.net/augeas-1.12.0.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    PATCHES libaugeas-1.12.0-1.patch
+    CONFIGURE
+      autoreconf &&
+      ./configure
+        --prefix=<INSTALL_DIR>
+        --enable-shared=no
+        --without-selinux
+    BUILD
+      cd <SOURCE_DIR>/gnulib/lib && $(MAKE) &&
+      cd <SOURCE_DIR>/src &&
+        $(MAKE) datadir.h &&
+        $(MAKE) install-libLTLIBRARIES &&
+        $(MAKE) install-data-am
+    INSTALL
+      $(MAKE) install-data-am
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 augeasMain()

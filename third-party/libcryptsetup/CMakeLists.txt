@@ -16,6 +16,28 @@ function(libcryptsetupMain)
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_libgcrypt)
 
+  set(dependencies util-linux libdevmapper popt libgcrypt)
+  definePrebuildProject(${name}
+    URL https://gitlab.com/cryptsetup/cryptsetup/repository/v1_7_5/archive.tar.gz
+    SHA256
+    DEPENDS ${dependencies}
+    CONFIGURE
+    ./autogen.sh
+      --prefix=<INSTALL_DIR>
+      --with-libgcrypt-prefix=<INSTALL_DIR>
+      --disable-selinux
+      --disable-udev
+      --disable-veritysetup
+      --disable-nls
+      --disable-kernel_crypto
+      --disable-shared
+      --enable-static
+    BUILD
+      cd lib && $(MAKE)
+    INSTALL
+      cd lib && $(MAKE) install
+    BUILD_IN_SOURCE ON
+  )
 endfunction()
 
 libcryptsetupMain()

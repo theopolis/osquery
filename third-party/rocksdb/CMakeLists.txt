@@ -17,6 +17,27 @@ function(rocksdbMain)
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_bzip2)
   target_compile_definitions("thirdparty_${name}" INTERFACE -DROCKSDB_LITE=1)
+
+  definePrebuildProject(${name}
+    URL https://github.com/facebook/rocksdb/archive/v6.1.2.tar.gz
+    SHA256
+    CONFIGURE
+      cmake
+        -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_BUILD_TYPE=Release
+        -DROCKSDB_LITE=ON
+        -DWITH_GFLAGS=OFF
+        -DWITH_TESTS=OFF
+        -DUSE_RTTI=ON
+        -DPORTABLE=ON
+        -DFAIL_ON_WARNINGS=OFF
+    BUILD
+      $(MAKE)
+    INSTALL
+      $(MAKE) install &&
+      mv <INSTALL_DIR>/lib/librocksdb.a <INSTALL_DIR>/lib/librocksdb_lite.a
+  )
 endfunction()
 
 rocksdbMain()
