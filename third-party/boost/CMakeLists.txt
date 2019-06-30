@@ -35,7 +35,7 @@ function(boostMain)
   if(DEFINED PLATFORM_DARWIN)
     set(platform_toolchain darwin)
   elseif(DEFINED PLATFORM_LINUX)
-    set(platform_toolchain chang)
+    set(platform_toolchain clang)
   endif()
 
   set(dependencies zlib bzip2)

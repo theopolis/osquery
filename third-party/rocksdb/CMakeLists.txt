@@ -32,6 +32,7 @@ function(rocksdbMain)
         -DUSE_RTTI=ON
         -DPORTABLE=ON
         -DFAIL_ON_WARNINGS=OFF
+        <SOURCE_DIR>
     BUILD
       $(MAKE)
     INSTALL

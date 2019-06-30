@@ -18,6 +18,8 @@ function(libauditMain)
     URL https://github.com/Distrotech/libaudit/archive/audit-2.4.2.tar.gz
     SHA256
     CONFIGURE
+      touch INSTALL.tmp &&
+      ./autogen.sh &&
       ./configure
         --prefix=<INSTALL_DIR>
         --disable-shared

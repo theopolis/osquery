@@ -4,15 +4,22 @@
 # This source code is licensed in accordance with the terms specified in
 # the LICENSE file found in the root directory of this source tree.
 
+include(ExternalProject)
+
 function(osqueryThirdpartyMain)
   initializePythonPathFolder()
   osqueryThirdpartyBuildMain()
 
-  add_subdirectory("glibc")
+  # Python modules
   add_subdirectory("jinja2")
   add_subdirectory("markupsafe")
-  add_subdirectory("sqlite")
 
+  # Placeholder or build-from-source
+  add_subdirectory("glibc")
+  add_subdirectory("sqlite")
+  add_subdirectory("googletest")
+
+  # Ordered recorsive dependencies
   add_subdirectory("zlib")
   add_subdirectory("bzip2")
   add_subdirectory("libxml2")
@@ -30,7 +37,6 @@ function(osqueryThirdpartyMain)
   add_subdirectory("augeas")
   add_subdirectory("aws-sdk-cpp")
   add_subdirectory("berkeley-db")
-  add_subdirectory("googletest")
   add_subdirectory("libarchive")
   add_subdirectory("libaudit")
   add_subdirectory("libdevmapper")
@@ -56,13 +62,9 @@ endfunction()
 function(osqueryThirdpartyBuildMain)
   # For our custom ExternalProject wrapper we define argument groups.
   add_custom_target(thirdparty_prebuilt)
-  set(REPLACE_CMD "${CMAKE_SOURCE_DIR}/tools/replace.py")
 endfunction()
 
 function(definePrebuildProject name)
-  include(ExternalProject)
-  set(_ep_keywords_definePrebuildProject "^(URL|SHA256|DEPENDS|PATCHES|CONFIGURE|BUILD|INSTALL|BUILD_IN_SOURCE)$")
-
   set(identifier "thirdparty_build_${name}")
 
   # Create a target to hold the arguments from the function call.
@@ -84,8 +86,11 @@ function(definePrebuildProject name)
   get_property(install_command TARGET ${props} PROPERTY _CEP_INSTALL)
   get_property(build_in_source TARGET ${props} PROPERTY _CEP_BUILD_IN_SOURCE)
 
+  set(patch_glue)
   foreach(patch ${patches})
-    list(APPEND patch_command "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/${patch}")
+    list(APPEND patch_command ${patch_glue}
+      patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/${patch})
+    set(patch_glue &&)
   endforeach()
 
   if(DEFINED PLATFORM_LINUX)

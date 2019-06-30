@@ -14,6 +14,7 @@ function(archiveMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
+  set(dependencies zlib bzip2 lzma)
   definePrebuildProject(${name}
     URL http://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz
     SHA256

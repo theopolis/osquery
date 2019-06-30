@@ -19,7 +19,7 @@ function(sleuthkitMain)
     URL https://github.com/sleuthkit/sleuthkit/archive/sleuthkit-4.6.1.tar.gz
     SHA256
     CONFIGURE
-      ./bootstrap
+      ./bootstrap &&
       ./configure
         --prefix=<INSTALL_DIR>
         --disable-java
