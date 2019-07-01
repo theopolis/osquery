@@ -15,7 +15,11 @@ function(lldpdMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
-  set(dependencies zlib bzip2)
+  set(dependencies zlib)
+  if(DEFINED PLATFORM_LINUX)
+    list(APPEND dependencies bzip2)
+  endif()
+
   definePrebuildProject(${name}
     URL https://media.luffy.cx/files/lldpd/lldpd-0.9.6.tar.gz
     SHA256 e74e2dd7e2a233ca1ff385c925ddae2a916d302819d1433741407d2f8fb0ddd8

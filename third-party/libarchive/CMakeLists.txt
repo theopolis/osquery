@@ -14,7 +14,11 @@ function(archiveMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
-  set(dependencies zlib bzip2 lzma)
+  set(dependencies zlib)
+  if(DEFINED PLATFORM_LINUX)
+    list(APPEND dependencies bzip2 lzma)
+  endif()
+
   definePrebuildProject(${name}
     URL http://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz
     SHA256 ed2dbd6954792b2c054ccf8ec4b330a54b85904a80cef477a1c74643ddafa0ce

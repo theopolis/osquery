@@ -36,7 +36,7 @@ function(librpmMain)
   target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_zlib)
   target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_bzip2)
 
-  if(DEFINED PLATFORM_DARWIN)
+  if(DEFINED PLATFORM_MACOS)
     set(extra_libs "-lz -liconv")
     set(extra_patches librpm-4.14.1-1-darwin.patch)
   endif()

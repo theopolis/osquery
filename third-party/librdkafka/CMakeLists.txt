@@ -17,7 +17,11 @@ function(librdkafkaMain)
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_openssl)
 
-  set(dependencies zlib bzip2 openssl rapidjson)
+  set(dependencies zlib openssl rapidjson)
+  if(DEFINED PLATFORM_LINUX)
+    list(APPEND dependencies bzip2)
+  endif()
+
   definePrebuildProject(${name}
     URL https://github.com/edenhill/librdkafka/archive/v1.0.1.tar.gz
     SHA256 b2a2defa77c0ef8c508739022a197886e0644bd7bf6179de1b68bdffb02b3550

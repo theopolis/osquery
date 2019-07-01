@@ -32,13 +32,15 @@ function(boostMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
 
-  if(DEFINED PLATFORM_DARWIN)
+  set(dependencies zlib)
+
+  if(DEFINED PLATFORM_MACOS)
     set(platform_toolchain darwin)
   elseif(DEFINED PLATFORM_LINUX)
     set(platform_toolchain clang)
+    list(APPEND dependencies bzip2)
   endif()
 
-  set(dependencies zlib bzip2)
   definePrebuildProject(${name}
     URL https://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2
     SHA256 5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9

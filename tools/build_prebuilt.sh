@@ -60,7 +60,7 @@ if [ "$(uname)" == "Darwin" ]; then
   PLATFORM=Darwin
   PLATFORM_FLAGS="-mmacosx-version-min=${DARWIN_BUILD}"
 	PLATFORM_LDFLAGS="-mmacosx-version-min=${DARWIN_BUILD}"
-  PLATFORM_PATH="darwin-x86_64"
+  PLATFORM_PATH="macos-x86_64"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
   PLATFORM=Linux
   PLATFORM_PATH="linux-x86_64"
@@ -91,7 +91,10 @@ export PREFIX=${THIRD_PARTY_PREFIX}
 BUILD_DIR="${SOURCE_DIR}/build/deps" # prebuilt
 
 # If working in vagrant then the shared folder does not work
-FS_TYPE=$(stat --file-system --format=%T ${SOURCE_DIR} 2>&1)
+if [ "${PLATFORM}" = "Linux" ]; then
+  FS_TYPE=$(stat --file-system --format=%T ${SOURCE_DIR} 2>&1)
+fi
+
 if [ "${FS_TYPE}" = "nfs" ]; then
   mkdir -p ~/deps
   ln -sf ~/deps "${SOURCE_DIR}/build"

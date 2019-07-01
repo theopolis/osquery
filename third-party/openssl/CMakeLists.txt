@@ -23,7 +23,7 @@ function(opensslMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_lib})
 
-  if(DEFINED PLATFORM_DARWIN)
+  if(DEFINED PLATFORM_MACOS)
     set(configure_targets darwin64-x86_64-cc enable-ec_nistp_64_gcc_128)
   elseif(DEFINED PLATFORM_LINUX)
     set(configure_targets linux-x86_64)
