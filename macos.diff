@@ -1,0 +1,151 @@
+diff --git a/third-party-prebuilt b/third-party-prebuilt
+--- a/third-party-prebuilt
++++ b/third-party-prebuilt
+@@ -1 +1 @@
+-Subproject commit bb92269c4ed51edc20be6f2afb268e73fa28ae97
++Subproject commit bb92269c4ed51edc20be6f2afb268e73fa28ae97-dirty
+diff --git a/third-party/boost/CMakeLists.txt b/third-party/boost/CMakeLists.txt
+index f5785451..c2b7bde0 100644
+--- a/third-party/boost/CMakeLists.txt
++++ b/third-party/boost/CMakeLists.txt
+@@ -32,13 +32,15 @@ function(boostMain)
+ 
+   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_libraries})
+ 
+-  if(DEFINED PLATFORM_DARWIN)
++  set(dependencies zlib)
++
++  if(DEFINED PLATFORM_MACOS)
+     set(platform_toolchain darwin)
+   elseif(DEFINED PLATFORM_LINUX)
+     set(platform_toolchain clang)
++    list(APPEND dependencies bzip2)
+   endif()
+ 
+-  set(dependencies zlib bzip2)
+   definePrebuildProject(${name}
+     URL https://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2
+     SHA256 5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9
+diff --git a/third-party/libarchive/CMakeLists.txt b/third-party/libarchive/CMakeLists.txt
+index 5df2a36d..f70a508e 100644
+--- a/third-party/libarchive/CMakeLists.txt
++++ b/third-party/libarchive/CMakeLists.txt
+@@ -14,7 +14,11 @@ function(archiveMain)
+ 
+   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+ 
+-  set(dependencies zlib bzip2 lzma)
++  set(dependencies zlib)
++  if(DEFINED PLATFORM_LINUX)
++    list(APPEND dependencies bzip2 lzma)
++  endif()
++
+   definePrebuildProject(${name}
+     URL http://www.libarchive.org/downloads/libarchive-3.3.2.tar.gz
+     SHA256 ed2dbd6954792b2c054ccf8ec4b330a54b85904a80cef477a1c74643ddafa0ce
+diff --git a/third-party/librdkafka/CMakeLists.txt b/third-party/librdkafka/CMakeLists.txt
+index 77b1dcaf..d2747691 100644
+--- a/third-party/librdkafka/CMakeLists.txt
++++ b/third-party/librdkafka/CMakeLists.txt
+@@ -17,7 +17,11 @@ function(librdkafkaMain)
+ 
+   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_openssl)
+ 
+-  set(dependencies zlib bzip2 openssl rapidjson)
++  set(dependencies zlib openssl rapidjson)
++  if(DEFINED PLATFORM_LINUX)
++    list(APPEND dependencies bzip2)
++  endif()
++
+   definePrebuildProject(${name}
+     URL https://github.com/edenhill/librdkafka/archive/v1.0.1.tar.gz
+     SHA256 b2a2defa77c0ef8c508739022a197886e0644bd7bf6179de1b68bdffb02b3550
+diff --git a/third-party/librpm/CMakeLists.txt b/third-party/librpm/CMakeLists.txt
+index 250fe4ee..fbe5e9b0 100644
+--- a/third-party/librpm/CMakeLists.txt
++++ b/third-party/librpm/CMakeLists.txt
+@@ -36,7 +36,7 @@ function(librpmMain)
+   target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_zlib)
+   target_link_libraries("thirdparty_${name}_librpmio" INTERFACE thirdparty_bzip2)
+ 
+-  if(DEFINED PLATFORM_DARWIN)
++  if(DEFINED PLATFORM_MACOS)
+     set(extra_libs "-lz -liconv")
+     set(extra_patches librpm-4.14.1-1-darwin.patch)
+   endif()
+diff --git a/third-party/lldpd/CMakeLists.txt b/third-party/lldpd/CMakeLists.txt
+index a4a27bc1..42a0b021 100644
+--- a/third-party/lldpd/CMakeLists.txt
++++ b/third-party/lldpd/CMakeLists.txt
+@@ -15,7 +15,11 @@ function(lldpdMain)
+ 
+   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
+ 
+-  set(dependencies zlib bzip2)
++  set(dependencies zlib)
++  if(DEFINED PLATFORM_LINUX)
++    list(APPEND dependencies bzip2)
++  endif()
++
+   definePrebuildProject(${name}
+     URL https://media.luffy.cx/files/lldpd/lldpd-0.9.6.tar.gz
+     SHA256 e74e2dd7e2a233ca1ff385c925ddae2a916d302819d1433741407d2f8fb0ddd8
+diff --git a/third-party/openssl/CMakeLists.txt b/third-party/openssl/CMakeLists.txt
+index ac9efcd9..266a21d4 100644
+--- a/third-party/openssl/CMakeLists.txt
++++ b/third-party/openssl/CMakeLists.txt
+@@ -23,7 +23,7 @@ function(opensslMain)
+ 
+   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_lib})
+ 
+-  if(DEFINED PLATFORM_DARWIN)
++  if(DEFINED PLATFORM_MACOS)
+     set(configure_targets darwin64-x86_64-cc enable-ec_nistp_64_gcc_128)
+   elseif(DEFINED PLATFORM_LINUX)
+     set(configure_targets linux-x86_64)
+diff --git a/third-party/rapidjson/CMakeLists.txt b/third-party/rapidjson/CMakeLists.txt
+index 8b229ce4..6fcd0188 100644
+--- a/third-party/rapidjson/CMakeLists.txt
++++ b/third-party/rapidjson/CMakeLists.txt
+@@ -15,7 +15,7 @@ function(rapidjsonMain)
+     SHA256 bf7ced29704a1e696fbccf2a2b4ea068e7774fa37f6d7dd4039d0787f8bed98e
+     PATCHES librapidjson-1.1.0-1.patch
+     CONFIGURE
+-      export CXXFLAGS=-Wno-extra-semi-stmt\ -Wno-zero-as-null-pointer-constant\ -Wno-shadow\ $ENV{CXXFLAGS} &&
++      export CXXFLAGS=-Wno-unknown-warning-option\ -Wno-extra-semi-stmt\ -Wno-zero-as-null-pointer-constant\ -Wno-shadow\ $ENV{CXXFLAGS} &&
+       cmake
+         -DCMAKE_CXX_FLAGS_RELEASE=$ENV{CXXFLAGS}
+         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+diff --git a/tools/build_prebuilt.sh b/tools/build_prebuilt.sh
+index fe261a1d..bf76fd32 100755
+--- a/tools/build_prebuilt.sh
++++ b/tools/build_prebuilt.sh
+@@ -7,6 +7,7 @@
+ #  the LICENSE file found in the root directory of this source tree.
+ 
+ set -e
++set -x
+ 
+ # To setup in a CI or similar on Ubuntu 18.04/18.10
+ # sudo apt-get install automake pkg-config libtool autopoint bison flex xsltproc texinfo
+@@ -60,7 +61,7 @@ if [ "$(uname)" == "Darwin" ]; then
+   PLATFORM=Darwin
+   PLATFORM_FLAGS="-mmacosx-version-min=${DARWIN_BUILD}"
+ 	PLATFORM_LDFLAGS="-mmacosx-version-min=${DARWIN_BUILD}"
+-  PLATFORM_PATH="darwin-x86_64"
++  PLATFORM_PATH="macos-x86_64"
+ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+   PLATFORM=Linux
+   PLATFORM_PATH="linux-x86_64"
+@@ -91,7 +92,10 @@ export PREFIX=${THIRD_PARTY_PREFIX}
+ BUILD_DIR="${SOURCE_DIR}/build/deps" # prebuilt
+ 
+ # If working in vagrant then the shared folder does not work
+-FS_TYPE=$(stat --file-system --format=%T ${SOURCE_DIR} 2>&1)
++if [ "${PLATFORM}" = "Linux" ]; then
++  FS_TYPE=$(stat --file-system --format=%T ${SOURCE_DIR} 2>&1)
++fi
++
+ if [ "${FS_TYPE}" = "nfs" ]; then
+   mkdir -p ~/deps
+   ln -sf ~/deps "${SOURCE_DIR}/build"
