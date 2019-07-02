@@ -34,7 +34,8 @@ function(libxml2Main)
     BUILD
       $(MAKE)
     INSTALL
-      $(MAKE) install
+      $(MAKE) install &&
+      ln -sf libxml2/libxml <INSTALL_DIR>/include
     BUILD_IN_SOURCE ON
   )
 endfunction()
