@@ -24,9 +24,43 @@ function(opensslMain)
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_lib})
 
   if(DEFINED PLATFORM_MACOS)
-    set(configure_targets darwin64-x86_64-cc enable-ec_nistp_64_gcc_128)
+    set(configure_targets
+      darwin64-x86_64-cc
+      enable-ec_nistp_64_gcc_128
+    )
+    set(build_command
+      mkdir -p <INSTALL_DIR>/etc/openssl &&
+      $(MAKE) depend &&
+      $(MAKE)
+    )
+    set(install_command
+      $(MAKE) install
+    )
   elseif(DEFINED PLATFORM_LINUX)
-    set(configure_targets linux-x86_64)
+    set(configure_targets
+      linux-x86_64
+    )
+    set(build_command
+      mkdir -p <INSTALL_DIR>/etc/openssl &&
+      $(MAKE) depend &&
+      $(MAKE)
+    )
+    set(install_command
+      $(MAKE) install
+    )
+  elseif(DEFINED PLATFORM_WINDOWS)
+    set(configure_targets
+      VC-WIN64A
+    )
+    set(build_command
+      ms/do_win64a.bat &&
+      nmake -f ms/nt.mak
+    )
+    set(install_command
+      cp out32/ssleay32.lib <INSTALL_DIR>/lib &&
+      cp out32/libeay32.lib <INSTALL_DIR>/lib &&
+      cp -R inc32/openssl <INSTALL_DIR>/include
+    )
   endif()
 
   definePrebuildProject(${name}
@@ -42,14 +76,14 @@ function(opensslMain)
         no-weak-ssl-ciphers
         zlib-dynamic
         enable-cms
+        --with-zlib-include=<INSTALL_DIR>/include
+        --with-zlib-lib=<INSTALL_DIR>/lib
         "$ENV{CFLAGS}"
         ${configure_targets}
     BUILD
-      mkdir -p <INSTALL_DIR>/etc/openssl &&
-      $(MAKE) depend &&
-      $(MAKE)
+      ${build_command}
     INSTALL
-      $(MAKE) install
+      ${install_command}
     BUILD_IN_SOURCE ON
   )
 endfunction()

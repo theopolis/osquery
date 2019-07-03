@@ -20,20 +20,29 @@ function(gflagsMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}" ${additional_library})
 
+  if(DEFINED PLATFORM_WINDOWS)
+    set(configure_options
+      -DCMAKE_CXX_FLAGS_RELEASE:STRING=/MT\ /O2\ /Ob2\ /DNDEBUG
+    )
+  endif()
+
   definePrebuildProject(${name}
     URL https://github.com/gflags/gflags/archive/v2.2.1.tar.gz
     SHA256 ae27cdbcd6a2f935baa78e4f21f675649271634c092b1be01469440495609d0e
     CONFIGURE
       cmake
-        -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS=OFF
+        -DGFLAGS_BUILD_STATIC_LIBS=ON
+        -DGFLAGS_BUILD_SHARED_LIBS=OFF
+        -DGFLAGS_BUILD_gflags_LIB=ON
+        -DGFLAGS_INSTALL_STATIC_LIBS=ON
+        ${configure_options}
         <SOURCE_DIR>
     BUILD
-      $(MAKE)
+      cmake --build . --config Release
     INSTALL
-      $(MAKE) install
+      cmake --build . --config Release --target install
   )
 endfunction()
 

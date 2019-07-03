@@ -36,9 +36,33 @@ function(boostMain)
 
   if(DEFINED PLATFORM_MACOS)
     set(platform_toolchain darwin)
+    set(boost_toolchain clang)
+    set(configure_command
+      CC=clang ./bootstrap.sh
+        --prefix=<INSTALL_DIR>
+        --libdir=<INSTALL_DIR>/lib
+        --with-toolset=cc &&
+      ${REPLACE_CMD} "cc ;" "${platform_toolchain} ;" project-config.jam
+    )
+    set(cxx_flags "cxxflags=-std=c++11 -fvisibility=hidden -fvisibility-inlines-hidden $ENV{CXXFLAGS}")
+    set(link_flags optimization=space "linkflags=$ENV{LDFLAGS}")
   elseif(DEFINED PLATFORM_LINUX)
-    set(platform_toolchain clang)
     list(APPEND dependencies bzip2)
+    set(platform_toolchain clang)
+    set(boost_toolchain clang)
+    set(configure_command
+      CC=clang ./bootstrap.sh
+        --prefix=<INSTALL_DIR>
+        --libdir=<INSTALL_DIR>/lib
+        --with-toolset=cc &&
+      ${REPLACE_CMD} "cc ;" "${platform_toolchain} ;" project-config.jam
+    )
+    set(cxx_flags "cxxflags=-std=c++11 -fvisibility=hidden -fvisibility-inlines-hidden $ENV{CXXFLAGS}")
+    set(link_flags optimization=space "linkflags=$ENV{LDFLAGS}")
+  elseif(DEFINED PLATFORM_WINDOWS)
+    set(boost_toolchain msvc-14.1)
+    set(configure_command bootstrap.bat)
+    set(link_flags runtime-link=static)
   endif()
 
   definePrebuildProject(${name}
@@ -46,18 +70,13 @@ function(boostMain)
     SHA256 5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9
     DEPENDS ${dependencies}
     CONFIGURE
-      CC=clang ./bootstrap.sh
-        --prefix=<INSTALL_DIR>
-        --libdir=<INSTALL_DIR>/lib
-        --with-toolset=cc &&
-      ${REPLACE_CMD} "cc ;" "${platform_toolchain} ;" project-config.jam
+      ${configure_command}
     BUILD true
     INSTALL
       ./b2 install
         --prefix=<INSTALL_DIR>
         --libdir=<INSTALL_DIR>/lib
         -d2
-        -j10
         --layout=tagged
         --ignore-site-config
         --disable-icu
@@ -69,12 +88,12 @@ function(boostMain)
         --with-context
         threading=multi
         link=static
-        optimization=space
         variant=release
-        toolset=clang
-        "cxxflags=-std=c++11 $ENV{CXXFLAGS}"
+        toolset=${boost_toolchain}
+        address-model=64
         include=<INSTALL_DIR>/include
-        "linkflags=$ENV{LDFLAGS}"
+        ${link_flags}
+        ${cxx_flags}
     BUILD_IN_SOURCE ON
   )
 endfunction()

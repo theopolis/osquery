@@ -13,10 +13,9 @@ function(thrifMain)
   )
 
   if(DEFINED PLATFORM_WINDOWS)
-    set(anchor_file "lib/parse.lib")
+    set(anchor_file "lib/thriftzmt.lib")
 
     set(additional_libraries
-      lib/thriftzmt.lib
       lib/thriftmt.lib
     )
   endif()
@@ -25,6 +24,12 @@ function(thrifMain)
 
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_boost)
 
+  if(DEFINED PLATFORM_LINUX OR DEFINED PLATFORM_MACOS)
+    set(configure_options
+      -DCMAKE_CXX_FLAGS="-fvisibility=hidden -fvisibility-inlines-hidden $ENV{CXXFLAGS}"
+    )
+  endif()
+
   set(dependencies boost openssl)
   definePrebuildProject(${name}
     URL https://github.com/apache/thrift/archive/0.11.0.tar.gz
@@ -32,41 +37,31 @@ function(thrifMain)
     PATCHES libthrift-0.11.0-1.patch
     DEPENDS ${dependencies}
     CONFIGURE
-      export CXXFLAGS=-Wno-error\ $ENV{CXXFLAGS} &&
-      export CPPFLAGS=-DOPENSSL_NO_SSL3\ $ENV{CPPFLAGS} &&
-      ./bootstrap.sh &&
-      ./configure
-        --prefix=<INSTALL_DIR>
-        --disable-shared
-        --enable-static
-        --disable-tests
-        --without-ruby
-        --without-php_extension
-        --without-haskell
-        --without-java
-        --without-perl
-        --without-php
-        --without-erlang
-        --without-go
-        --without-qt
-        --without-qt4
-        --without-qt5
-        --without-d
-        --without-lua
-        --without-dart
-        --without-nodejs
-        --without-rs
-        --without-python
-        --with-cpp
-        --with-libevent=no
-        --enable-tutorial=no
-        --with-openssl=<INSTALL_DIR>
-        --with-boost=<INSTALL_DIR>
+      cmake
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DWITH_SHARED_LIB=OFF
+        -DBUILD_TESTING=OFF
+        -DBUILD_EXAMPLES=OFF
+        -DBUILD_C_GLIB=OFF
+        -DBUILD_JAVA=OFF
+        -DBUILD_PYTHON=OFF
+        -DBUILD_HASKELL=OFF
+        -DWITH_BOOST_STATIC=ON
+        -DWITH_STDTHREADS=OFF
+        -DWITH_BOOSTTHREADS=OFF
+        -DWITH_OPENSSL=ON
+        -DWITH_QT4=OFF
+        -DWITH_QT5=OFF
+        -DCMAKE_CXX_STANDARD=11
+        -DWITH_MT=ON
+        -DBOOST_ROOT=<INSTALL_DIR>
+        -DZLIB_ROOT=<INSTALL_DIR>
+        ${configure_options}
+        <SOURCE_DIR>
     BUILD
-      $(MAKE)
+      cmake --build . --config Release
     INSTALL
-      $(MAKE) install
-    BUILD_IN_SOURCE ON
+      cmake --build . --config Release --target install
   )
 endfunction()
 

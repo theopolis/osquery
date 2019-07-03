@@ -20,15 +20,14 @@ function(linenoisengMain)
     SHA256 35f8fa471328dd534da111f46c1814fb7efdf0feafb1b71c5a6b4b98d5fd67e8
     CONFIGURE
       cmake
-        -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS=OFF
         <SOURCE_DIR>
     BUILD
-      $(MAKE)
+      cmake --build . --config Release
     INSTALL
-      $(MAKE) install
+      cmake --build . --config Release --target install
   )
 endfunction()
 

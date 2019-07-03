@@ -9,20 +9,26 @@ function(zstdMain)
   set(anchor_file "lib/libzstd.a")
 
   if(DEFINED PLATFORM_WINDOWS)
-    set(anchor_file "lib/libzstd.lib")
+    set(anchor_file "lib/zstd_static.lib")
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
   definePrebuildProject(${name}
-    URL https://github.com/facebook/zstd/archive/v1.2.0.tar.gz
-    SHA256 4a7e4593a3638276ca7f2a09dc4f38e674d8317bbea51626393ca73fc047cbfb
-    CONFIGURE true
+    URL https://github.com/facebook/zstd/releases/download/v1.4.0/zstd-1.4.0.tar.gz
+    SHA256 7f323f0e0c18488748f3d9b2d4353f00e904ea2ccd0372ea04d7f77aa1156557
+    CONFIGURE
+      cmake
+        -DZSTD_USE_STATIC_RUNTIME=ON
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DCMAKE_BUILD_TYPE=Release
+        -DBUILD_SHARED_LIBS=OFF
+        -DZSTD_BUILD_SHARED=OFF
+        <SOURCE_DIR>/build/cmake
     BUILD
-      $(MAKE) lib-release
+      cmake --build . --config Release
     INSTALL
-      $(MAKE) install PREFIX=<INSTALL_DIR>
-    BUILD_IN_SOURCE ON
+      cmake --build . --config Release --target install
   )
 endfunction()
 

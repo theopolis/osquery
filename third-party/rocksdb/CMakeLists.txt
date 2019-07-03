@@ -10,7 +10,7 @@ function(rocksdbMain)
   set(anchor_file "lib/librocksdb_lite.a")
 
   if(DEFINED PLATFORM_WINDOWS)
-    set(anchor_file "lib/rocksdb.lib")
+    set(anchor_file "lib/rocksdb_lite.lib")
   endif()
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
@@ -18,26 +18,40 @@ function(rocksdbMain)
   target_link_libraries("thirdparty_${name}" INTERFACE thirdparty_bzip2)
   target_compile_definitions("thirdparty_${name}" INTERFACE -DROCKSDB_LITE=1)
 
+  if(DEFINED PLATFORM_WINDOWS)
+    set(lib_name rocksdb.lib)
+    set(lib_target rocksdb_lite.lib)
+    set(configure_options
+      -DROCKSDB_INSTALL_ON_WINDOWS=ON
+      -DCMAKE_CXX_FLAGS_RELEASE:STRING=/MT\ /O2\ /Ob2\ /DNDEBUG
+    )
+  else()
+    set(lib_name librocksdb.a)
+    set(lib_target librocksdb_lite.a)
+  endif()
+
   definePrebuildProject(${name}
     URL https://github.com/facebook/rocksdb/archive/v6.1.2.tar.gz
     SHA256 df93f3b66caa1cbe1c2862c99c33e18a5c5b24a64fb51dfe8ef805e3c9fd1cad
     CONFIGURE
       cmake
-        -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        -DCMAKE_BUILD_TYPE=Release
         -DROCKSDB_LITE=ON
         -DWITH_GFLAGS=OFF
+        -DWITH_RUNTIME_DEBUG=OFF
         -DWITH_TESTS=OFF
-        -DUSE_RTTI=ON
+        -DWITH_TOOLS=OFF
+        -DUSE_RTTI=OFF
         -DPORTABLE=ON
         -DFAIL_ON_WARNINGS=OFF
+        -DWITH_MD_LIBRARY=OFF
+        ${configure_options}
         <SOURCE_DIR>
     BUILD
-      $(MAKE)
+      cmake --build . --config Release
     INSTALL
-      $(MAKE) install &&
-      mv <INSTALL_DIR>/lib/librocksdb.a <INSTALL_DIR>/lib/librocksdb_lite.a
+      cmake --build . --config Release --target install &&
+      mv <INSTALL_DIR>/lib/${lib_name} <INSTALL_DIR>/lib/${lib_target}
   )
 endfunction()
 

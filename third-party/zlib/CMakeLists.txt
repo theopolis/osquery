@@ -14,19 +14,26 @@ function(zlibMain)
 
   importThirdPartyBinaryLibrary("${name}" "${anchor_file}")
 
-  set(dependencies "")
+  if (DEFINED PLATFORM_WINDOWS)
+    set(configure_options
+      -DCMAKE_C_FLAGS_RELEASE:STRING=/MT\ /O2\ /Ob2\ /DNDEBUG
+    )
+  endif()
 
   definePrebuildProject(${name}
     URL https://downloads.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.gz
     SHA256 c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
     DEPENDS ${dependencies}
     CONFIGURE
-      ./configure --prefix=<INSTALL_DIR>
+      cmake
+        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+        -DBUILD_SHARED_LIBS=OFF
+        ${configure_options}
+        <SOURCE_DIR>
     BUILD
-      $(MAKE)
+      cmake --build . --config Release
     INSTALL
-      $(MAKE) install
-    BUILD_IN_SOURCE ON
+      cmake --build . --config Release --target install
   )
 endfunction()
 
