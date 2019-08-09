@@ -22,6 +22,7 @@ function(ssdeepCppMain)
     "${library_root}/helpers.cpp"
     "${library_root}/ui.cpp"
     "${library_root}/fuzzy.c"
+    "${library_root}/find-file-size.c"
   )
 
   target_compile_definitions(thirdparty_ssdeep-cpp PRIVATE
