@@ -55,9 +55,11 @@ function(generateLibevent)
 
     "${library_root}"
     "${library_root}/include"
+    "${library_root}/compat"
   )
 
   target_include_directories(thirdparty_libevent SYSTEM INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/config/libevent"
     "${library_root}/include"
   )
 endfunction()
@@ -106,17 +108,44 @@ function(generateLiblldpd)
     "${library_root}/client/conf-power.c"
     "${library_root}/client/conf-lldp.c"
     "${library_root}/client/conf-system.c"
-    "${library_root}/daemon/frame.c"
-    "${library_root}/daemon/privsep_io.c"
-    "${library_root}/daemon/lldpd.c"
-    "${library_root}/daemon/interfaces.c"
     "${library_root}/daemon/client.c"
+    "${library_root}/daemon/event.c"
+    "${library_root}/daemon/frame.c"
+    "${library_root}/daemon/interfaces.c"
+    "${library_root}/daemon/lldpd.c"
+    "${library_root}/daemon/main.c"
+    "${library_root}/daemon/netlink.c"
+    "${library_root}/daemon/pattern.c"
+    "${library_root}/daemon/priv.c"
     "${library_root}/daemon/privsep.c"
     "${library_root}/daemon/privsep_fd.c"
-    "${library_root}/daemon/priv.c"
-    "${library_root}/daemon/pattern.c"
-    "${library_root}/daemon/netlink.c"
+    "${library_root}/daemon/privsep_io.c"
+    "${library_root}/daemon/protocols/cdp.c"
+    "${library_root}/daemon/protocols/edp.c"
+    "${library_root}/daemon/protocols/lldp.c"
+    "${library_root}/daemon/protocols/sonmp.c"
   )
+
+  if(DEFINED PLATFORM_MACOS)
+    target_sources(thirdparty_lldpd PRIVATE
+      "${library_root}/daemon/dmi-osx.c"
+      "${library_root}/daemon/forward-bsd.c"
+      "${library_root}/daemon/interfaces-bsd.c"
+      "${library_root}/daemon/priv-bsd.c"
+    )
+
+  elseif(DEFINED PLATFORM_LINUX)
+    target_sources(thirdparty_lldpd PRIVATE
+      "${library_root}/daemon/dmi-linux.c"
+      "${library_root}/daemon/forward-linux.c"
+      "${library_root}/daemon/interfaces-linux.c"
+      "${library_root}/daemon/priv-linux.c"
+    )
+  else()
+    target_sources(thirdparty_lldpd PRIVATE
+      "${library_root}/daemon/dmi-dummy.c"
+    )
+  endif()
 
   target_compile_definitions(thirdparty_lldpd PRIVATE
     _FORTIFY_SOURCE=2
@@ -140,7 +169,9 @@ function(generateLiblldpd)
     "${CMAKE_CURRENT_SOURCE_DIR}/config/liblldpd"
 
     "${library_root}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/include"
     "${library_root}/lib"
+    "${library_root}/daemon"
   )
 
   set(public_header_list
