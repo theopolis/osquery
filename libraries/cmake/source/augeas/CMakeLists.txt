@@ -141,9 +141,7 @@ function(augeasMain)
     "${library_root}/src"
   )
 
-  set_target_properties(thirdparty_augeas PROPERTIES
-    LENSES_FOLDER_PATH "${library_root}/lenses"
-  )
+  set_property(GLOBAL PROPERTY AUGEAS_LENSES_FOLDER_PATH "${library_root}/lenses")
 endfunction()
 
 function(importSELinux)

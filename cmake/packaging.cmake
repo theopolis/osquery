@@ -116,9 +116,9 @@ function(findPackagingTool)
 endfunction()
 
 function(generateInstallTargets)
+  get_property(augeas_lenses_path GLOBAL PROPERTY AUGEAS_LENSES_FOLDER_PATH)
 
   if(DEFINED PLATFORM_LINUX)
-
     # .
     if("${PACKAGING_SYSTEM}"  STREQUAL "DEB")
       file(COPY "${CMAKE_SOURCE_DIR}/tools/deployment/linux_postinstall.sh" DESTINATION "${CMAKE_BINARY_DIR}/package/deb")
@@ -140,8 +140,7 @@ function(generateInstallTargets)
     file(COPY "${CMAKE_SOURCE_DIR}/tools/deployment/osquery.example.conf" DESTINATION "${CMAKE_BINARY_DIR}/package/linux")
     install(FILES "${CMAKE_BINARY_DIR}/package/linux/osquery.example.conf" DESTINATION share/osquery)
 
-    get_target_property(augeas_lenses_dir thirdparty_augeas LENSES_FOLDER_PATH)
-    install(DIRECTORY "${augeas_lenses_dir}/"
+    install(DIRECTORY "${augeas_lenses_path}/"
             DESTINATION share/osquery/lenses
             FILES_MATCHING PATTERN "*.aug"
             PATTERN "tests" EXCLUDE)
@@ -205,16 +204,10 @@ function(generateInstallTargets)
     install(DIRECTORY COMPONENT osquery DESTINATION /private/var/log/osquery)
     install(DIRECTORY COMPONENT osquery DESTINATION /private/var/osquery)
 
-    get_target_property(augeas_target_type thirdparty_augeas TYPE)
-    if(augeas_target_type STREQUAL "INTERFACE_LIBRARY")
-      message(WARNING "Augeas lenses are not being packaged")
-    else()
-      get_target_property(augeas_lenses_dir thirdparty_augeas LENSES_FOLDER_PATH)
-      install(DIRECTORY "${augeas_lenses_dir}" COMPONENT osquery
+    install(DIRECTORY "${augeas_lenses_path}" COMPONENT osquery
             DESTINATION /private/var/osquery/lenses
             FILES_MATCHING PATTERN "*.aug"
             PATTERN "tests" EXCLUDE)
-    endif()
 
     file(COPY "${CMAKE_SOURCE_DIR}/packs" DESTINATION "${CMAKE_BINARY_DIR}/package/pkg")
     install(DIRECTORY "${CMAKE_BINARY_DIR}/package/pkg/packs" COMPONENT osquery DESTINATION /private/var/osquery)
