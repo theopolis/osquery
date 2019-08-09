@@ -187,6 +187,14 @@ function(importRemotePythonModule identifier base_url file_name hash)
   add_dependencies("thirdparty_python_modules" "${target_name}")
 endfunction()
 
+# Used by each find_package script
+function(importFacebookLibrary library_name)
+  add_subdirectory(
+    "${CMAKE_SOURCE_DIR}/libraries/cmake/facebook/${library_name}"
+    "${CMAKE_BINARY_DIR}/libs/fb/${library_name}"
+  )
+endfunction()
+
 # Make sure that globals.cmake and options.cmake have been included
 if("${PYTHON_PATH}" STREQUAL "")
   message(FATAL_ERROR "The PYTHON_PATH variable was not found. Has globals.cmake been included?")

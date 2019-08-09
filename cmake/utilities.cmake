@@ -82,7 +82,6 @@ endfunction()
 
 # Generates the global_c_settings, global_cxx_settings targets and the respective thirdparty variant
 function(generateGlobalSettingsTargets)
-
   if(NOT DEFINED PLATFORM_WINDOWS)
     if("${CMAKE_BUILD_TYPE}" STREQUAL "")
       message(SEND_ERROR "The CMAKE_BUILD_TYPE variabile is empty! Make sure to include globals.cmake before utilities.cmake!")

@@ -8,4 +8,4 @@ cmake_minimum_required(VERSION 3.13.3)
 include("${CMAKE_CURRENT_LIST_DIR}/api.cmake")
 
 message(STATUS "Importing: facebook/libelfin")
-add_subdirectory("${CMAKE_SOURCE_DIR}/libraries/cmake/facebook/libelfin")
+importFacebookLibrary("libelfin")

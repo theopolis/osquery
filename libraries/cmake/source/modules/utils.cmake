@@ -69,5 +69,8 @@ function(importSourceSubmodule library_name)
     endif()
   endif()
 
-  add_subdirectory("${directory_path}")
+  add_subdirectory(
+    "${directory_path}"
+    "${CMAKE_BINARY_DIR}/libs/src/${library_name}"
+  )
 endfunction()

@@ -5,7 +5,6 @@
 # the LICENSE file found in the root directory of this source tree.
 
 cmake_minimum_required(VERSION 3.13.3)
-include("${CMAKE_CURRENT_LIST_DIR}/api.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
-message(STATUS "Importing: facebook/googletest")
-importFacebookLibrary("googletest")
+importSourceSubmodule("glog")

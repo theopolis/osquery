@@ -8,4 +8,4 @@ cmake_minimum_required(VERSION 3.13.3)
 include("${CMAKE_CURRENT_LIST_DIR}/api.cmake")
 
 message(STATUS "Importing: facebook/bzip2")
-add_subdirectory("${CMAKE_SOURCE_DIR}/libraries/cmake/facebook/bzip2")
+importFacebookLibrary("bzip2")

@@ -97,3 +97,9 @@
 [submodule "libraries/cmake/source/googletest/src"]
 	path = libraries/cmake/source/googletest/src
 	url = https://github.com/google/googletest
+[submodule "libraries/cmake/source/glog/src"]
+	path = libraries/cmake/source/glog/src
+	url = https://github.com/google/glog
+[submodule "libraries/cmake/source/gflags/src"]
+	path = libraries/cmake/source/gflags/src
+	url = https://github.com/gflags/gflags

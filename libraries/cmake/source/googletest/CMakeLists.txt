@@ -28,7 +28,7 @@ function(googleTestMain)
   endforeach()
 
   set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
-  add_subdirectory("${library_root}" EXCLUDE_FROM_ALL)
+  add_subdirectory("${library_root}" "${CMAKE_CURRENT_BINARY_DIR}/submodule" EXCLUDE_FROM_ALL)
 
   set(target_list
     gmock
