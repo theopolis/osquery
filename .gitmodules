@@ -94,3 +94,6 @@
 [submodule "libraries/cmake/source/lldpd/src"]
 	path = libraries/cmake/source/lldpd/src
 	url = https://github.com/vincentbernat/lldpd
+[submodule "libraries/cmake/source/googletest/src"]
+	path = libraries/cmake/source/googletest/src
+	url = https://github.com/google/googletest
