@@ -125,12 +125,22 @@ function(importFormula library_name)
     list(APPEND output_file_list "${install_prefix}/${output_lib}")
   endforeach()
 
+  set(log_folder_path
+    "${CMAKE_BINARY_DIR}/formula_logs"
+  )
+
+  set(log_file_path
+    "${log_folder_path}/${library_name}.txt"
+  )
+
   add_custom_command(
     OUTPUT ${output_file_list}
-    COMMAND "${CMAKE_COMMAND}" ${formula_dependency_settings} "${project_directory_path}"
-    COMMAND "${CMAKE_COMMAND}" --build . --config "${CMAKE_BUILD_TYPE}"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${log_folder_path}"
+    COMMAND "${CMAKE_COMMAND}" -E remove -f "${log_file_path}"
+    COMMAND "${CMAKE_COMMAND}" ${formula_dependency_settings} "${project_directory_path}" >> "${log_file_path}" 2>&1
+    COMMAND "${CMAKE_COMMAND}" --build . --config "${CMAKE_BUILD_TYPE}" >> "${log_file_path}" 2>&1
     WORKING_DIRECTORY "${build_directory_path}"
-    COMMENT "Running formula: ${library_name}"
+    COMMENT "Running formula: ${library_name} (${log_file_path})"
     VERBATIM
   )
 
