@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.13.3)
 include(ExternalProject)
 
-set(OSQUERY_FORMULA_INSTALL_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build")
+set(OSQUERY_FORMULA_INSTALL_DIRECTORY "${CMAKE_BINARY_DIR}/installed_formulas")
 
 function(importFormula library_name)
   message(STATUS "Importing formula: formula/${library_name}")

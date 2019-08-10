@@ -62,7 +62,6 @@ function(importLibraries)
 
   set(library_descriptor_list
     "Linux,Darwin:augeas"
-    "Linux,Darwin,Windows:aws-sdk-cpp"
     "Linux:berkeley-db"
     "Linux,Darwin,Windows:boost"
     "Linux,Darwin,Windows:bzip2"
@@ -100,6 +99,7 @@ function(importLibraries)
     "Linux,Darwin,Windows:zlib"
     "Linux,Darwin,Windows:zstd"
     "Linux,Darwin,Windows:openssl"
+    "Linux,Darwin,Windows:aws-sdk-cpp"
   )
 
   foreach(python_module ${python_module_list})
