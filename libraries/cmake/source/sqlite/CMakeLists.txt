@@ -5,7 +5,9 @@
 # the LICENSE file found in the root directory of this source tree.
 
 function(sqliteMain)
+  set(SQLITE_GENERATE_INSTALL_TARGET false CACHE BOOL "" FORCE)
   add_subdirectory(src)
+
   target_link_libraries(thirdparty_sqlite PUBLIC
     global_c_settings
   )
