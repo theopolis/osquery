@@ -7,4 +7,11 @@
 cmake_minimum_required(VERSION 3.13.3)
 include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
-importSourceSubmodule("aws-sdk-cpp")
+importSourceSubmodule(
+  "aws-sdk-cpp"
+
+  "aws-c-common_src"
+  "aws-c-event-stream_src"
+  "aws-checksums_src"
+  "aws-sdk-cpp_src"
+)

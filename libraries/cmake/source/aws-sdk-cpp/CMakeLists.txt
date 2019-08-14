@@ -13,6 +13,14 @@ function(awsSdkCppMain)
   generateAwsChecksumsTarget()
   generateAwsCeventStreamTarget()
   generateAwsSdkCppTargets()
+
+  add_library(thirdparty_aws-sdk-cpp INTERFACE)
+  target_link_libraries(thirdparty_aws-sdk-cpp INTERFACE
+    thirdparty_aws_ec2
+    thirdparty_aws_kinesis
+    thirdparty_aws_firehose
+    thirdparty_aws_sts
+  )
 endfunction()
 
 function(generateAwsCcommonTarget)
@@ -113,6 +121,8 @@ function(generateAwsChecksumsTarget)
     "${library_root}/source/crc.c"
     "${library_root}/source/crc_jni.c"
     "${library_root}/source/crc_sw.c"
+    "${library_root}/source/intel/cpuid.c"
+    "${library_root}/source/intel/crc32c_sse42_asm.c"
   )
 
   target_include_directories(thirdparty_aws_checksums SYSTEM PUBLIC
@@ -165,6 +175,7 @@ function(generateAwsSdkCppTargets)
   generateAwsFirehose()
   generateAwsKinesis()
   generateAwsEc2()
+  generateAwsSts()
 endfunction()
 
 function(generateTinyXml2)
@@ -297,6 +308,7 @@ function(generateAwsCore)
   )
 
   target_link_libraries(thirdparty_aws_core PUBLIC
+    thirdparty_openssl
     thirdparty_tinyxml2
     thirdparty_cjson
     thirdparty_aws_c_event_stream
@@ -1744,6 +1756,35 @@ function(generateAwsSts)
   set(library_root "${AWS_SDK_CPP_ROOT}/aws-cpp-sdk-sts")
 
   add_library(thirdparty_aws_sts STATIC
+    "${library_root}/source/STSClient.cpp"
+    "${library_root}/source/STSEndpoint.cpp"
+    "${library_root}/source/STSErrorMarshaller.cpp"
+    "${library_root}/source/STSErrors.cpp"
+    "${library_root}/source/model/AssumeRoleRequest.cpp"
+    "${library_root}/source/model/AssumeRoleResult.cpp"
+    "${library_root}/source/model/AssumeRoleWithSAMLRequest.cpp"
+    "${library_root}/source/model/AssumeRoleWithSAMLResult.cpp"
+    "${library_root}/source/model/AssumeRoleWithWebIdentityRequest.cpp"
+    "${library_root}/source/model/AssumeRoleWithWebIdentityResult.cpp"
+    "${library_root}/source/model/AssumedRoleUser.cpp"
+    "${library_root}/source/model/Credentials.cpp"
+    "${library_root}/source/model/DecodeAuthorizationMessageRequest.cpp"
+    "${library_root}/source/model/DecodeAuthorizationMessageResult.cpp"
+    "${library_root}/source/model/FederatedUser.cpp"
+    "${library_root}/source/model/GetAccessKeyInfoRequest.cpp"
+    "${library_root}/source/model/GetAccessKeyInfoResult.cpp"
+    "${library_root}/source/model/GetCallerIdentityRequest.cpp"
+    "${library_root}/source/model/GetCallerIdentityResult.cpp"
+    "${library_root}/source/model/GetFederationTokenRequest.cpp"
+    "${library_root}/source/model/GetFederationTokenResult.cpp"
+    "${library_root}/source/model/GetSessionTokenRequest.cpp"
+    "${library_root}/source/model/GetSessionTokenResult.cpp"
+    "${library_root}/source/model/PolicyDescriptorType.cpp"
+    "${library_root}/source/model/ResponseMetadata.cpp"
+  )
+
+  target_include_directories(thirdparty_aws_sts SYSTEM PUBLIC
+    "${library_root}/include"
   )
 
   target_link_libraries(thirdparty_aws_sts PUBLIC
@@ -1757,4 +1798,3 @@ function(generateAwsSts)
 endfunction()
 
 awsSdkCppMain()
-

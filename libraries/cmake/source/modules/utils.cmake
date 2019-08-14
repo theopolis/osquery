@@ -56,8 +56,16 @@ function(importSourceSubmodule library_name)
   message(STATUS "Importing: source/${library_name}")
 
   set(directory_path "${CMAKE_SOURCE_DIR}/libraries/cmake/source/${library_name}")
-  set(submodule_path "${directory_path}/src")
-  initializeGitSubmodule("${submodule_path}")
+
+  if("${ARGN}" STREQUAL "")
+    set(submodule_name_list "src")
+  else()
+    set(submodule_name_list ${ARGN})
+  endif()
+
+  foreach(submodule_name ${submodule_name_list})
+    initializeGitSubmodule("${directory_path}/${submodule_name}")
+  endforeach()
 
   if(NOT TARGET thirdparty_source_module_warnings)
     add_library(thirdparty_source_module_warnings INTERFACE)
