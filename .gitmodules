@@ -103,6 +103,15 @@
 [submodule "libraries/cmake/source/gflags/src"]
 	path = libraries/cmake/source/gflags/src
 	url = https://github.com/gflags/gflags
-[submodule "libraries/cmake/source/aws-sdk-cpp/src"]
-	path = libraries/cmake/source/aws-sdk-cpp/src
+[submodule "libraries/cmake/source/aws-sdk-cpp/aws-c-common_src"]
+	path = libraries/cmake/source/aws-sdk-cpp/aws-c-common_src
+	url = https://github.com/awslabs/aws-c-common
+[submodule "libraries/cmake/source/aws-sdk-cpp/aws-c-event-stream_src"]
+	path = libraries/cmake/source/aws-sdk-cpp/aws-c-event-stream_src
+	url = https://github.com/awslabs/aws-c-event-stream
+[submodule "libraries/cmake/source/aws-sdk-cpp/aws-checksums_src"]
+	path = libraries/cmake/source/aws-sdk-cpp/aws-checksums_src
+	url = https://github.com/awslabs/aws-checksums
+[submodule "libraries/cmake/source/aws-sdk-cpp/aws-sdk-cpp_src"]
+	path = libraries/cmake/source/aws-sdk-cpp/aws-sdk-cpp_src
 	url = https://github.com/aws/aws-sdk-cpp
