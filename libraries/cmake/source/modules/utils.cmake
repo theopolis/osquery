@@ -45,6 +45,7 @@ function(initializeGitSubmodule submodule_path)
   execute_process(
     COMMAND "${git_executable_path}" submodule update --init --recursive "${submodule_path}"
     RESULT_VARIABLE process_exit_code
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   )
 
   if(NOT ${process_exit_code} EQUAL 0)
