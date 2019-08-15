@@ -6,7 +6,7 @@
 
 function(osqueryEV2Main)
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryEV2testsTest()
   endif()
 

@@ -6,7 +6,7 @@
 
 function(osqueryTablesApplicationsMain)
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     add_subdirectory("posix/tests")
   endif()
 

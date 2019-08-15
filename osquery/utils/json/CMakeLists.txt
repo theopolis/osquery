@@ -6,7 +6,7 @@
 
 function(osqueryUtilsJsonMain)
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryUtilsJsonJsontestsTest()
   endif()
 

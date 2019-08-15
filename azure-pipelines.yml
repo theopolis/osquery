@@ -40,7 +40,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
           -DCMAKE_C_COMPILER=clang
           -DCMAKE_CXX_COMPILER=clang++
-          -DBUILD_TESTING=ON
+          -DOSQUERY_BUILD_TESTS=ON
           $(EXTRA_CMAKE_ARGS)
           $(Build.SourcesDirectory)
 
@@ -161,7 +161,7 @@ jobs:
       displayName: "Configure osquery"
       inputs:
         workingDirectory: $(Build.BinariesDirectory)/build
-        cmakeArgs: -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DBUILD_TESTING=ON $(EXTRA_CMAKE_ARGS) $(Build.SourcesDirectory)
+        cmakeArgs: -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DOSQUERY_BUILD_TESTS=ON $(EXTRA_CMAKE_ARGS) $(Build.SourcesDirectory)
 
     - task: CMake@1
       displayName: "Build osquery"
@@ -260,7 +260,7 @@ jobs:
       displayName: "Configure osquery"
       inputs:
         workingDirectory: $(Build.BinariesDirectory)\build
-        cmakeArgs: -G "Visual Studio 15 2017 Win64" -T host=x64 -DBUILD_TESTING=ON $(Build.SourcesDirectory)
+        cmakeArgs: -G "Visual Studio 15 2017 Win64" -T host=x64 -DOSQUERY_BUILD_TESTS=ON $(Build.SourcesDirectory)
 
     - task: CMake@1
       displayName: "Build osquery"

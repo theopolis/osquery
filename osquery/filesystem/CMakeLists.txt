@@ -6,7 +6,7 @@
 
 function(osqueryFilesystemMain)
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryFilesystemTest()
   endif()
 

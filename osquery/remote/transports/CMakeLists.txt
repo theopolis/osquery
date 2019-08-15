@@ -6,7 +6,7 @@
 
 function(osqueryRemoteTransportsMain)
 
-  if(BUILD_TESTING AND DEFINED PLATFORM_POSIX)
+  if(OSQUERY_BUILD_TESTS AND DEFINED PLATFORM_POSIX)
     generateOsqueryRemoteTransportsRemotetransportstlstestsTest()
   endif()
 

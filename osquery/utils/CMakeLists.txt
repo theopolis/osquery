@@ -20,7 +20,7 @@ function(osqueryUtilsMain)
   add_subdirectory("versioning")
   add_subdirectory("schemer")
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryUtilsUtilstestsTest()
   endif()
 

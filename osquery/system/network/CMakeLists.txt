@@ -6,7 +6,7 @@
 
 function(osquerySystemNetworkMain)
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     add_subdirectory("tests")
   endif()
 

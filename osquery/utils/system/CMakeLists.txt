@@ -8,7 +8,7 @@ function(osqueryUtilsSystemMain)
 
   add_subdirectory("linux")
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryUtilsSystemErrnoErrnotestsTest()
     generateOsqueryUtilsSystemCpuCputopologytestsTest()
     generateOsqueryUtilsSystemTimeTimetestsTest()

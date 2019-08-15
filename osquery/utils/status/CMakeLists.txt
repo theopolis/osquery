@@ -6,7 +6,7 @@
 
 function(osqueryUtilsStatusMain)
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryUtilsStatusStatustestsTest()
   endif()
 

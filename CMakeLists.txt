@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.13.3)
 project(osquery)
 
-if(BUILD_TESTING)
+if(OSQUERY_BUILD_TESTS)
   enable_testing()
 endif()
 
@@ -45,7 +45,7 @@ function(main)
   add_subdirectory("tools")
   add_subdirectory("specs")
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     add_subdirectory("tests")
   endif()
 

@@ -7,7 +7,7 @@
 function(osqueryExtensionsMain)
   add_subdirectory("thrift")
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     add_subdirectory("tests")
   endif()
 

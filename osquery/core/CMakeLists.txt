@@ -8,7 +8,7 @@ function(osqueryCoreMain)
   add_subdirectory("plugins")
   add_subdirectory("sql")
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     add_subdirectory("tests")
   endif()
 

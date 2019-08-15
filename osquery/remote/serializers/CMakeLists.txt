@@ -6,7 +6,7 @@
 
 function(osqueryRemoteSerializersMain)
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryRemoteserializersjsontestsTest()
   endif()
 

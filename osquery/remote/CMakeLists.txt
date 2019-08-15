@@ -9,7 +9,7 @@ function(osqueryRemoteMain)
   add_subdirectory("transports")
   add_subdirectory("enroll")
 
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     add_subdirectory("tests")
   endif()
 

@@ -5,7 +5,7 @@
 # the LICENSE file found in the root directory of this source tree.
 
 function(osqueryUtilsConversionsMain)
-  if(BUILD_TESTING)
+  if(OSQUERY_BUILD_TESTS)
     generateOsqueryUtilsConversionsConversionstestsTest()
     generateOsqueryUtilsConversionsTotestsTest()
   endif()
