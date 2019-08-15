@@ -133,11 +133,14 @@ function(importFormula library_name)
     "${log_folder_path}/${library_name}.txt"
   )
 
+  getCompilationFlags(c c_compilation_flags)
+  getCompilationFlags(cxx cxx_compilation_flags)
+
   add_custom_command(
     OUTPUT ${output_file_list}
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${log_folder_path}"
     COMMAND "${CMAKE_COMMAND}" -E remove -f "${log_file_path}"
-    COMMAND "${CMAKE_COMMAND}" ${formula_dependency_settings} "${project_directory_path}" >> "${log_file_path}" 2>&1
+    COMMAND "${CMAKE_COMMAND}" -DC_FLAGS:STRING="${c_compilation_flags}" -DCXX_FLAGS:STRING="${c_compilation_flags}" ${formula_dependency_settings} "${project_directory_path}" >> "${log_file_path}" 2>&1
     COMMAND "${CMAKE_COMMAND}" --build . --config "${CMAKE_BUILD_TYPE}" >> "${log_file_path}" 2>&1
     WORKING_DIRECTORY "${build_directory_path}"
     COMMENT "Running formula: ${library_name} (${log_file_path})"
@@ -175,4 +178,42 @@ function(importFormula library_name)
   message(STATUS "  Version: ${metadata_version}")
   message(STATUS "  Revision: ${metadata_revision}")
   message(STATUS "  Dependencies: ${metadata_dependencies}")
+endfunction()
+
+function(getCompilationFlags language output_variable)
+  if("${language}" STREQUAL "c")
+    set(target_name_list "c_settings")
+
+  elseif("${language}" STREQUAL "cxx")
+    set(target_name_list "cxx_settings")
+
+  else()
+    message(FATAL_ERROR "Invalid language specified. Valid options are c and cxx")
+  endif()
+
+  list(APPEND target_name_list
+    global_settings
+  )
+
+  unset("${output_variable}")
+
+  foreach(target_name ${target_name_list})
+    get_target_property(compile_option_list "${target_name}" INTERFACE_COMPILE_OPTIONS)
+    get_target_property(compile_def_list "${target_name}" INTERFACE_COMPILE_DEFINITIONS)
+
+    if(NOT "${compile_option_list}" STREQUAL "compile_option_list-NOTFOUND")
+      list(APPEND "${output_variable}" ${compile_option_list})
+    endif()
+
+    if(NOT "${compile_def_list}" STREQUAL "compile_def_list-NOTFOUND")
+      foreach(compile_def ${compile_def_list})
+        list(APPEND "${output_variable}"
+          "-D${compile_def}"
+        )
+      endforeach()
+    endif()
+  endforeach()
+
+  string(REPLACE ";" "," "${output_variable}" "${${output_variable}}")
+  set("${output_variable}" "${${output_variable}}" PARENT_SCOPE)
 endfunction()

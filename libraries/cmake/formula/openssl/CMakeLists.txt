@@ -13,14 +13,19 @@ function(opensslMain)
     return()
   endif()
 
-  # TODO(alessandro): Port all the settings from the original formula AND make sure it uses CMAKE_C_COMPILER
+  # The formula will be configured with the C_FLAGS and CXX_FLAGS parameters; we should
+  # forward them to the configure script when possible
+  message(WARNING "TODO: Use C_FLAGS")
+
+  # TODO(alessandro): Port all the settings from the original formula
+  # TODO(alessandro): Use the compilation flags we got from the main project (C_FLAGS, CXX_FLAGS)
   ExternalProject_Add(
     openssl
-    URL "http://www.openssl.org/source/openssl-1.0.2o.tar.gz"
+    URL "https://www.openssl.org/source/openssl-1.0.2o.tar.gz"
 
     CONFIGURE_COMMAND
-      perl ./Configure "--prefix=${CMAKE_INSTALL_PREFIX}"
-        "--openssldir=${CMAKE_INSTALL_PREFIX}/etc/openssl"
+      "${CMAKE_COMMAND}" -E env CC="${CMAKE_C_COMPILER}"
+      perl ./Configure "--prefix=${CMAKE_INSTALL_PREFIX}" "--openssldir=${CMAKE_INSTALL_PREFIX}/etc/openssl"
         no-ssl2
         no-ssl3
         no-asm
@@ -33,7 +38,8 @@ function(opensslMain)
         linux-x86_64
 
     BUILD_COMMAND
-      "${CMAKE_COMMAND}" -E make_directory "${CMAKE_INSTALL_PREFIX}/etc/openssl" &&
+     "${CMAKE_COMMAND}" -E env CC="${CMAKE_C_COMPILER}"
+     "${CMAKE_COMMAND}" -E make_directory "${CMAKE_INSTALL_PREFIX}/etc/openssl" &&
       $(MAKE) depend -j 10 &&
       $(MAKE) -j 10
 
