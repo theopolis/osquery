@@ -5,11 +5,6 @@
 # the LICENSE file found in the root directory of this source tree.
 
 function(ssdeepCppMain)
-  if(NOT DEFINED PLATFORM_LINUX AND NOT DEFINED PLATFORM_MACOS)
-    add_osquery_library(thirdparty_ssdeep-cpp INTERFACE)
-    return()
-  endif()
-
   set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   add_library(thirdparty_ssdeep-cpp

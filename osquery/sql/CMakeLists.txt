@@ -52,8 +52,13 @@ function(generateOsquerySql)
     thirdparty_googletest_headers
     thirdparty_sqlite
     thirdparty_gflags
-    thirdparty_ssdeep-cpp
   )
+
+  if(NOT DEFINED PLATFORM_WINDOWS)
+    target_link_libraries(osquery_sql PUBLIC
+      thirdparty_ssdeep-cpp
+    )
+  endif()
 
   set(public_header_files
     dynamic_table_row.h
