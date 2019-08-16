@@ -1,8 +1,5 @@
-# Temporary; the thirdparty-submodules will no longer be required
-# when this is merged
 trigger:
 - master
-- thirdparty-submodules
 
 jobs:
 
