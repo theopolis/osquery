@@ -138,7 +138,7 @@ function(librpmMain)
   )
 
   target_link_libraries(thirdparty_librpm PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_librpm PRIVATE

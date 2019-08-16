@@ -30,7 +30,7 @@ function(libelfinElf)
   )
 
   target_link_libraries(thirdparty_libelfin_elf PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   # The original package built for Buck was built installing
@@ -85,7 +85,7 @@ function(libelfinDwarf)
   )
 
   target_link_libraries(thirdparty_libelfin_dwarf PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   # The original package built for Buck was built installing

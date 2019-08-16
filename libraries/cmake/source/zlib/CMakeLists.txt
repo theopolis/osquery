@@ -38,7 +38,7 @@ function(zlibMain)
   )
 
   target_link_libraries(thirdparty_zlib PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_zlib PRIVATE

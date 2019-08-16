@@ -19,7 +19,7 @@ function(linenoisengMain)
   )
 
   target_link_libraries(thirdparty_linenoise-ng PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_linenoise-ng PRIVATE

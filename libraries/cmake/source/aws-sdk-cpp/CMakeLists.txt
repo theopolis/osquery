@@ -109,7 +109,7 @@ function(generateAwsCcommonTarget)
   )
 
   target_link_libraries(thirdparty_aws_c_common PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 
@@ -134,7 +134,7 @@ function(generateAwsChecksumsTarget)
   )
 
   target_link_libraries(thirdparty_aws_checksums PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 
@@ -159,7 +159,7 @@ function(generateAwsCeventStreamTarget)
   )
 
   target_link_libraries(thirdparty_aws_c_event_stream PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 
@@ -327,7 +327,7 @@ function(generateAwsCore)
   )
 
   target_link_libraries(thirdparty_aws_core PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 
@@ -438,7 +438,7 @@ function(generateAwsFirehose)
   )
 
   target_link_libraries(thirdparty_aws_firehose PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 
@@ -527,7 +527,7 @@ function(generateAwsKinesis)
   )
 
   target_link_libraries(thirdparty_aws_kinesis PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 
@@ -1748,7 +1748,7 @@ function(generateAwsEc2)
   )
 
   target_link_libraries(thirdparty_aws_ec2 PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 
@@ -1793,7 +1793,7 @@ function(generateAwsSts)
   )
 
   target_link_libraries(thirdparty_aws_sts PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 

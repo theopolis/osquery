@@ -96,7 +96,7 @@ function(generateLibrdkafka)
   )
 
   target_link_libraries(thirdparty_librdkafka_c PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_librdkafka_c PRIVATE
@@ -138,7 +138,7 @@ function(generateLibrdkafkaxx)
   )
 
   target_link_libraries(thirdparty_librdkafka_cxx PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_librdkafka_cxx PRIVATE

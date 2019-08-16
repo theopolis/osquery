@@ -128,7 +128,7 @@ function(augeasMain)
   )
 
   target_link_libraries(thirdparty_augeas PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_augeas PRIVATE
@@ -160,7 +160,7 @@ function(importSELinux)
   )
 
   target_link_libraries(thirdparty_selinux PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_selinux SYSTEM INTERFACE

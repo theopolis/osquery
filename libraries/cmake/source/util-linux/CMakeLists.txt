@@ -224,7 +224,7 @@ function(utillinuxMain)
 
 
   target_link_libraries(thirdparty_util-linux PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_compile_options(thirdparty_util-linux PRIVATE

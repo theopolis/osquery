@@ -47,7 +47,7 @@ function(generateLibevent)
   )
 
   target_link_libraries(thirdparty_libevent PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_libevent PRIVATE
@@ -162,7 +162,7 @@ function(generateLiblldpd)
   )
 
   target_link_libraries(thirdparty_lldpd PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_lldpd PRIVATE

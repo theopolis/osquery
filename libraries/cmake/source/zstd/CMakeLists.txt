@@ -55,7 +55,7 @@ function(zstdMain)
   )
 
   target_link_libraries(thirdparty_zstd PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_zstd PRIVATE

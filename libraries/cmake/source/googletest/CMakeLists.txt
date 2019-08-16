@@ -43,7 +43,7 @@ function(googleTestMain)
     )
 
     target_link_libraries("${target_name}" PRIVATE
-      thirdparty_source_module_warnings
+      thirdparty_source_module_settings
     )
   endforeach()
 

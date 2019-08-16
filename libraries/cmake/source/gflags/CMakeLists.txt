@@ -9,23 +9,16 @@ function(gflagsMain)
   set(BUILD_gflags_LIB true CACHE BOOL "" FORCE)
 
   set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
   add_subdirectory("${library_root}" "${CMAKE_CURRENT_BINARY_DIR}/submodule" EXCLUDE_FROM_ALL)
 
   set(compile_options_target_list
-    global_settings
-    cxx_settings
-    thirdparty_source_module_warnings
+    global_cxx_settings
+    thirdparty_source_module_settings
   )
 
   foreach(compile_options_target ${compile_options_target_list})
-    get_target_property(flag_list
-      "${compile_options_target}"
-      INTERFACE_COMPILE_OPTIONS
-    )
-
-    target_compile_options(gflags_static PUBLIC
-      ${flag_list}
-    )
+    copyInterfaceTargetFlagsTo(gflags_static ${compile_options_target})
   endforeach()
 
   add_library(thirdparty_gflags INTERFACE)

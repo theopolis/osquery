@@ -133,7 +133,7 @@ function(libdpkgMain)
   )
 
   target_link_libraries(thirdparty_libdpkg PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_compile_definitions(thirdparty_libdpkg PRIVATE

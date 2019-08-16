@@ -32,7 +32,7 @@ function(bzip2Main)
   )
 
   target_link_libraries(thirdparty_bzip2 PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_bzip2 PRIVATE

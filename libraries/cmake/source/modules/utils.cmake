@@ -68,12 +68,23 @@ function(importSourceSubmodule library_name)
     initializeGitSubmodule("${directory_path}/${submodule_name}")
   endforeach()
 
-  if(NOT TARGET thirdparty_source_module_warnings)
-    add_library(thirdparty_source_module_warnings INTERFACE)
+  if(NOT TARGET thirdparty_source_module_settings)
+    add_library(thirdparty_source_module_settings INTERFACE)
 
     if(NOT OSQUERY_THIRD_PARTY_SOURCE_MODULE_WARNINGS)
-      target_compile_options(thirdparty_source_module_warnings INTERFACE
+      target_compile_options(thirdparty_source_module_settings INTERFACE
         -Wno-everything -Wno-all -Wno-error
+      )
+    endif()
+
+    if(DEFINED PLATFORM_LINUX)
+      target_compile_options(thirdparty_source_module_settings INTERFACE
+        -Oz
+        -g0
+      )
+
+      target_compile_definitions(thirdparty_source_module_settings INTERFACE
+        NDEBUG
       )
     endif()
   endif()

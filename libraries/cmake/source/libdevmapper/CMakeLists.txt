@@ -136,7 +136,7 @@ function(libdevmapperMain)
   )
 
   target_link_libraries(thirdparty_libdevmapper PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   set(public_header_path_list

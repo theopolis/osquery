@@ -498,3 +498,58 @@ function(generateSpecialTargets)
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     VERBATIM)
 endfunction()
+
+function(copyInterfaceTargetFlagsTo destination_target source_target)
+
+  set(target_list ${source_target})
+  set(target_list_length 1)
+
+  while(${target_list_length} GREATER 0)
+    foreach(target ${target_list})
+
+      if(NOT TARGET ${target})
+        continue()
+      endif()
+
+      get_target_property(target_type ${target} TYPE)
+
+      if(NOT "${target_type}" STREQUAL "INTERFACE_LIBRARY")
+        continue()
+      endif()
+
+      get_target_property(dependencies ${target} INTERFACE_LINK_LIBRARIES)
+
+      if(NOT "${dependencies}" STREQUAL "dependencies-NOTFOUND")
+        list(APPEND new_target_list ${dependencies})
+      endif()
+
+      get_target_property(compile_options ${target} INTERFACE_COMPILE_OPTIONS)
+      get_target_property(compile_definitions ${target} INTERFACE_COMPILE_DEFINITIONS)
+      get_target_property(link_options ${target} INTERFACE_LINK_OPTIONS)
+
+      if(NOT "${compile_options}" STREQUAL "compile_options-NOTFOUND")
+        list(APPEND compile_options_list ${compile_options})
+      endif()
+
+      if(NOT "${compile_definitions}" STREQUAL "compile_definitions-NOTFOUND")
+        list(APPEND compile_definitions_list ${compile_definitions})
+      endif()
+
+      if(NOT "${link_options}" STREQUAL "link_options-NOTFOUND")
+        list(APPEND link_options_list ${link_options})
+      endif()
+    endforeach()
+
+    set(target_list ${new_target_list})
+    list(LENGTH target_list target_list_length)
+    unset(new_target_list)
+  endwhile()
+
+  list(REMOVE_DUPLICATES compile_options_list)
+  list(REMOVE_DUPLICATES compile_definitions_list)
+  list(REMOVE_DUPLICATES link_options_list)
+
+  target_compile_options(${destination_target} PUBLIC ${compile_options_list})
+  target_compile_definitions(${destination_target} PUBLIC ${compile_definitions_list})
+  target_link_options(${destination_target} PUBLIC ${link_options_list})
+endfunction()

@@ -136,7 +136,7 @@ function(sleuthkitMain)
   )
 
   target_link_libraries(thirdparty_sleuthkit PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_sleuthkit PRIVATE

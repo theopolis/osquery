@@ -28,7 +28,7 @@ function(poptMain)
   )
 
   target_link_libraries(thirdparty_popt PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_compile_definitions(thirdparty_popt PRIVATE

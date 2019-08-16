@@ -13,7 +13,7 @@ function(sqliteMain)
   )
 
   target_link_libraries(thirdparty_sqlite PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 endfunction()
 

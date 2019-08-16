@@ -55,7 +55,7 @@ function(libmagicMain)
   )
 
   target_link_libraries(thirdparty_libmagic PRIVATE
-    thirdparty_source_module_warnings
+    thirdparty_source_module_settings
   )
 
   target_include_directories(thirdparty_libmagic PRIVATE
