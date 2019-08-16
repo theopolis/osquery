@@ -42,6 +42,11 @@ function(boostMain)
     thirdparty_boost_beast
     thirdparty_boost_xpressive
   )
+
+  find_package(icu REQUIRED)
+  target_link_libraries(thirdparty_boost INTERFACE
+    thirdparty_icu
+  )
 endfunction()
 
 function(generateBoostSerialization)
@@ -324,6 +329,7 @@ function(generateBoostLocale)
     thirdparty_boost_core
     thirdparty_boost_thread
     thirdparty_boost_unordered
+    thirdparty_icu
   )  
 endfunction()
 
