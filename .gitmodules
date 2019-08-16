@@ -115,3 +115,6 @@
 [submodule "libraries/cmake/source/aws-sdk-cpp/aws-sdk-cpp_src"]
 	path = libraries/cmake/source/aws-sdk-cpp/aws-sdk-cpp_src
 	url = https://github.com/aws/aws-sdk-cpp
+[submodule "libraries/cmake/source/boost/src"]
+	path = libraries/cmake/source/boost/src
+	url = https://github.com/boostorg/boost
