@@ -118,3 +118,6 @@
 [submodule "libraries/cmake/source/boost/src"]
 	path = libraries/cmake/source/boost/src
 	url = https://github.com/boostorg/boost
+[submodule "libraries/cmake/source/icu/src"]
+	path = libraries/cmake/source/icu/src
+	url = https://github.com/unicode-org/icu
