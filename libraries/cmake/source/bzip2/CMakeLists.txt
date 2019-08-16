@@ -10,17 +10,11 @@ function(bzip2Main)
   add_library(thirdparty_bzip2
     "${library_root}/randtable.c"
     "${library_root}/decompress.c"
-    "${library_root}/bzip2recover.c"
-    "${library_root}/unzcrash.c"
-    "${library_root}/bzip2.c"
-    "${library_root}/dlltest.c"
     "${library_root}/bzlib.c"
     "${library_root}/blocksort.c"
     "${library_root}/compress.c"
     "${library_root}/huffman.c"
-    "${library_root}/mk251.c"
     "${library_root}/crctable.c"
-    "${library_root}/spewG.c"
   )
 
   target_compile_definitions(thirdparty_bzip2 PRIVATE

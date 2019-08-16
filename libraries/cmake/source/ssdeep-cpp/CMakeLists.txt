@@ -8,7 +8,6 @@ function(ssdeepCppMain)
   set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   add_library(thirdparty_ssdeep-cpp
-    "${library_root}/main.cpp"
     "${library_root}/match.cpp"
     "${library_root}/engine.cpp"
     "${library_root}/filedata.cpp"

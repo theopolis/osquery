@@ -97,13 +97,6 @@ function(librpmMain)
     "${library_root}/lib/verify.c"
     "${library_root}/rpmio/base64.c"
     "${library_root}/lib/poptALL.c"
-    "${library_root}/rpm2cpio.c"
-    "${library_root}/rpmbuild.c"
-    "${library_root}/rpmdb.c"
-    "${library_root}/rpmkeys.c"
-    "${library_root}/rpmqv.c"
-    "${library_root}/rpmsign.c"
-    "${library_root}/rpmspec.c"
   )
 
   target_compile_definitions(thirdparty_librpm PRIVATE

@@ -78,21 +78,11 @@ function(generateLiblldpd)
     "${library_root}/version.c"
     "${library_root}/marshal.c"
     "${library_root}/ctl.c"
-    "${library_root}/daemon/main.c"
     "${library_root}/lib/atom.c"
     "${library_root}/lib/connection.c"
     "${library_root}/lib/helpers.c"
     "${library_root}/lib/errors.c"
     "${library_root}/lib/fixedpoint.c"
-    "${library_root}/client/lldpcli.c"
-    "${library_root}/client/display.c"
-    "${library_root}/client/conf.c"
-    "${library_root}/client/commands.c"
-    "${library_root}/client/show.c"
-    "${library_root}/client/misc.c"
-    "${library_root}/client/tokenizer.c"
-    "${library_root}/client/text_writer.c"
-    "${library_root}/client/kv_writer.c"
     "${library_root}/lldpd-structs.c"
     "${library_root}/lib/atoms/dot3.c"
     "${library_root}/lib/atoms/dot1.c"
@@ -103,56 +93,13 @@ function(generateLiblldpd)
     "${library_root}/lib/atoms/mgmt.c"
     "${library_root}/lib/atoms/custom.c"
     "${library_root}/lib/atoms/chassis.c"
-    "${library_root}/client/conf-med.c"
-    "${library_root}/client/conf-dot3.c"
-    "${library_root}/client/conf-power.c"
-    "${library_root}/client/conf-lldp.c"
-    "${library_root}/client/conf-system.c"
-    "${library_root}/daemon/client.c"
-    "${library_root}/daemon/event.c"
-    "${library_root}/daemon/frame.c"
-    "${library_root}/daemon/interfaces.c"
-    "${library_root}/daemon/lldpd.c"
-    "${library_root}/daemon/main.c"
-    "${library_root}/daemon/netlink.c"
-    "${library_root}/daemon/pattern.c"
-    "${library_root}/daemon/priv.c"
-    "${library_root}/daemon/privsep.c"
-    "${library_root}/daemon/privsep_fd.c"
-    "${library_root}/daemon/privsep_io.c"
-    "${library_root}/daemon/protocols/cdp.c"
-    "${library_root}/daemon/protocols/edp.c"
-    "${library_root}/daemon/protocols/lldp.c"
-    "${library_root}/daemon/protocols/sonmp.c"
   )
-
-  if(DEFINED PLATFORM_MACOS)
-    target_sources(thirdparty_lldpd PRIVATE
-      "${library_root}/daemon/dmi-osx.c"
-      "${library_root}/daemon/forward-bsd.c"
-      "${library_root}/daemon/interfaces-bsd.c"
-      "${library_root}/daemon/priv-bsd.c"
-    )
-
-  elseif(DEFINED PLATFORM_LINUX)
-    target_sources(thirdparty_lldpd PRIVATE
-      "${library_root}/daemon/dmi-linux.c"
-      "${library_root}/daemon/forward-linux.c"
-      "${library_root}/daemon/interfaces-linux.c"
-      "${library_root}/daemon/priv-linux.c"
-    )
-  else()
-    target_sources(thirdparty_lldpd PRIVATE
-      "${library_root}/daemon/dmi-dummy.c"
-    )
-  endif()
 
   target_compile_definitions(thirdparty_lldpd PRIVATE
     _FORTIFY_SOURCE=2
     _GNU_SOURCE
     HAVE_CONFIG_H
     SYSCONFDIR=\"/usr/local/etc\"
-    LLDPCLI_PATH="/usr/local/sbin/lldpcli"
     PIC
   )
 
@@ -171,7 +118,6 @@ function(generateLiblldpd)
     "${library_root}"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/include"
     "${library_root}/lib"
-    "${library_root}/daemon"
   )
 
   set(public_header_list

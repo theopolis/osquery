@@ -8,21 +8,13 @@ function(lzmaMain)
   set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   add_library(thirdparty_lzma
-    "${library_root}/src/common/common_w32res.rc"
     "${library_root}/src/common/tuklib_cpucores.c"
-    "${library_root}/src/common/tuklib_exit.c"
-    "${library_root}/src/common/tuklib_mbstr_fw.c"
-    "${library_root}/src/common/tuklib_mbstr_width.c"
-    "${library_root}/src/common/tuklib_open_stdxxx.c"
     "${library_root}/src/common/tuklib_physmem.c"
-    "${library_root}/src/common/tuklib_progname.c"
     "${library_root}/src/liblzma/check/check.c"
     "${library_root}/src/liblzma/check/crc32_fast.c"
     "${library_root}/src/liblzma/check/crc32_table.c"
-    "${library_root}/src/liblzma/check/crc32_tablegen.c"
     "${library_root}/src/liblzma/check/crc64_fast.c"
     "${library_root}/src/liblzma/check/crc64_table.c"
-    "${library_root}/src/liblzma/check/crc64_tablegen.c"
     "${library_root}/src/liblzma/check/sha256.c"
     "${library_root}/src/liblzma/common/alone_decoder.c"
     "${library_root}/src/liblzma/common/alone_encoder.c"
@@ -81,14 +73,9 @@ function(lzmaMain)
     "${library_root}/src/liblzma/lzma/lzma_encoder_optimum_normal.c"
     "${library_root}/src/liblzma/lzma/lzma_encoder_presets.c"
     "${library_root}/src/liblzma/rangecoder/price_table.c"
-    "${library_root}/src/liblzma/simple/arm.c"
-    "${library_root}/src/liblzma/simple/armthumb.c"
-    "${library_root}/src/liblzma/simple/ia64.c"
-    "${library_root}/src/liblzma/simple/powerpc.c"
     "${library_root}/src/liblzma/simple/simple_coder.c"
     "${library_root}/src/liblzma/simple/simple_decoder.c"
     "${library_root}/src/liblzma/simple/simple_encoder.c"
-    "${library_root}/src/liblzma/simple/sparc.c"
     "${library_root}/src/liblzma/simple/x86.c"
   )
 

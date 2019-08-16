@@ -23,18 +23,14 @@ function(smartmontoolsMain)
     "${library_root}/getopt/getopt1.c"
     "${library_root}/getopt/getopt.c"
     "${library_root}/ata_common.cpp"
-    "${library_root}/smartctl.cpp"
     "${library_root}/libsmartctl.cpp"
     "${library_root}/atacmds.cpp"
     "${library_root}/scsiata.cpp"
-    "${library_root}/smartd.cpp"
-    "${library_root}/nvmecmds.cpp"
     "${library_root}/dev_ata_cmd_set.cpp"
     "${library_root}/ataidentify.cpp"
     "${library_root}/atacmdnames.cpp"
     "${library_root}/ataprint.cpp"
     "${library_root}/cciss.cpp"
-    "${library_root}/nvmeprint.cpp"
     "${library_root}/dev_intelliprop.cpp"
   )
 

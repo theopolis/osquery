@@ -8,9 +8,6 @@ function(libgpgerrorMain)
   set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   add_library(thirdparty_libgpg-error
-    "${library_root}/src/mkheader.c"
-    "${library_root}/src/gen-posix-lock-obj.c"
-    "${library_root}/src/mkerrcodes.c"
     "${library_root}/src/code-to-errno.c"
     "${library_root}/src/posix-lock.c"
     "${library_root}/src/posix-thread.c"
@@ -21,12 +18,8 @@ function(libgpgerrorMain)
     "${library_root}/src/estream.c"
     "${library_root}/src/init.c"
     "${library_root}/src/strerror.c"
-    "${library_root}/src/strsource-sym.c"
-    "${library_root}/src/strerror-sym.c"
-    "${library_root}/src/gpg-error.c"
     "${library_root}/src/visibility.c"
     "${library_root}/src/b64dec.c"
-    "${library_root}/doc/yat2m.c"
   )
 
   target_compile_definitions(thirdparty_libgpg-error PRIVATE

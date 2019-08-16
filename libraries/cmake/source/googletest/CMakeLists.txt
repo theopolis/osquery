@@ -32,7 +32,6 @@ function(googleTestMain)
 
   set(target_list
     gmock
-    gmock_main
     gtest
     gtest_main
   )
@@ -49,10 +48,7 @@ function(googleTestMain)
 
   add_library(thirdparty_googletest INTERFACE)
   target_link_libraries(thirdparty_googletest INTERFACE
-    gtest
-    gtest_main
-    gmock
-    gmock_main
+    ${target_list}
   )
 
   get_target_property(googletest_include_dirs gtest INTERFACE_INCLUDE_DIRECTORIES)

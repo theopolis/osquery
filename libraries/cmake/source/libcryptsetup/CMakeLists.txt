@@ -33,8 +33,6 @@ function(libcryptsetupMain)
     "${library_root}/lib/volumekey.c"
     "${library_root}/lib/crypt_plain.c"
     "${library_root}/lib/random.c"
-    "${library_root}/src/utils_tools.c"
-    "${library_root}/src/utils_password.c"
   )
 
   target_compile_definitions(thirdparty_libcryptsetup PRIVATE

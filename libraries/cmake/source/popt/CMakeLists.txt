@@ -13,14 +13,6 @@ function(poptMain)
     "${library_root}/poptconfig.c"
     "${library_root}/popthelp.c"
     "${library_root}/poptint.c"
-    "${library_root}/test1.c"
-    "${library_root}/test2.c"
-    "${library_root}/tdict.c"
-    "${library_root}/poptconfig.c"
-    "${library_root}/popt.c"
-    "${library_root}/poptint.c"
-    "${library_root}/poptparse.c"
-    "${library_root}/popthelp.c"
   )
 
   target_link_libraries(thirdparty_popt PUBLIC

@@ -52,7 +52,6 @@ function(libgcryptMain)
     "${library_root}/cipher/camellia.c"
     "${library_root}/cipher/camellia-glue.c"
     "${library_root}/cipher/idea.c"
-    "${library_root}/cipher/gost-s-box.c"
     "${library_root}/cipher/salsa20.c"
     "${library_root}/cipher/chacha20.c"
     "${library_root}/cipher/dsa.c"
@@ -116,10 +115,8 @@ function(libgcryptMain)
     "${library_root}/src/missing-string.c"
     "${library_root}/src/secmem.c"
     "${library_root}/src/fips.c"
-    "${library_root}/src/dumpsexp.c"
     "${library_root}/src/hwf-x86.c"
     "${library_root}/src/context.c"
-    "${library_root}/src/mpicalc.c"
 
     "${CMAKE_CURRENT_SOURCE_DIR}/generated/mpi/mpih-add1.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/generated/mpi/mpih-sub1.c"

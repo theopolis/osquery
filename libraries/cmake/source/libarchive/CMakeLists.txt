@@ -8,10 +8,6 @@ function(libarchiveMain)
   set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
   add_library(thirdparty_libarchive
-    "${library_root}/cat/bsdcat.c"
-    "${library_root}/cat/cmdline.c"
-    "${library_root}/cpio/cmdline.c"
-    "${library_root}/cpio/cpio.c"
     "${library_root}/libarchive/archive_acl.c"
     "${library_root}/libarchive/archive_check_magic.c"
     "${library_root}/libarchive/archive_cmdline.c"
