@@ -7,73 +7,23 @@
 function(boostMain)
   set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
+  importBoostInterfaceLibraries()
+
   generateBoostLocale()
-  generateBoostPropertyTree()
-  generateBoostMpl()
-  generateBoostIterator()
-  generateBoostCore()
-  generateBoostTypeTraits()
-  generateBoostSmartPtr()
-  generateBoostAssert()
-  generateBoostConfig()
   generateBoostContext()
   generateBoostCoroutine()
   generateBoostFilesystem()
   generateBoostRegex()
   generateBoostThread()
-  generateBoostSystem()
-  generateBoostPreprocessor()
-  generateBoostStaticAssert()
-  generateBoostDetail()
-  generateBoostIo()
-  generateBoostContainerHash()
-  generateBoostMove()
-  generateBoostBind()
   generateBoostAtomic()
   generateBoostDateTime()
-  generateBoostThrowException()
-  generateBoostUtility()
-  generateBoostPredef()
-  generateBoostLexicalCast()
-  generateBoostRange()
-  generateBoostConceptCheck()
-  generateBoostNumeric()
-  generateBoostInteger()
-  generateBoostArray()
+  generateBoostNumericConversion()
   generateBoostContainer()
-  generateBoostIntrusive()
   generateBoostMath()
-  generateBoostMultiprecision()
-  generateBoostTokenizer()
   generateBoostChrono()
-  generateBoostRatio()
-  generateBoostTuple()
   generateBoostException()
-  generateBoostOptional()
-  generateBoostFunction()
-  generateBoostTypeIndex()
-  generateBoostAlgorithm()
-  generateBoostUnordered()
-  generateBoostFormat()
-  generateBoostVariant()
   generateBoostSerialization()
-  generateBoostSpirit()
-  generateBoostCoroutine2()
-  generateBoostAny()
-  generateBoostMultiIndex()
-  generateBoostForeach()
-  generateBoostAsio()
-  generateBoostUUID()
   generateBoostRandom()
-  generateBoostBeast()
-  generateBoostMp11()
-  generateBoostLogic()
-  generateBoostTti()
-  generateBoostFunctionTypes()
-  generateBoostXpressive()
-  generateBoostProto()
-  generateBoostFusion()
-  generateBoostConversion()
 
   add_library(thirdparty_boost INTERFACE)
 
@@ -154,6 +104,7 @@ function(generateBoostSerialization)
   )
 
   target_link_libraries(thirdparty_boost_serialization PUBLIC
+    global_cxx_settings
     thirdparty_boost_assert
     thirdparty_boost_core
     thirdparty_boost_integer
@@ -169,6 +120,21 @@ function(generateBoostSerialization)
   )  
 endfunction()
 
+function(generateBoostNumericConversion)
+  set(library_root "${BOOST_ROOT}/libs/numeric/conversion")
+
+  add_library(thirdparty_boost_numericconversion INTERFACE)
+
+  target_include_directories(thirdparty_boost_numericconversion SYSTEM INTERFACE
+    "${library_root}/include"
+  )
+
+  target_link_libraries(thirdparty_boost_numericconversion INTERFACE
+    global_cxx_settings
+    thirdparty_boost_config
+  )
+endfunction()
+
 function(generateBoostRandom)
   set(library_root "${BOOST_ROOT}/libs/random")
 
@@ -181,111 +147,107 @@ function(generateBoostRandom)
   )
 
   target_link_libraries(thirdparty_boost_random PUBLIC
+    global_cxx_settings
     thirdparty_boost_core
     thirdparty_boost_system
     thirdparty_boost_throwexception
   )  
 endfunction()
 
-function(generateBoostFusion)
-  set(library_root "${BOOST_ROOT}/libs/fusion")
+function(importBoostInterfaceLibrary folder_name)
+  set(library_root "${BOOST_ROOT}/libs/${folder_name}")
 
-  add_library(thirdparty_boost_fusion INTERFACE)
+  string(REPLACE "_" "" target_name "${folder_name}")
+  set(target_name "thirdparty_boost_${target_name}")
 
-  target_include_directories(thirdparty_boost_fusion SYSTEM INTERFACE
+  add_library("${target_name}" INTERFACE)
+
+  target_include_directories("${target_name}" SYSTEM INTERFACE
     "${library_root}/include"
   )
 
-  target_link_libraries(thirdparty_boost_fusion INTERFACE
-    thirdparty_boost_config
-  )  
+  foreach(additional_dependency ${ARGN})
+    string(REPLACE "_" "" additional_dependency "${additional_dependency}")
+
+    target_link_libraries("${target_name}" INTERFACE
+      "thirdparty_boost_${additional_dependency}"
+    )
+  endforeach()
+
+  target_link_libraries("${target_name}" INTERFACE
+    global_cxx_settings
+  )
 endfunction()
 
-function(generateBoostLogic)
-  set(library_root "${BOOST_ROOT}/libs/logic")
-
-  add_library(thirdparty_boost_logic INTERFACE)
-
-  target_include_directories(thirdparty_boost_logic SYSTEM INTERFACE
-    "${library_root}/include"
+function(importBoostInterfaceLibraries)
+  set(library_descriptor_list
+    "fusion:config"
+    "logic:config"
+    "conversion:config"
+    "xpressive:proto,fusion,conversion"
+    "proto:config"
+    "beast:mp11,logic"
+    "mp11:config"
+    "unordered:config"
+    "function_types:config"
+    "tti:function_types"
+    "uuid:random,tti"
+    "asio:config"
+    "any:config"
+    "foreach:config"
+    "multi_index:foreach"
+    "property_tree:any,multi_index"
+    "spirit:optional"
+    "algorithm:config"
+    "variant:config"
+    "format:config"
+    "optional:config"
+    "type_index:container_hash"
+    "coroutine2:container_hash"
+    "function:type_index,bind"
+    "ratio:type_traits,core,integer"
+    "multiprecision:config"
+    "tokenizer:config"
+    "intrusive:config"
+    "array:config"
+    "range:iterator,concept_check"
+    "concept_check:config"
+    "utility:core"
+    "throw_exception:assert"
+    "move:assert,static_assert"
+    "container_hash:detail"
+    "io:config"
+    "detail:config"
+    "mpl:preprocessor"
+    "static_assert:config"
+    "core:config"
+    "type_traits:static_assert,assert"
+    "preprocessor:config"
+    "bind:config"
+    "smart_ptr:predef,throw_exception,move"
+    "assert:config"
+    "iterator:mpl,assert,detail"
+    "predef:config"
+    "integer:config"
+    "lexical_cast:range,numeric_conversion,integer,array,container,math"
+    "system:config"
+    "tuple:config"
   )
 
-  target_link_libraries(thirdparty_boost_logic INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostConversion)
-  set(library_root "${BOOST_ROOT}/libs/conversion")
-
-  add_library(thirdparty_boost_conversion INTERFACE)
-
-  target_include_directories(thirdparty_boost_conversion SYSTEM INTERFACE
-    "${library_root}/include"
+  add_library(thirdparty_boost_config INTERFACE)
+  target_include_directories(thirdparty_boost_config SYSTEM INTERFACE
+    "${BOOST_ROOT}/libs/config/include"
   )
 
-  target_link_libraries(thirdparty_boost_conversion INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
+  foreach(library_descriptor ${library_descriptor_list})
+    string(REPLACE ":" ";" temp "${library_descriptor}")
+    list(GET temp 0 library_name)
+    list(GET temp 1 library_dependency_list)
 
-function(generateBoostXpressive)
-  set(library_root "${BOOST_ROOT}/libs/xpressive")
+    string(REPLACE "," ";" library_dependency_list "${library_dependency_list}")
 
-  add_library(thirdparty_boost_xpressive INTERFACE)
-
-  target_include_directories(thirdparty_boost_xpressive SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_xpressive INTERFACE
-    thirdparty_boost_proto
-    thirdparty_boost_fusion
-    thirdparty_boost_conversion
-  )  
-endfunction()
-
-function(generateBoostProto)
-  set(library_root "${BOOST_ROOT}/libs/proto")
-
-  add_library(thirdparty_boost_proto INTERFACE)
-
-  target_include_directories(thirdparty_boost_proto SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_proto INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostBeast)
-  set(library_root "${BOOST_ROOT}/libs/beast")
-
-  add_library(thirdparty_boost_beast INTERFACE)
-
-  target_include_directories(thirdparty_boost_beast SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_beast INTERFACE
-    thirdparty_boost_mp11
-    thirdparty_boost_logic
-  )  
-endfunction()
-
-function(generateBoostMp11)
-  set(library_root "${BOOST_ROOT}/libs/mp11")
-
-  add_library(thirdparty_boost_mp11 INTERFACE)
-
-  target_include_directories(thirdparty_boost_mp11 SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_mp11 INTERFACE
-    thirdparty_boost_config
-  )  
+    importBoostInterfaceLibrary("${library_name}" ${library_dependency_list})
+  endforeach()
 endfunction()
 
 function(generateBoostLocale)
@@ -355,253 +317,13 @@ function(generateBoostLocale)
   )
 
   target_link_libraries(thirdparty_boost_locale PUBLIC
+    global_cxx_settings
     thirdparty_boost_assert
     thirdparty_boost_iterator
     thirdparty_boost_typetraits
     thirdparty_boost_core
     thirdparty_boost_thread
     thirdparty_boost_unordered
-  )  
-endfunction()
-
-function(generateBoostUnordered)
-  set(library_root "${BOOST_ROOT}/libs/unordered")
-
-  add_library(thirdparty_boost_unordered INTERFACE)
-
-  target_include_directories(thirdparty_boost_unordered SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_unordered INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostFunctionTypes)
-  set(library_root "${BOOST_ROOT}/libs/function_types")
-
-  add_library(thirdparty_boost_functiontypes INTERFACE)
-
-  target_include_directories(thirdparty_boost_functiontypes SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_functiontypes INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostTti)
-  set(library_root "${BOOST_ROOT}/libs/tti")
-
-  add_library(thirdparty_boost_tti INTERFACE)
-
-  target_include_directories(thirdparty_boost_tti SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_tti INTERFACE
-    thirdparty_boost_functiontypes
-  )  
-endfunction()
-
-function(generateBoostUUID)
-  set(library_root "${BOOST_ROOT}/libs/uuid")
-
-  add_library(thirdparty_boost_uuid INTERFACE)
-
-  target_include_directories(thirdparty_boost_uuid SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_uuid  INTERFACE
-    thirdparty_boost_random
-    thirdparty_boost_tti
-  )  
-endfunction()
-
-function(generateBoostAsio)
-  set(library_root "${BOOST_ROOT}/libs/asio")
-
-  add_library(thirdparty_boost_asio INTERFACE)
-
-  target_include_directories(thirdparty_boost_asio SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_asio INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostAny)
-  set(library_root "${BOOST_ROOT}/libs/any")
-
-  add_library(thirdparty_boost_any INTERFACE)
-
-  target_include_directories(thirdparty_boost_any SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_any INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostForeach)
-  set(library_root "${BOOST_ROOT}/libs/foreach")
-
-  add_library(thirdparty_boost_foreach INTERFACE)
-
-  target_include_directories(thirdparty_boost_foreach SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_foreach INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostMultiIndex)
-  set(library_root "${BOOST_ROOT}/libs/multi_index")
-
-  add_library(thirdparty_boost_multiindex INTERFACE)
-
-  target_include_directories(thirdparty_boost_multiindex SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_multiindex INTERFACE
-    thirdparty_boost_foreach
-  )  
-endfunction()
-
-function(generateBoostPropertyTree)
-  set(library_root "${BOOST_ROOT}/libs/property_tree")
-
-  add_library(thirdparty_boost_propertytree INTERFACE)
-
-  target_include_directories(thirdparty_boost_propertytree SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_propertytree INTERFACE
-    thirdparty_boost_any
-    thirdparty_boost_multiindex
-  )  
-endfunction()
-
-function(generateBoostSpirit)
-  set(library_root "${BOOST_ROOT}/libs/spirit")
-
-  add_library(thirdparty_boost_spirit INTERFACE)
-
-  target_include_directories(thirdparty_boost_spirit SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_spirit INTERFACE
-    thirdparty_boost_optional
-  )  
-endfunction()
-
-function(generateBoostAlgorithm)
-  set(library_root "${BOOST_ROOT}/libs/algorithm")
-
-  add_library(thirdparty_boost_algorithm INTERFACE)
-
-  target_include_directories(thirdparty_boost_algorithm SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_algorithm INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostVariant)
-  set(library_root "${BOOST_ROOT}/libs/variant")
-
-  add_library(thirdparty_boost_variant INTERFACE)
-
-  target_include_directories(thirdparty_boost_variant SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_variant INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostFormat)
-  set(library_root "${BOOST_ROOT}/libs/format")
-
-  add_library(thirdparty_boost_format INTERFACE)
-
-  target_include_directories(thirdparty_boost_format SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_format INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostOptional)
-  set(library_root "${BOOST_ROOT}/libs/optional")
-
-  add_library(thirdparty_boost_optional INTERFACE)
-
-  target_include_directories(thirdparty_boost_optional SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_optional INTERFACE
-    thirdparty_boost_config
-  )  
-endfunction()
-
-function(generateBoostTypeIndex)
-  set(library_root "${BOOST_ROOT}/libs/type_index")
-
-  add_library(thirdparty_boost_typeindex INTERFACE)
-
-  target_include_directories(thirdparty_boost_typeindex SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_typeindex INTERFACE
-    thirdparty_boost_containerhash
-  )  
-endfunction()
-
-function(generateBoostCoroutine2)
-  set(library_root "${BOOST_ROOT}/libs/coroutine2")
-
-  add_library(thirdparty_boost_coroutine2 INTERFACE)
-
-  target_include_directories(thirdparty_boost_coroutine2 SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_coroutine2 INTERFACE
-    thirdparty_boost_containerhash
-  )  
-endfunction()
-
-function(generateBoostFunction)
-  set(library_root "${BOOST_ROOT}/libs/function")
-
-  add_library(thirdparty_boost_function INTERFACE)
-
-  target_include_directories(thirdparty_boost_function SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_function INTERFACE
-    thirdparty_boost_typeindex
-    thirdparty_boost_bind
   )  
 endfunction()
 
@@ -617,24 +339,9 @@ function(generateBoostException)
   )
 
   target_link_libraries(thirdparty_boost_exception PUBLIC
+    global_cxx_settings
     thirdparty_boost_config
   )  
-endfunction()
-
-function(generateBoostRatio)
-  set(library_root "${BOOST_ROOT}/libs/ratio")
-
-  add_library(thirdparty_boost_ratio INTERFACE)
-
-  target_include_directories(thirdparty_boost_ratio SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_ratio INTERFACE
-    thirdparty_boost_typetraits
-    thirdparty_boost_core
-    thirdparty_boost_integer
-  )
 endfunction()
 
 function(generateBoostChrono)
@@ -651,6 +358,7 @@ function(generateBoostChrono)
   )
 
   target_link_libraries(thirdparty_boost_chrono PUBLIC
+    global_cxx_settings
     thirdparty_boost_predef
     thirdparty_boost_mpl
     thirdparty_boost_ratio
@@ -658,34 +366,6 @@ function(generateBoostChrono)
     thirdparty_boost_throwexception
     thirdparty_boost_utility
   )  
-endfunction()
-
-function(generateBoostMultiprecision)
-  set(library_root "${BOOST_ROOT}/libs/multiprecision")
-
-  add_library(thirdparty_boost_multiprecision INTERFACE)
-
-  target_include_directories(thirdparty_boost_multiprecision SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_multiprecision INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostTokenizer)
-  set(library_root "${BOOST_ROOT}/libs/tokenizer")
-
-  add_library(thirdparty_boost_tokenizer INTERFACE)
-
-  target_include_directories(thirdparty_boost_tokenizer SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_tokenizer INTERFACE
-    thirdparty_boost_config
-  )
 endfunction()
 
 function(generateBoostMath)
@@ -832,6 +512,7 @@ function(generateBoostMath)
   )
 
   target_link_libraries(thirdparty_boost_math PUBLIC
+    global_cxx_settings
     thirdparty_boost_staticassert
     thirdparty_boost_predef
     thirdparty_boost_typetraits
@@ -864,67 +545,11 @@ function(generateBoostContainer)
   )
 
   target_link_libraries(thirdparty_boost_container PUBLIC
+    global_cxx_settings
     thirdparty_boost_move
     thirdparty_boost_core
     thirdparty_boost_intrusive
   )  
-endfunction()
-
-function(generateBoostIntrusive)
-  set(library_root "${BOOST_ROOT}/libs/intrusive")
-
-  add_library(thirdparty_boost_intrusive INTERFACE)
-
-  target_include_directories(thirdparty_boost_intrusive SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_intrusive INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostArray)
-  set(library_root "${BOOST_ROOT}/libs/array")
-
-  add_library(thirdparty_boost_array INTERFACE)
-
-  target_include_directories(thirdparty_boost_array SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_array INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostNumeric)
-  set(library_root "${BOOST_ROOT}/libs/numeric/conversion")
-
-  add_library(thirdparty_boost_numericconversion INTERFACE)
-
-  target_include_directories(thirdparty_boost_numericconversion SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_numericconversion INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostRange)
-  set(library_root "${BOOST_ROOT}/libs/range")
-
-  add_library(thirdparty_boost_range INTERFACE)
-
-  target_include_directories(thirdparty_boost_range SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_range INTERFACE
-    thirdparty_boost_iterator
-    thirdparty_boost_conceptcheck
-  )
 endfunction()
 
 function(generateBoostDateTime)
@@ -944,6 +569,7 @@ function(generateBoostDateTime)
   )
 
   target_link_libraries(thirdparty_boost_datetime PUBLIC
+    global_cxx_settings
     thirdparty_boost_throwexception
     thirdparty_boost_utility
     thirdparty_boost_mpl
@@ -953,298 +579,22 @@ function(generateBoostDateTime)
   )  
 endfunction()
 
-function(generateBoostConceptCheck)
-  set(library_root "${BOOST_ROOT}/libs/concept_check")
-
-  add_library(thirdparty_boost_conceptcheck INTERFACE)
-
-  target_include_directories(thirdparty_boost_conceptcheck SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_conceptcheck INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostUtility)
-  set(library_root "${BOOST_ROOT}/libs/utility")
-
-  add_library(thirdparty_boost_utility INTERFACE)
-
-  target_include_directories(thirdparty_boost_utility SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_utility INTERFACE
-    thirdparty_boost_core
-  )
-endfunction()
-
-function(generateBoostThrowException)
-  set(library_root "${BOOST_ROOT}/libs/throw_exception")
-
-  add_library(thirdparty_boost_throwexception INTERFACE)
-
-  target_include_directories(thirdparty_boost_throwexception SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_throwexception INTERFACE
-    thirdparty_boost_assert
-  )
-endfunction()
-
-function(generateBoostMove)
-  set(library_root "${BOOST_ROOT}/libs/move")
-
-  add_library(thirdparty_boost_move INTERFACE)
-
-  target_include_directories(thirdparty_boost_move SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_move INTERFACE
-    thirdparty_boost_assert
-    thirdparty_boost_staticassert
-  )
-endfunction()
-
-function(generateBoostContainerHash)
-  set(library_root "${BOOST_ROOT}/libs/container_hash")
-
-  add_library(thirdparty_boost_containerhash INTERFACE)
-
-  target_include_directories(thirdparty_boost_containerhash SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_containerhash INTERFACE
-    thirdparty_boost_detail
-  )
-endfunction()
-
-function(generateBoostIo)
-  set(library_root "${BOOST_ROOT}/libs/io")
-
-  add_library(thirdparty_boost_io INTERFACE)
-
-  target_include_directories(thirdparty_boost_io SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_io INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostDetail)
-  set(library_root "${BOOST_ROOT}/libs/detail")
-
-  add_library(thirdparty_boost_detail INTERFACE)
-
-  target_include_directories(thirdparty_boost_detail SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_detail INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostMpl)
-  set(library_root "${BOOST_ROOT}/libs/mpl")
-
-  add_library(thirdparty_boost_mpl INTERFACE)
-
-  target_include_directories(thirdparty_boost_mpl SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_mpl INTERFACE
-    thirdparty_boost_preprocessor
-  )
-endfunction()
-
-function(generateBoostStaticAssert)
-  set(library_root "${BOOST_ROOT}/libs/static_assert")
-
-  add_library(thirdparty_boost_staticassert INTERFACE)
-
-  target_include_directories(thirdparty_boost_staticassert SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_staticassert INTERFACE
-  thirdparty_boost_config
-)
-endfunction()
-
-function(generateBoostCore)
-  set(library_root "${BOOST_ROOT}/libs/core")
-
-  add_library(thirdparty_boost_core INTERFACE)
-
-  target_include_directories(thirdparty_boost_core SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_core INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostTypeTraits)
-  set(library_root "${BOOST_ROOT}/libs/type_traits")
-
-  add_library(thirdparty_boost_typetraits INTERFACE)
-
-  target_include_directories(thirdparty_boost_typetraits SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_typetraits INTERFACE
-    thirdparty_boost_staticassert
-    thirdparty_boost_assert
-  )
-endfunction()
-
-function(generateBoostPreprocessor)
-  set(library_root "${BOOST_ROOT}/libs/preprocessor")
-
-  add_library(thirdparty_boost_preprocessor INTERFACE)
-
-  target_include_directories(thirdparty_boost_preprocessor SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_preprocessor INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostBind)
-  set(library_root "${BOOST_ROOT}/libs/bind")
-
-  add_library(thirdparty_boost_bind INTERFACE)
-
-  target_include_directories(thirdparty_boost_bind SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_bind INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostSmartPtr)
-  set(library_root "${BOOST_ROOT}/libs/smart_ptr")
-
-  add_library(thirdparty_boost_smartptr INTERFACE)
-
-  target_include_directories(thirdparty_boost_smartptr SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_smartptr INTERFACE
-    thirdparty_boost_predef
-    thirdparty_boost_throwexception
-    thirdparty_boost_move
-  )
-endfunction()
-
-function(generateBoostAssert)
-  set(library_root "${BOOST_ROOT}/libs/assert")
-
-  add_library(thirdparty_boost_assert INTERFACE)
-
-  target_include_directories(thirdparty_boost_assert SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_assert INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostIterator)
-  set(library_root "${BOOST_ROOT}/libs/iterator")
-
-  add_library(thirdparty_boost_iterator INTERFACE)
-
-  target_include_directories(thirdparty_boost_iterator SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_iterator INTERFACE
-    thirdparty_boost_mpl
-    thirdparty_boost_assert
-    thirdparty_boost_detail
-  )
-endfunction()
-
-function(generateBoostConfig)
-  set(library_root "${BOOST_ROOT}/libs/config")
-
-  add_library(thirdparty_boost_config INTERFACE)
-
-  target_include_directories(thirdparty_boost_config SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-endfunction()
-
-function(generateBoostPredef)
-  set(library_root "${BOOST_ROOT}/libs/predef")
-
-  add_library(thirdparty_boost_predef INTERFACE)
-
-  target_include_directories(thirdparty_boost_predef SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_predef INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostInteger)
-  set(library_root "${BOOST_ROOT}/libs/integer")
-
-  add_library(thirdparty_boost_integer INTERFACE)
-
-  target_include_directories(thirdparty_boost_integer SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_integer INTERFACE
-    thirdparty_boost_config
-  )
-endfunction()
-
-function(generateBoostLexicalCast)
-  set(library_root "${BOOST_ROOT}/libs/lexical_cast")
-
-  add_library(thirdparty_boost_lexicalcast INTERFACE)
-
-  target_include_directories(thirdparty_boost_lexicalcast SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_lexicalcast INTERFACE
-    thirdparty_boost_range
-    thirdparty_boost_numericconversion
-    thirdparty_boost_integer
-    thirdparty_boost_array
-    thirdparty_boost_container
-    thirdparty_boost_math
-  )
-endfunction()
-
 function(generateBoostContext)
   set(library_root "${BOOST_ROOT}/libs/context")
 
+  set(asm_source_file_list
+    "${library_root}/src/asm/jump_x86_64_sysv_elf_gas.S"
+    "${library_root}/src/asm/make_x86_64_sysv_elf_gas.S"
+    "${library_root}/src/asm/ontop_x86_64_sysv_elf_gas.S"
+  )
+
+  foreach(asm_source_file ${asm_source_file_list})
+    set_property(SOURCE "${asm_source_file}" PROPERTY LANGUAGE C)
+  endforeach()
+
   add_library(thirdparty_boost_context STATIC
     "${library_root}/src/execution_context.cpp"
+    ${asm_source_file_list}
   )
 
   if(DEFINED PLATFORM_POSIX)
@@ -1263,6 +613,7 @@ function(generateBoostContext)
   )
 
   target_link_libraries(thirdparty_boost_context PUBLIC
+    global_cxx_settings
     thirdparty_boost_config
     thirdparty_boost_assert
     thirdparty_boost_smartptr
@@ -1288,13 +639,12 @@ function(generateBoostCoroutine)
     )
   endif()
 
-  # TODO: the asm/ files!
-
   target_include_directories(thirdparty_boost_coroutine SYSTEM PUBLIC
     "${library_root}/include"
   )
 
   target_link_libraries(thirdparty_boost_coroutine PUBLIC
+    global_cxx_settings
     thirdparty_boost_core
     thirdparty_boost_system
     thirdparty_boost_typetraits
@@ -1327,6 +677,7 @@ function(generateBoostFilesystem)
   )
 
   target_link_libraries(thirdparty_boost_filesystem PUBLIC
+    global_cxx_settings
     thirdparty_boost_system
     thirdparty_boost_typetraits
     thirdparty_boost_core
@@ -1366,6 +717,7 @@ function(generateBoostRegex)
   )
 
   target_link_libraries(thirdparty_boost_regex PUBLIC
+    global_cxx_settings
     thirdparty_boost_predef
     thirdparty_boost_assert
     thirdparty_boost_throwexception
@@ -1375,20 +727,6 @@ function(generateBoostRegex)
     thirdparty_boost_typetraits
     thirdparty_boost_integer
     thirdparty_boost_containerhash
-  )
-endfunction()
-
-function(generateBoostTuple)
-  set(library_root "${BOOST_ROOT}/libs/tuple")
-
-  add_library(thirdparty_boost_tuple INTERFACE)
-
-  target_include_directories(thirdparty_boost_tuple SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_tuple INTERFACE
-    thirdparty_boost_config
   )
 endfunction()
 
@@ -1404,6 +742,7 @@ function(generateBoostAtomic)
   )
 
   target_link_libraries(thirdparty_boost_atomic PUBLIC
+    global_cxx_settings
     thirdparty_boost_assert
   )
 endfunction()
@@ -1437,6 +776,7 @@ function(generateBoostThread)
   )
 
   target_link_libraries(thirdparty_boost_thread PUBLIC
+    global_cxx_settings
     thirdparty_boost_core
     thirdparty_boost_system
     thirdparty_boost_typetraits
@@ -1453,20 +793,6 @@ function(generateBoostThread)
     thirdparty_boost_function
     thirdparty_boost_typeindex
     thirdparty_boost_algorithm
-  )
-endfunction()
-
-function(generateBoostSystem)
-  set(library_root "${BOOST_ROOT}/libs/system")
-
-  add_library(thirdparty_boost_system INTERFACE)
-
-  target_include_directories(thirdparty_boost_system SYSTEM INTERFACE
-    "${library_root}/include"
-  )
-
-  target_link_libraries(thirdparty_boost_system INTERFACE
-    thirdparty_boost_config
   )
 endfunction()
 
