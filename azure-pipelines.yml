@@ -23,6 +23,8 @@ jobs:
       image: trailofbits/osql-experimental:ubuntu-18.04
       options: --privileged
 
+    timeoutInMinutes: 120
+
     steps:
     # Temporary; this could be embedded in the Docker image, with the
     # rest of the dependencies
