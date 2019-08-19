@@ -17,9 +17,8 @@ function(gflagsMain)
     thirdparty_source_module_settings
   )
 
-  foreach(compile_options_target ${compile_options_target_list})
-    copyInterfaceTargetFlagsTo(gflags_static ${compile_options_target})
-  endforeach()
+  copyInterfaceTargetFlagsTo(gflags_static global_cxx_settings PUBLIC)
+  copyInterfaceTargetFlagsTo(gflags_static thirdparty_source_module_settings PRIVATE)
 
   add_library(thirdparty_gflags INTERFACE)
   target_link_libraries(thirdparty_gflags INTERFACE
