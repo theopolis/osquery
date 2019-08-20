@@ -20,7 +20,6 @@ function(sleuthkitMain)
     "${library_root}/tsk/auto/db_sqlite.cpp"
     "${library_root}/tsk/auto/guid.cpp"
     "${library_root}/tsk/auto/is_image_supported.cpp"
-    "${library_root}/tsk/auto/sqlite3.c"
     "${library_root}/tsk/auto/tsk_db.cpp"
     "${library_root}/tsk/base/XGetopt.c"
     "${library_root}/tsk/base/crc.c"
