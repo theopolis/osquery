@@ -10,6 +10,10 @@ include(ExternalProject)
 set(OSQUERY_FORMULA_INSTALL_DIRECTORY "${CMAKE_BINARY_DIR}/installed_formulas")
 
 function(importFormula library_name)
+  if("${library_name}" STREQUAL "modules")
+    message(FATAL_ERROR "Invalid library name specified: ${library_name}")
+  endif()
+
   message(STATUS "Importing formula: formula/${library_name}")
 
   # Make sure the source folder exists

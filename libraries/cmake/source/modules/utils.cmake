@@ -49,9 +49,11 @@ function(patchSubmoduleSourceCode patches_dir apply_to_dir)
 endfunction()
 
 function(importSourceSubmodule library_name)
-  message(STATUS "Importing: source/${library_name}")
+  if("${library_name}" STREQUAL "modules")
+    message(FATAL_ERROR "Invalid library name specified: ${library_name}")
+  endif()
 
-  set(directory_path "${CMAKE_SOURCE_DIR}/libraries/cmake/source/${library_name}")
+  message(STATUS "Importing: source/${library_name}")
 
   if("${ARGN}" STREQUAL "")
     set(submodule_name_list "src")
@@ -59,6 +61,7 @@ function(importSourceSubmodule library_name)
     set(submodule_name_list ${ARGN})
   endif()
 
+  set(directory_path "${CMAKE_SOURCE_DIR}/libraries/cmake/source/${library_name}")
   foreach(submodule_name ${submodule_name_list})
     initializeGitSubmodule("${directory_path}/${submodule_name}")
 

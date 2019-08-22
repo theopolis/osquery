@@ -125,7 +125,6 @@ endfunction()
 # Generates an interface library named thirdparty_name that automatically includes the specified
 # include folder. This library will depend on the downloader and extractor targets
 function(importThirdPartyHeaderOnlyLibrary library_type name version hash anchor_file include_folder)
-
   if("${library_type}" STREQUAL "SOURCE")
     set(base_url "${THIRD_PARTY_REPOSITORY_URL}/third-party/src")
   elseif("${library_type}" STREQUAL "PREBUILT")
@@ -189,6 +188,10 @@ endfunction()
 
 # Used by each find_package script
 function(importFacebookLibrary library_name)
+  if("${library_name}" STREQUAL "modules")
+    message(FATAL_ERROR "Invalid library name specified: ${library_name}")
+  endif()
+
   add_subdirectory(
     "${CMAKE_SOURCE_DIR}/libraries/cmake/facebook/${library_name}"
     "${CMAKE_BINARY_DIR}/libs/fb/${library_name}"
