@@ -8,42 +8,19 @@ cmake_minimum_required(VERSION 3.13.3)
 
 option(OSQUERY_THIRD_PARTY_SOURCE_MODULE_WARNINGS "This option can be enable to show all warnings in the source modules. Not recommended" OFF)
 
-function(getGitExecutableName output_variable)
-  set(output "git")
-  if(DEFINED PLATFORM_WINDOWS)
-    set(output "${output}.exe")
-  endif()
-
-  set("${output_variable}" "${output}" PARENT_SCOPE)
-endfunction()
-
-function(locateGitExecutable output_variable)
-  getGitExecutableName(git_executable_name)
-
-  find_program(git_path "${git_executable_name}")
-  if("${git_path}" STREQUAL "git_path-NOTFOUND")
-    set("${output_variable}" "git_path-NOTFOUND" PARENT_SCOPE)
-
-  else()
-    set("${output_variable}" "${git_path}" PARENT_SCOPE)
-  endif()
-endfunction()
-
 function(initializeGitSubmodule submodule_path)
   file(GLOB submodule_folder_contents "${submodule_path}/*")
 
   list(LENGTH submodule_folder_contents submodule_folder_file_count)
   if(NOT ${submodule_folder_file_count} EQUAL 0)
+    set(initializeGitSubmodule_IsAlreadyCloned TRUE PARENT_SCOPE)
     return()
   endif()
 
-  locateGitExecutable(git_executable_path)
-  if("${git_executable_path}" STREQUAL "git_executable_path-NOTFOUND")
-    message(FATAL_ERROR "Failed to locate the git executable")
-  endif()
+  find_package(Git REQUIRED)
 
   execute_process(
-    COMMAND "${git_executable_path}" submodule update --init --recursive "${submodule_path}"
+    COMMAND "${GIT_EXECUTABLE}" submodule update --init --recursive "${submodule_path}"
     RESULT_VARIABLE process_exit_code
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   )
@@ -51,6 +28,25 @@ function(initializeGitSubmodule submodule_path)
   if(NOT ${process_exit_code} EQUAL 0)
     message(FATAL_ERROR "Failed to update the following git submodule: \"${submodule_path}\"")
   endif()
+
+  set(initializeGitSubmodule_IsAlreadyCloned FALSE PARENT_SCOPE)
+endfunction()
+
+function(patchSubmoduleSourceCode patches_dir apply_to_dir)
+  file(GLOB submodule_patches "${patches_dir}/*.patch")
+
+  foreach(patch ${submodule_patches})
+    message(STATUS "Applying patch ${patch}, work dir ${apply_to_dir}")
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" apply "${patch}"
+      RESULT_VARIABLE process_exit_code
+      WORKING_DIRECTORY "${apply_to_dir}"
+    )
+
+    if(NOT ${process_exit_code} EQUAL 0)
+      message(FATAL_ERROR "Failed to patch the following git submodule: \"${apply_to_dir}\"")
+    endif()
+  endforeach()
 endfunction()
 
 function(importSourceSubmodule library_name)
@@ -66,6 +62,10 @@ function(importSourceSubmodule library_name)
 
   foreach(submodule_name ${submodule_name_list})
     initializeGitSubmodule("${directory_path}/${submodule_name}")
+
+    if(NOT initializeGitSubmodule_IsAlreadyCloned)
+      patchSubmoduleSourceCode("${directory_path}/patches/${submodule_name}" "${directory_path}/${submodule_name}")
+    endif()
   endforeach()
 
   if(NOT TARGET thirdparty_source_module_settings)
