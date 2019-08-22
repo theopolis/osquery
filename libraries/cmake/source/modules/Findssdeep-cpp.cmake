@@ -7,4 +7,7 @@
 cmake_minimum_required(VERSION 3.13.3)
 include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
-importSourceSubmodule("ssdeep-cpp")
+importSourceSubmodule(
+  NAME "ssdeep-cpp"
+  SUBMODULES "src"
+)

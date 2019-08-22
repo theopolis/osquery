@@ -8,7 +8,28 @@ cmake_minimum_required(VERSION 3.13.3)
 
 option(OSQUERY_THIRD_PARTY_SOURCE_MODULE_WARNINGS "This option can be enable to show all warnings in the source modules. Not recommended" OFF)
 
-function(initializeGitSubmodule submodule_path)
+function(getGitExecutableName output_variable)
+  set(output "git")
+  if(DEFINED PLATFORM_WINDOWS)
+    set(output "${output}.exe")
+  endif()
+
+  set("${output_variable}" "${output}" PARENT_SCOPE)
+endfunction()
+
+function(locateGitExecutable output_variable)
+  getGitExecutableName(git_executable_name)
+
+  find_program(git_path "${git_executable_name}")
+  if("${git_path}" STREQUAL "git_path-NOTFOUND")
+    set("${output_variable}" "git_path-NOTFOUND" PARENT_SCOPE)
+
+  else()
+    set("${output_variable}" "${git_path}" PARENT_SCOPE)
+  endif()
+endfunction()
+
+function(initializeGitSubmodule submodule_path no_recursive)
   file(GLOB submodule_folder_contents "${submodule_path}/*")
 
   list(LENGTH submodule_folder_contents submodule_folder_file_count)
@@ -19,10 +40,18 @@ function(initializeGitSubmodule submodule_path)
 
   find_package(Git REQUIRED)
 
+  if(no_recursive)
+    set(optional_recursive_arg "")
+  else()
+    set(optional_recursive_arg "--recursive")
+  endif()
+
+  get_filename_component(working_directory "${submodule_path}" DIRECTORY)
+
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" submodule update --init --recursive "${submodule_path}"
+    COMMAND "${GIT_EXECUTABLE}" submodule update --init ${optional_recursive_arg} "${submodule_path}"
     RESULT_VARIABLE process_exit_code
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY "${working_directory}"
   )
 
   if(NOT ${process_exit_code} EQUAL 0)
@@ -48,22 +77,28 @@ function(patchSubmoduleSourceCode patches_dir apply_to_dir)
   endforeach()
 endfunction()
 
-function(importSourceSubmodule library_name)
-  if("${library_name}" STREQUAL "modules")
-    message(FATAL_ERROR "Invalid library name specified: ${library_name}")
+function(importSourceSubmodule)
+  cmake_parse_arguments(
+    ARGS
+    "NO_RECURSIVE"
+    "NAME"
+    "SUBMODULES"
+    ${ARGN}
+  )
+
+  if("${ARGS_NAME}" STREQUAL "modules")
+    message(FATAL_ERROR "Invalid library name specified: ${ARGS_NAME}")
   endif()
 
-  message(STATUS "Importing: source/${library_name}")
+  message(STATUS "Importing: source/${ARGS_NAME}")
 
-  if("${ARGN}" STREQUAL "")
-    set(submodule_name_list "src")
-  else()
-    set(submodule_name_list ${ARGN})
+  if("${ARGS_SUBMODULES}" STREQUAL "")
+    message(FATAL_ERROR "Missing git submodule name(s)")
   endif()
 
-  set(directory_path "${CMAKE_SOURCE_DIR}/libraries/cmake/source/${library_name}")
-  foreach(submodule_name ${submodule_name_list})
-    initializeGitSubmodule("${directory_path}/${submodule_name}")
+  set(directory_path "${CMAKE_SOURCE_DIR}/libraries/cmake/source/${ARGS_NAME}")
+  foreach(submodule_name ${ARGS_SUBMODULES})
+    initializeGitSubmodule("${directory_path}/${submodule_name}" ${ARGS_NO_RECURSIVE})
 
     if(NOT initializeGitSubmodule_IsAlreadyCloned)
       patchSubmoduleSourceCode("${directory_path}/patches/${submodule_name}" "${directory_path}/${submodule_name}")
@@ -93,6 +128,6 @@ function(importSourceSubmodule library_name)
 
   add_subdirectory(
     "${directory_path}"
-    "${CMAKE_BINARY_DIR}/libs/src/${library_name}"
+    "${CMAKE_BINARY_DIR}/libs/src/${ARGS_NAME}"
   )
 endfunction()

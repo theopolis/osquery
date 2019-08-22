@@ -7,4 +7,7 @@
 cmake_minimum_required(VERSION 3.13.3)
 include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
-importSourceSubmodule("libgpg-error")
+importSourceSubmodule(
+  NAME "libgpg-error"
+  SUBMODULES "src"
+)
