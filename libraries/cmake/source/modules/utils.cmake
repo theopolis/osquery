@@ -36,7 +36,6 @@ function(patchSubmoduleSourceCode patches_dir apply_to_dir)
   file(GLOB submodule_patches "${patches_dir}/*.patch")
 
   foreach(patch ${submodule_patches})
-    message(STATUS "Applying patch ${patch}, work dir ${apply_to_dir}")
     execute_process(
       COMMAND "${GIT_EXECUTABLE}" apply "${patch}"
       RESULT_VARIABLE process_exit_code
