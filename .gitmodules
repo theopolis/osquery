@@ -1,6 +1,6 @@
 [submodule "libraries/cmake/source/bzip2/src"]
 	path = libraries/cmake/source/bzip2/src
-	url = git://sourceware.org/git/bzip2.git
+	url = https://sourceware.org/git/bzip2.git
 [submodule "libraries/cmake/source/libarchive/src"]
 	path = libraries/cmake/source/libarchive/src
 	url = https://github.com/libarchive/libarchive
@@ -75,19 +75,19 @@
 	url = https://github.com/aclements/libelfin
 [submodule "libraries/cmake/source/libgcrypt/src"]
 	path = libraries/cmake/source/libgcrypt/src
-  url = https://dev.gnupg.org/source/libgcrypt.git
+	url = https://dev.gnupg.org/source/libgcrypt.git
 [submodule "libraries/cmake/source/libgpg-error/src"]
 	path = libraries/cmake/source/libgpg-error/src
 	url = https://dev.gnupg.org/source/libgpg-error.git
 [submodule "libraries/cmake/source/libcryptsetup/src"]
 	path = libraries/cmake/source/libcryptsetup/src
-  url = https://gitlab.com/cryptsetup/cryptsetup.git
+	url = https://gitlab.com/cryptsetup/cryptsetup.git
 [submodule "libraries/cmake/source/libdevmapper/src"]
 	path = libraries/cmake/source/libdevmapper/src
-	url = git://sourceware.org/git/lvm2.git
+	url = https://sourceware.org/git/lvm2.git
 [submodule "libraries/cmake/source/libiptables/src"]
 	path = libraries/cmake/source/libiptables/src
-	url = git://git.netfilter.org/iptables.git
+	url = https://git.netfilter.org/iptables.git
 [submodule "libraries/cmake/source/librdkafka/src"]
 	path = libraries/cmake/source/librdkafka/src
 	url = https://github.com/edenhill/librdkafka
