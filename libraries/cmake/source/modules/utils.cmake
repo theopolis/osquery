@@ -63,6 +63,9 @@ endfunction()
 
 function(patchSubmoduleSourceCode patches_dir apply_to_dir)
   file(GLOB submodule_patches "${patches_dir}/*.patch")
+  if("${submodule_patches}" STREQUAL "")
+    return()
+  endif()
 
   foreach(patch ${submodule_patches})
     execute_process(
