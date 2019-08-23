@@ -9,5 +9,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
 importSourceSubmodule(
   NAME "libaudit"
-  SUBMODULES "src"
+
+  SUBMODULES
+    "src"
 )

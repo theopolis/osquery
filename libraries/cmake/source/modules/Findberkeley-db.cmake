@@ -9,5 +9,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
 importSourceSubmodule(
   NAME "berkeley-db"
-  SUBMODULES "src"
+
+  SHALLOW_SUBMODULES
+    "src"
 )

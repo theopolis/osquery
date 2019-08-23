@@ -29,7 +29,7 @@ function(locateGitExecutable output_variable)
   endif()
 endfunction()
 
-function(initializeGitSubmodule submodule_path no_recursive)
+function(initializeGitSubmodule submodule_path no_recursive shallow)
   file(GLOB submodule_folder_contents "${submodule_path}/*")
 
   list(LENGTH submodule_folder_contents submodule_folder_file_count)
@@ -46,10 +46,16 @@ function(initializeGitSubmodule submodule_path no_recursive)
     set(optional_recursive_arg "--recursive")
   endif()
 
+  if(shallow)
+    set(optional_depth_arg "--depth=1")
+  else()
+    set(optional_depth_arg "")
+  endif()
+
   get_filename_component(working_directory "${submodule_path}" DIRECTORY)
 
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" submodule update --init ${optional_recursive_arg} "${submodule_path}"
+    COMMAND "${GIT_EXECUTABLE}" submodule update --init ${optional_recursive_arg} ${optional_depth_arg} "${submodule_path}"
     RESULT_VARIABLE process_exit_code
     WORKING_DIRECTORY "${working_directory}"
   )
@@ -63,9 +69,6 @@ endfunction()
 
 function(patchSubmoduleSourceCode patches_dir apply_to_dir)
   file(GLOB submodule_patches "${patches_dir}/*.patch")
-  if("${submodule_patches}" STREQUAL "")
-    return()
-  endif()
 
   foreach(patch ${submodule_patches})
     execute_process(
@@ -85,7 +88,7 @@ function(importSourceSubmodule)
     ARGS
     "NO_RECURSIVE"
     "NAME"
-    "SUBMODULES"
+    "SUBMODULES;SHALLOW_SUBMODULES"
     ${ARGN}
   )
 
@@ -95,13 +98,21 @@ function(importSourceSubmodule)
 
   message(STATUS "Importing: source/${ARGS_NAME}")
 
-  if("${ARGS_SUBMODULES}" STREQUAL "")
+  if("${ARGS_SUBMODULES};${SHALLOW_SUBMODULES}" STREQUAL "")
     message(FATAL_ERROR "Missing git submodule name(s)")
   endif()
 
   set(directory_path "${CMAKE_SOURCE_DIR}/libraries/cmake/source/${ARGS_NAME}")
-  foreach(submodule_name ${ARGS_SUBMODULES})
-    initializeGitSubmodule("${directory_path}/${submodule_name}" ${ARGS_NO_RECURSIVE})
+
+  foreach(submodule_name ${ARGS_SUBMODULES} ${ARGS_SHALLOW_SUBMODULES})
+    list(FIND ARGS_SHALLOW_SUBMODULES "${submodule_name}" shallow_clone)
+    if(${shallow_clone} EQUAL -1)
+      set(shallow_clone false)
+    else()
+      set(shallow_clone true)
+    endif()
+
+    initializeGitSubmodule("${directory_path}/${submodule_name}" ${ARGS_NO_RECURSIVE} ${shallow_clone})
 
     if(NOT initializeGitSubmodule_IsAlreadyCloned)
       patchSubmoduleSourceCode("${directory_path}/patches/${submodule_name}" "${directory_path}/${submodule_name}")

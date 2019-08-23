@@ -87,7 +87,7 @@
 	url = https://sourceware.org/git/lvm2.git
 [submodule "libraries/cmake/source/libiptables/src"]
 	path = libraries/cmake/source/libiptables/src
-	url = https://git.netfilter.org/iptables.git
+	url = https://git.netfilter.org/iptables
 [submodule "libraries/cmake/source/librdkafka/src"]
 	path = libraries/cmake/source/librdkafka/src
 	url = https://github.com/edenhill/librdkafka

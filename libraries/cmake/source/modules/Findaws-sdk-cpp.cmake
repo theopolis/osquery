@@ -10,7 +10,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 importSourceSubmodule(
   NAME "aws-sdk-cpp"
 
-  SUBMODULES
+  SHALLOW_SUBMODULES
     "aws-c-common_src"
     "aws-c-event-stream_src"
     "aws-checksums_src"

@@ -9,5 +9,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
 importSourceSubmodule(
   NAME "util-linux"
-  SUBMODULES "src"
+
+  SHALLOW_SUBMODULES
+    "src"
 )

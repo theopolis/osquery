@@ -9,5 +9,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
 importSourceSubmodule(
   NAME "zlib"
-  SUBMODULES "src"
+
+  SHALLOW_SUBMODULES
+    "src"
 )
