@@ -145,7 +145,7 @@ function(augeasMain)
 endfunction()
 
 function(importSELinux)
-  set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/src/.gnulib")
+  set(library_root "${CMAKE_CURRENT_SOURCE_DIR}/gnulib/src")
 
   add_library(thirdparty_selinux
     "${library_root}/lib/getfilecon.c"

@@ -10,6 +10,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 importSourceSubmodule(
   NAME "rapidjson"
 
-  SUBMODULES
+  NO_RECURSIVE
+
+  SHALLOW_SUBMODULES
     "src"
 )

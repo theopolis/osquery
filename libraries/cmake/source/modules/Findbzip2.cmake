@@ -10,6 +10,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 importSourceSubmodule(
   NAME "bzip2"
 
+  # Remote does not support shallow
   SUBMODULES
     "src"
 )

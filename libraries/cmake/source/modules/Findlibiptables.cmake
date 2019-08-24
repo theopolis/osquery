@@ -10,6 +10,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 importSourceSubmodule(
   NAME "libiptables"
 
-  SUBMODULES
+  SHALLOW_SUBMODULES
     "src"
 )

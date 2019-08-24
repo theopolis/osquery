@@ -18,7 +18,7 @@
 	url = https://github.com/arangodb/linenoise-ng
 [submodule "libraries/cmake/source/lzma/src"]
 	path = libraries/cmake/source/lzma/src
-	url = https://git.tukaani.org/xz.git
+	url = https://github.com/xz-mirror/xz
 [submodule "libraries/cmake/source/rapidjson/src"]
 	path = libraries/cmake/source/rapidjson/src
 	url = https://github.com/Tencent/rapidjson
@@ -84,10 +84,10 @@
 	url = https://gitlab.com/cryptsetup/cryptsetup.git
 [submodule "libraries/cmake/source/libdevmapper/src"]
 	path = libraries/cmake/source/libdevmapper/src
-	url = https://sourceware.org/git/lvm2.git
+	url = https://github.com/lvmteam/lvm2
 [submodule "libraries/cmake/source/libiptables/src"]
 	path = libraries/cmake/source/libiptables/src
-	url = https://git.netfilter.org/iptables
+	url = https://github.com/osquery/third-party-iptables
 [submodule "libraries/cmake/source/librdkafka/src"]
 	path = libraries/cmake/source/librdkafka/src
 	url = https://github.com/edenhill/librdkafka
@@ -121,3 +121,6 @@
 [submodule "libraries/cmake/source/icu/src"]
 	path = libraries/cmake/source/icu/src
 	url = https://github.com/unicode-org/icu
+[submodule "libraries/cmake/source/augeas/gnulib/src"]
+	path = libraries/cmake/source/augeas/gnulib/src
+	url = https://github.com/theopolis/gnulib
