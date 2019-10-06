@@ -17,6 +17,7 @@ function(opensslMain)
     --sysroot=${CMAKE_SYSROOT}
     -l:libunwind.a
     -lpthread
+    -llzma
   )
   list(APPEND openssl_c_flags ${C_FLAGS})
   string(REPLACE ";" " " openssl_c_flags "${openssl_c_flags}")

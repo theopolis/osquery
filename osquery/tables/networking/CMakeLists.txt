@@ -84,9 +84,7 @@ function(generateOsqueryTablesNetworking)
   )
 
   if(NOT DEFINED PLATFORM_WINDOWS)
-    target_link_libraries(osquery_tables_networking PUBLIC
-      thirdparty_glibc_resolv
-    )
+    target_link_libraries(osquery_tables_networking PUBLIC libresolv.so)
   endif()
 
   if(DEFINED PLATFORM_LINUX)

@@ -106,8 +106,9 @@ function(setupBuildFlags)
 
       set(linux_cxx_link_libraries
         libc++abi.a
-        rt
-        dl
+        librt.so
+        libdl.so
+        libpthread.so
       )
 
       list(APPEND osquery_defines ${osquery_linux_common_defines})

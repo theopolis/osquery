@@ -64,7 +64,7 @@ function(generateOsqueryCore)
   )
 
   if(DEFINED PLATFORM_POSIX)
-    list(APPEND dependencies thirdparty_glibc_pthread)
+    list(APPEND dependencies libpthread.so)
   endif()
 
   if(DEFINED PLATFORM_LINUX)

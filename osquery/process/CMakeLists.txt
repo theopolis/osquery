@@ -34,7 +34,7 @@ function(generateOsqueryProcess)
   )
 
   if(DEFINED PLATFORM_POSIX)
-    target_link_libraries(osquery_process PUBLIC thirdparty_glibc_dl)
+    target_link_libraries(osquery_process PUBLIC libdl.so)
   endif()
 
   set(public_header_files

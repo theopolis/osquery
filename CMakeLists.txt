@@ -77,7 +77,7 @@ function(importLibraries)
     "Linux,Darwin,Windows:boost"
     "Linux,Darwin,Windows:bzip2"
     "Linux,Darwin,Windows:gflags"
-    "Linux,Darwin:glibc"
+    "Darwin:glibc"
     "Linux,Darwin,Windows:glog"
     "Linux,Darwin,Windows:googletest"
     "Linux,Darwin,Windows:libarchive"
