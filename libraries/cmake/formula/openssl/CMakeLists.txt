@@ -15,6 +15,7 @@ function(opensslMain)
   set(openssl_c_flags
     -fPIC
     --sysroot=${CMAKE_SYSROOT}
+    -fuse-ld=lld
     -l:libunwind.a
     -lpthread
   )

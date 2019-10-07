@@ -2,8 +2,8 @@ include(CheckPIESupported)
 check_pie_supported()
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_LINK_SEARCH_START_STATIC ON)
-set(CMAKE_LINK_SEARCH_END_STATIC ON)
+set(CMAKE_LINK_SEARCH_START_STATIC OFF)
+set(CMAKE_LINK_SEARCH_END_STATIC OFF)
 
 function(setupBuildFlags)
   add_library(cxx_settings INTERFACE)
@@ -106,8 +106,8 @@ function(setupBuildFlags)
 
       set(linux_cxx_link_libraries
         libc++abi.a
-        rt
-        dl
+        librt.so
+        libdl.so
       )
 
       list(APPEND osquery_defines ${osquery_linux_common_defines})

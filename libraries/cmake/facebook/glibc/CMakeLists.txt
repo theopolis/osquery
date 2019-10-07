@@ -8,15 +8,15 @@ function(glibcMain)
   add_library(thirdparty_glibc INTERFACE)
 
   if(DEFINED PLATFORM_POSIX)
-    target_link_options(thirdparty_glibc INTERFACE -ldl)
+    target_link_libraries(thirdparty_glibc INTERFACE libdl.so)
   endif()
 
   if(DEFINED PLATFORM_LINUX OR DEFINED PLATFORM_MACOS)
-    target_link_options(thirdparty_glibc INTERFACE -lresolv)
+    target_link_libraries(thirdparty_glibc INTERFACE libresolv.so)
   endif()
 
   if(DEFINED PLATFORM_LINUX)
-    target_link_options(thirdparty_glibc INTERFACE -pthread)
+    target_link_libraries(thirdparty_glibc INTERFACE libpthread.so)
   endif()
 
   add_library(thirdparty_glibc_resolv ALIAS thirdparty_glibc)
