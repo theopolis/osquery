@@ -241,4 +241,10 @@ TEST_F(ConversionsTests, test_iterativeparsing) {
   EXPECT_FALSE(doc.fromString(json).ok());
 }
 
+TEST_F(ConversionsTests, test_json_largeexp) {
+  std::string json("0.0000074836628E-2147483636");
+  auto doc = JSON::newObject();
+
+  EXPECT_TRUE(doc.fromString(json).ok());
+}
 } // namespace osquery
