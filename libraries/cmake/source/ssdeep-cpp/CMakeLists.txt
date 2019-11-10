@@ -15,6 +15,9 @@ function(ssdeepCppMain)
     "${library_root}/cycles.cpp"
     "${library_root}/helpers.cpp"
     "${library_root}/ui.cpp"
+  )
+
+  add_library(thirdparty_ssdeep-c
     "${library_root}/fuzzy.c"
     "${library_root}/find-file-size.c"
   )
@@ -23,12 +26,45 @@ function(ssdeepCppMain)
     HAVE_CONFIG_H
   )
 
+  target_compile_definitions(thirdparty_ssdeep-c PRIVATE
+    HAVE_CONFIG_H
+  )
+
+  if(DEFINED PLATFORM_LINUX)
+    target_compile_definitions(thirdparty_ssdeep-cpp PRIVATE
+      __LINUX__
+    )
+
+    target_compile_definitions(thirdparty_ssdeep-c PRIVATE
+      __LINUX__
+    )
+
+  elseif(DEFINED PLATFORM_MACOS)
+    target_compile_definitions(thirdparty_ssdeep-cpp PRIVATE
+      HAVE_SYS_DISK_H
+    )
+
+    target_compile_definitions(thirdparty_ssdeep-c PRIVATE
+      HAVE_SYS_DISK_H
+    )
+
+  endif()
+
   target_link_libraries(thirdparty_ssdeep-cpp PRIVATE
     thirdparty_cxx_settings
+    thirdparty_ssdeep-c
+  )
+
+  target_link_libraries(thirdparty_ssdeep-c PRIVATE
     thirdparty_c_settings
   )
 
   target_include_directories(thirdparty_ssdeep-cpp PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/config"
+    "${library_root}"
+  )
+
+  target_include_directories(thirdparty_ssdeep-c PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/config"
     "${library_root}"
   )

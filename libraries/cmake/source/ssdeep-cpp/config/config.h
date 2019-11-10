@@ -121,4 +121,4 @@
 /* #undef _LARGE_FILES */
 
 /* Linux operating system functions */
-#define __LINUX__ 1
+/* #undef __LINUX__ 1 */
