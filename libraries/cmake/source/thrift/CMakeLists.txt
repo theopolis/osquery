@@ -100,15 +100,27 @@ function(thriftMain)
     thirdparty_cxx_settings
   )
 
-  target_include_directories(thirdparty_thrift PRIVATE
-    "${library_root}/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/config"
-  )
+  if(DEFINED PLATFORM_LINUX)
+    target_include_directories(thirdparty_thrift PRIVATE
+      "${library_root}/src"
+      "${CMAKE_CURRENT_SOURCE_DIR}/config/linux"
+    )
 
-  target_include_directories(thirdparty_thrift SYSTEM INTERFACE
-    "${library_root}/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/config"
-  )
+    target_include_directories(thirdparty_thrift SYSTEM INTERFACE
+      "${library_root}/src"
+      "${CMAKE_CURRENT_SOURCE_DIR}/config/linux"
+    )
+  elseif(DEFINED PLATFORM_MACOS)
+    target_include_directories(thirdparty_thrift PRIVATE
+      "${library_root}/src"
+      "${CMAKE_CURRENT_SOURCE_DIR}/config/macos"
+    )
+
+    target_include_directories(thirdparty_thrift SYSTEM INTERFACE
+      "${library_root}/src"
+      "${CMAKE_CURRENT_SOURCE_DIR}/config/macos"
+    )
+  endif()
 endfunction()
 
 thriftMain()
