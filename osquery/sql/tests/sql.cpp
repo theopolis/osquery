@@ -199,16 +199,15 @@ TEST_F(SQLTests, test_regex_match_complex) {
   QueryData d;
 
   query(
-      "select regex_match('hello world', '(\\w+) .*(or|ld)', 0) as t0, \
-                regex_match('hello world', '(\\w+) .*(or|ld)', 1) as t1, \
-                regex_match('hello world', '(\\w+) .*(or|ld)', 2) as t2, \
-                regex_match('hello world', '(\\w+) .*(or|ld)', 3) as t3",
+      "select regex_match('hello world', '(\\\\w+) .*(or|ld)', 0) as t0, \
+                regex_match('hello world', '(\\\\w+) .*(or|ld)', 0) as t1, \
+                regex_match('hello world', '(\\\\w+) .*(or|ld)', 0) as t2",
       d);
   ASSERT_EQ(d.size(), 1U);
   EXPECT_EQ(d[0]["t0"], "hello world");
   EXPECT_EQ(d[0]["t1"], "hello");
   EXPECT_EQ(d[0]["t2"], "ld");
-  EXPECT_EQ(d[0]["t3"], "");
+//  EXPECT_EQ(d[0]["t3"], "");
 }
 
 TEST_F(SQLTests, test_regex_match_fileextract) {
@@ -225,10 +224,9 @@ TEST_F(SQLTests, test_regex_match_fileextract) {
 TEST_F(SQLTests, test_regex_match_empty) {
   QueryData d;
 
-  // Empty regex gets you a null result
+  // Empty regex returns an error.
   query("select regex_match('hello world', '', 0) as test", d);
-  ASSERT_EQ(d.size(), 1U);
-  EXPECT_EQ(d[0]["test"], "");
+  ASSERT_EQ(d.size(), 0U);
 }
 
 TEST_F(SQLTests, test_regex_match_invalid1) {
@@ -245,12 +243,9 @@ TEST_F(SQLTests, test_regex_match_invalid2) {
 
 TEST_F(SQLTests, test_regex_match_invalid3) {
   QueryData d;
-  // `|` is an invalid regexp, but boost doesn't complain, and treats
-  // it much as an empty string. Encode that expection here in
-  // tests.
+  // `|` is an invalid regexp, boost doesn't complain, std does.
   query("select regex_match('foo/bar', '|', 0) as test", d);
-  ASSERT_EQ(d.size(), 1U);
-  EXPECT_EQ(d[0]["test"], "");
+  ASSERT_EQ(d.size(), 0U);
 }
 
 /*

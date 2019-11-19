@@ -17,9 +17,10 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <regex>
 
-#include <boost/algorithm/string/regex.hpp>
-#include <boost/regex.hpp>
+//#include <boost/algorithm/string/regex.hpp>
+//#include <boost/regex.hpp>
 
 #include <osquery/logger.h>
 #include <osquery/utils/conversions/split.h>
@@ -70,9 +71,11 @@ static SplitResult regexSplit(const std::string& input,
                               const std::string& token) {
   // Split using the token as a regex to support multi-character tokens.
   // Exceptions are caught by the caller, as that's where the sql context is
-  std::vector<std::string> result;
-  boost::algorithm::split_regex(result, input, boost::regex(token));
-  return result;
+  std::regex rgx{token};
+  std::sregex_token_iterator
+    first{begin(input), end(input), rgx, -1},
+    last;
+  return {first, last};
 }
 
 static void callStringSplitFunc(sqlite3_context* context,
@@ -124,7 +127,7 @@ static void regexStringSplitFunc(sqlite3_context* context,
                                  sqlite3_value** argv) {
   try {
     callStringSplitFunc(context, argc, argv, regexSplit);
-  } catch (const boost::regex_error& e) {
+  } catch (const std::regex_error& e) {
     LOG(INFO) << "Invalid regex: " << e.what();
     sqlite3_result_error(context, "Invalid regex", -1);
   }
@@ -147,17 +150,19 @@ static void regexStringMatchFunc(sqlite3_context* context,
 
   // parse and verify input parameters
   std::string input((char*)sqlite3_value_text(argv[0]));
-  boost::smatch results;
+  std::smatch results;
   auto index = static_cast<size_t>(sqlite3_value_int(argv[2]));
   bool isMatchFound = false;
 
   try {
+printf("poop '%s'\n", (char*)sqlite3_value_text(argv[1]));
+
+    std::regex rgx((char*)sqlite3_value_text(argv[1]), std::regex_constants::awk);
     isMatchFound =
-        boost::regex_search(input,
+        std::regex_search(input,
                             results,
-                            boost::regex((char*)sqlite3_value_text(argv[1]),
-                                         boost::regex::extended));
-  } catch (const boost::regex_error& e) {
+                            rgx);
+  } catch (const std::regex_error& e) {
     LOG(INFO) << "Invalid regex: " << e.what();
     sqlite3_result_error(context, "Invalid regex", -1);
     return;
