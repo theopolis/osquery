@@ -1,7 +1,7 @@
 table_name("package_bom")
 description("OS X package bill of materials (BOM) file list.")
 schema([
-    Column("filepath", TEXT, "Package file or directory"),
+    Column("filepath", TEXT, "Package file or directory", index=True),
     Column("uid", INTEGER, "Expected user of file or directory"),
     Column("gid", INTEGER, "Expected group of file or directory"),
     Column("mode", INTEGER, "Expected permissions"),

@@ -268,7 +268,8 @@ std::string columnDefinition(const TableColumns& columns, bool is_extension) {
     if (options & ColumnOptions::INDEX) {
       indexed = true;
     }
-    if (options & (ColumnOptions::INDEX | ColumnOptions::ADDITIONAL)) {
+    if (options & (ColumnOptions::INDEX | ColumnOptions::ADDITIONAL |
+                   ColumnOptions::REQUIRED)) {
       pkeys.push_back(std::get<0>(column));
       epilog[kDisableRowId] = true;
     }
