@@ -2,9 +2,6 @@ include(CheckPIESupported)
 check_pie_supported()
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_LINK_SEARCH_START_STATIC OFF)
-set(CMAKE_LINK_SEARCH_END_STATIC OFF)
-
 function(setupBuildFlags)
   add_library(cxx_settings INTERFACE)
   add_library(c_settings INTERFACE)
@@ -58,6 +55,7 @@ function(setupBuildFlags)
       -Woverloaded-virtual
       -Wnon-virtual-dtor
       -Weffc++
+      -stdlib=libc++
     )
 
     set(posix_cxx_link_options

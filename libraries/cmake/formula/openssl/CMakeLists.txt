@@ -44,7 +44,7 @@ function(opensslMain)
 
         -fPIC
         --sysroot=${CMAKE_SYSROOT}
-        -l:libunwind.a
+        -lunwind
         -lpthread
     )
 
@@ -132,7 +132,7 @@ endfunction()
 function(generateMetadataTargets)
   set(metadata_version "${OPENSSL_VERSION}")
   set(metadata_revision "1")
-  set(metadata_dependencies "thirdparty_zlib")
+  set(metadata_dependencies "thirdparty_zlib;thirdparty_lzma")
 
   if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
     set(metadata_libraries
