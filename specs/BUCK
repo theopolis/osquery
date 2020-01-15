@@ -289,10 +289,6 @@ osquery_gentable_cxx_library(
             "linux",
         ),
         (
-            "linux/socket_events.table",
-            "linux",
-        ),
-        (
             "linux/elf_symbols.table",
             "linux",
         ),
@@ -611,6 +607,10 @@ osquery_gentable_cxx_library(
         (
             "posix/smbios_tables.table",
             "linux,macos",
+        ),
+        (
+            "posix/socket_events.table",
+            "Linux,macos",
         ),
         (
             "posix/ssh_configs.table",
