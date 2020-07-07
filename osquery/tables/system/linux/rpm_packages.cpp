@@ -227,12 +227,14 @@ void genRpmPackageFiles(RowYield& yield, QueryContext& context) {
     if (file_count <= 0) {
       logger.vlog(1, "RPM package " + package_name + " contains 0 files");
       rpmfiFree(fi);
+      rpmtdFree(td);
       continue;
     } else if (file_count > MAX_RPM_FILES) {
       logger.vlog(1,
                   "RPM package " + package_name + " contains over " +
                       std::to_string(MAX_RPM_FILES) + " files");
       rpmfiFree(fi);
+      rpmtdFree(td);
       continue;
     }
 
