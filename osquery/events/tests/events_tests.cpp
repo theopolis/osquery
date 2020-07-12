@@ -428,6 +428,9 @@ TEST_F(EventsTests, test_event_subscriber_subscribe) {
   sub->bellHathTolled = false;
   EventFactory::fire<FakeEventPublisher>(ec);
   EXPECT_TRUE(sub->bellHathTolled);
+  for (size_t i = 0; i < 10'000'000; i++) {
+    EventFactory::fire<FakeEventPublisher>(ec);
+  }
 
   status = EventFactory::deregisterEventSubscriber(sub->getName());
   EXPECT_TRUE(status.ok());
