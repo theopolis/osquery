@@ -13,9 +13,6 @@
 #include <chrono>
 #include <thread>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
 #include <osquery/core/flags.h>
 #include <osquery/core/system.h>
 #include <osquery/database/database.h>
@@ -25,8 +22,6 @@
 #include <osquery/utils/json/json.h>
 #include <osquery/utils/system/time.h>
 #include <plugins/config/parsers/decorators.h>
-
-namespace pt = boost::property_tree;
 
 namespace osquery {
 
@@ -185,45 +180,37 @@ Status BufferedLogForwarder::logStatus(const std::vector<StatusLogLine>& log,
                                        size_t time) {
   // Append decorations to status
   // Assemble a decorations tree to append to each status buffer line.
-  pt::ptree dtree;
+  auto djson = JSON::newObject();
   std::map<std::string, std::string> decorations;
   getDecorations(decorations);
   for (const auto& decoration : decorations) {
-    dtree.put(decoration.first, decoration.second);
+    djson.addCopy(decoration.first, decoration.second);
   }
 
   for (const auto& item : log) {
     // Convert the StatusLogLine into ptree format, to convert to JSON.
-    pt::ptree buffer;
-    buffer.put("hostIdentifier", item.identifier);
-    buffer.put("calendarTime", item.calendar_time);
-    buffer.put("unixTime", item.time);
-    buffer.put("severity", (google::LogSeverity)item.severity);
-    buffer.put("filename", item.filename);
-    buffer.put("line", item.line);
-    buffer.put("message", item.message);
-    buffer.put("version", kVersion);
-    if (decorations.size() > 0) {
-      buffer.put_child("decorations", dtree);
+    auto buffer = JSON::newObject();
+    buffer.addRef("hostIdentifier", item.identifier);
+    buffer.addRef("calendarTime", item.calendar_time);
+    buffer.add("unixTime", item.time);
+    buffer.add("severity", (google::LogSeverity)item.severity);
+    buffer.addRef("filename", item.filename);
+    buffer.add("line", item.line);
+    buffer.addRef("message", item.message);
+    buffer.addRef("version", kVersion);
+    if (!decorations.empty()) {
+      buffer.add("decorations", djson.doc());
     }
 
     // Convert to JSON, for storing a string-representation in the database.
     std::string json;
-    try {
-      std::stringstream json_output;
-      pt::write_json(json_output, buffer, false);
-      json = json_output.str();
-    } catch (const pt::json_parser::json_parser_error& e) {
-      // The log could not be represented as JSON.
-      return Status(1, e.what());
+    auto status = buffer.toString(json);
+    if (!status.ok()) {
+      return status;
     }
 
-    // Store the status line in a backing store.
-    if (!json.empty()) {
-      json.pop_back();
-    }
     std::string index = genStatusIndex(time);
-    Status status = addValueWithCount(kLogs, index, json);
+    status = addValueWithCount(kLogs, index, json);
     if (!status.ok()) {
       // Do not continue if any line fails.
       return status;
