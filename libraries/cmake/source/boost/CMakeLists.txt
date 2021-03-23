@@ -28,6 +28,9 @@ function(boostMain)
   generateBoostIostreams()
   generateBoostWinapi()
   generateBoostEndian()
+  generateBoostInterprocess()
+  generateBoostLockfree()
+  generateBoostParameter()
 
   if(OSQUERY_ENABLE_VALGRIND_SUPPORT)
     set(valgrind_header_possible_paths
@@ -118,6 +121,9 @@ function(boostMain)
     thirdparty_boost_winapi
     thirdparty_boost_circularbuffer
     thirdparty_boost_endian
+    thirdparty_boost_interprocess
+    thirdparty_boost_lockfree
+    thirdparty_boost_parameter
   )
 endfunction()
 
@@ -226,6 +232,48 @@ function(generateBoostEndian)
   target_link_libraries(thirdparty_boost_endian INTERFACE
     thirdparty_boost_config
     )
+endfunction()
+
+function(generateBoostInterprocess)
+  set(library_root "${BOOST_ROOT}/libs/interprocess")
+
+  add_library(thirdparty_boost_interprocess INTERFACE)
+
+  target_include_directories(thirdparty_boost_interprocess SYSTEM INTERFACE
+    "${library_root}/include"
+    )
+
+  target_link_libraries(thirdparty_boost_interprocess INTERFACE
+    thirdparty_boost_config
+    )
+endfunction()
+
+function(generateBoostLockfree)
+  set(library_root "${BOOST_ROOT}/libs/lockfree")
+
+  add_library(thirdparty_boost_lockfree INTERFACE)
+
+  target_include_directories(thirdparty_boost_lockfree SYSTEM INTERFACE
+    "${library_root}/include"
+  )
+
+  target_link_libraries(thirdparty_boost_lockfree INTERFACE
+    thirdparty_boost_config
+  )
+endfunction()
+
+function(generateBoostParameter)
+  set(library_root "${BOOST_ROOT}/libs/parameter")
+
+  add_library(thirdparty_boost_parameter INTERFACE)
+
+  target_include_directories(thirdparty_boost_parameter SYSTEM INTERFACE
+    "${library_root}/include"
+  )
+
+  target_link_libraries(thirdparty_boost_parameter INTERFACE
+    thirdparty_boost_config
+  )
 endfunction()
 
 function(generateBoostRandom)

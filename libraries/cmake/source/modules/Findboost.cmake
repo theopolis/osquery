@@ -90,6 +90,9 @@ importSourceSubmodule(
     "src/libs/scope_exit"
     "src/libs/typeof"
     "src/libs/endian"
+    "src/libs/interprocess"
+    "src/libs/lockfree"
+    "src/libs/parameter"
 
   PATCH
     "src/libs/process"

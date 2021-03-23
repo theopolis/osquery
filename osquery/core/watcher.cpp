@@ -18,6 +18,10 @@
 #endif
 
 #include <boost/filesystem.hpp>
+#include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/containers/string.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/lockfree/spsc_queue.hpp>
 #include <boost/thread.hpp>
 
 #include <osquery/config/config.h>
@@ -37,6 +41,13 @@
 #include <osquery/utils/system/time.h>
 
 namespace fs = boost::filesystem;
+
+typedef boost::interprocess::
+    allocator<char, boost::interprocess::managed_shared_memory::segment_manager>
+        IpcCharAllocator;
+typedef boost::interprocess::
+    basic_string<char, std::char_traits<char>, IpcCharAllocator>
+        IpcString;
 
 namespace osquery {
 
@@ -226,6 +237,35 @@ bool WatcherRunner::ok() const {
           Watcher::get().hasManagedExtensions());
 }
 
+namespace bip = boost::interprocess;
+
+// using WatcherIpcMessage = BasicWatcherIpcMessage<>;
+
+namespace shared {
+template <typename T>
+using alloc = bip::allocator<T, bip::managed_shared_memory::segment_manager>;
+using char_alloc = alloc<char>;
+
+struct watcher_message {
+  using string = bip::basic_string<char, std::char_traits<char>, char_alloc>;
+
+  watcher_message(char_alloc alloc) : message(alloc) {}
+
+  template <typename T>
+  watcher_message(size_t _code, T&& _message, char_alloc alloc)
+      : code(_code), message(std::forward<T>(_message), alloc) {}
+
+  size_t code{0};
+  string message;
+};
+
+using watcher_message_alloc = alloc<watcher_message>;
+
+using ring_buffer =
+    boost::lockfree::spsc_queue<watcher_message, boost::lockfree::capacity<10>>;
+// boost::lockfree::allocator<watcher_message_alloc>>;
+} // namespace shared
+
 void WatcherRunner::start() {
   // Hold the current process (watcher) for inspection too.
   auto& watcher = Watcher::get();
@@ -235,29 +275,68 @@ void WatcherRunner::start() {
   watcher.resetWorkerCounters(0);
   PerformanceState watcher_state;
 
+  // Remove shared memory on construction and destruction
+  struct shm_remove {
+    shm_remove() {
+      bip::shared_memory_object::remove("MySharedMemory");
+    }
+    ~shm_remove() {
+      bip::shared_memory_object::remove("MySharedMemory");
+      printf("removed shm\n");
+    }
+  } remover;
+
+  /// Will cause an exception if this does not exist.
+  printf("making shared memory\n");
+  bip::managed_shared_memory segment(
+      bip::create_only, "MySharedMemory", 4 * 1024);
+  shared::watcher_message_alloc allocator(segment.get_segment_manager());
+
+  shared::ring_buffer* squeue =
+      segment.find_or_construct<shared::ring_buffer>("watcher_to_worker")();
+  shared::ring_buffer* rqueue =
+      segment.find_or_construct<shared::ring_buffer>("worker_to_watcher")();
+
   // Enter the watch loop.
+  int i = 0;
   do {
-    if (use_worker_ && !watch(watcher.getWorker())) {
-      if (watcher.fatesBound()) {
-        // A signal has interrupted the watcher.
-        break;
-      }
+    printf("watcher pushing into queue\n");
+    squeue->push(shared::watcher_message(i++, "this is a message", allocator));
+    // queue->push(shared::watcher_message(1, "watcher 1",
+    // watcher_message_alloc));
 
-      auto status = watcher.getWorkerStatus();
-      if (status == EXIT_CATASTROPHIC) {
-        requestShutdown(EXIT_CATASTROPHIC, "Worker returned exit status");
-        break;
-      }
+    shared::watcher_message message(allocator);
+    printf("watcher will try to pop\n");
+    if (rqueue->pop(message)) {
+      printf("watcher message: %d %s\n", message.code, message.message.c_str());
+    }
+    printf("watcher finished\n");
 
-      if (watcher.workerRestartCount() ==
-          getWorkerLimit(WatchdogLimitType::RESPAWN_LIMIT)) {
-        // Too many worker restarts.
-        requestShutdown(EXIT_FAILURE, "Too many worker restarts");
-        break;
-      }
+    if (use_worker_) {
+      // TODO get messages from worker.
 
-      // The watcher failed, create a worker.
-      createWorker();
+      if (!watch(watcher.getWorker())) {
+        if (watcher.fatesBound()) {
+          // A signal has interrupted the watcher.
+          break;
+        }
+
+        auto status = watcher.getWorkerStatus();
+        if (status == EXIT_CATASTROPHIC) {
+          requestShutdown(EXIT_CATASTROPHIC, "Worker returned exit status");
+          break;
+        }
+
+        if (watcher.workerRestartCount() ==
+            getWorkerLimit(WatchdogLimitType::RESPAWN_LIMIT)) {
+          // Too many worker restarts.
+          requestShutdown(EXIT_FAILURE, "Too many worker restarts");
+          break;
+        }
+
+        // The watcher failed, create a worker.
+        createWorker();
+      }
     }
 
     // After inspecting the worker, check the extensions.
@@ -661,7 +740,37 @@ void WatcherRunner::createExtension(const std::string& extension) {
 }
 
 void WatcherWatcherRunner::start() {
+  bip::managed_shared_memory segment(bip::open_only, "MySharedMemory");
+  shared::watcher_message_alloc allocator(segment.get_segment_manager());
+
+  shared::ring_buffer* rqueue =
+      segment.find_or_construct<shared::ring_buffer>("watcher_to_worker")();
+  shared::ring_buffer* squeue =
+      segment.find_or_construct<shared::ring_buffer>("worker_to_watcher")();
+
   while (!interrupted()) {
+    // TODO Look for messages from watcher.
+
+    try {
+      /// Will cause an exception if this does not exist.
+      // bip::managed_shared_memory segment(bip::open_only, "MySharedMemory");
+
+      shared::watcher_message message(allocator);
+      printf("worker will try to pop\n");
+      if (rqueue->pop(message)) {
+        printf(
+            "worker message: %d %s\n", message.code, message.message.c_str());
+        squeue->push(message);
+      }
+      printf("worker finished\n");
+
+      // std::pair<IpcString*, std::size_t> ret =
+      // segment.find<IpcString>("String"); printf("string: %s\n",
+      // (*ret.first).c_str());
+    } catch (std::exception& e) {
+      printf("exception\n");
+    }
+
     if (isLauncherProcessDead(*watcher_)) {
       // Watcher died, the worker must follow.
       VLOG(1) << "osqueryd worker (" << PlatformProcess::getCurrentPid()
