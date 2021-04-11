@@ -249,8 +249,6 @@ void EventSubscriberPlugin::generateRows(IDatabaseInterface& db_interface,
   if (shouldOptimize()) {
     setOptimizeData(db_interface, optimize_time_, optimize_eid_);
   }
-
-  last_query_time_ = getUnixTime();
 }
 
 void EventSubscriberPlugin::genTable(RowYield& yield, QueryContext& context) {

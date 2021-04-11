@@ -264,9 +264,6 @@ class EventSubscriberPlugin : public Plugin, public Eventer {
   /// Do not respond to periodic/scheduled/triggered event expiration requests.
   bool expire_events_{true};
 
-  /// When the last query hit this subscriber
-  std::size_t last_query_time_{};
-
   /**
    * @brief Optimize subscriber selects by tracking the last select time.
    *
